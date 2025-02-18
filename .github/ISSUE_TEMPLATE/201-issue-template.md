@@ -3,7 +3,7 @@ name: 201 issue template
 about: 201팀의 이슈 템플릿입니다.
 title: "[tag] issue"
 labels: ''
-assignees: '3405000'
+assignees: ''
 
 ---
 
