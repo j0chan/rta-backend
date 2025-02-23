@@ -9,14 +9,18 @@ import { typeOrmConfig } from './config/typeorm.config'
 import { StoresController } from './stores/stores.controller';
 import { StoresService } from './stores/stores.service';
 import { StoresModule } from './stores/stores.module';
+import { EventsController } from './events/events.controller';
+import { EventsService } from './events/events.service';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     UsersModule,
-    StoresModule
+    StoresModule,
+    EventsModule
   ],
-  controllers: [AppController, UsersController, StoresController],
-  providers: [AppService, UsersService, StoresService],
+  controllers: [AppController, UsersController, StoresController, EventsController],
+  providers: [AppService, UsersService, StoresService, EventsService],
 })
 export class AppModule {}
