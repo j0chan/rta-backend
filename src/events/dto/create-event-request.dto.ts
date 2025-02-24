@@ -7,7 +7,7 @@ export class CreateEventRequestDto {
 
     @IsNotEmpty()
     @IsString()
-    descripition: string
+    description: string
 
     @IsNotEmpty()
     @IsDate()
