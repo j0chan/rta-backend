@@ -1,6 +1,6 @@
 import { EventStatus } from "./event-status.enum";
 
-export class StoreEvent {
+export class Event {
     event_id: number;
     store_id: number;
     title: string;
