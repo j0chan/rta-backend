@@ -5,7 +5,6 @@ import { UsersController } from './users/users.controller'
 import { UsersService } from './users/users.service'
 import { UsersModule } from './users/users.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { typeOrmConfig } from './config/typeorm.config'
 import { StoresController } from './stores/stores.controller'
 import { StoresService } from './stores/stores.service'
 import { StoresModule } from './stores/stores.module'
@@ -24,7 +23,19 @@ import { ReviewsModule } from './reviews/reviews.module'
     EventsModule,
     ReviewsModule
   ],
-  controllers: [AppController, UsersController, StoresController, EventsController, ReviewsController],
-  providers: [AppService, UsersService, StoresService, EventsService, ReviewsService],
+  controllers: [
+    AppController,
+    UsersController,
+    StoresController,
+    EventsController,
+    ReviewsController
+  ],
+  providers: [
+    AppService,
+    UsersService,
+    StoresService,
+    EventsService,
+    ReviewsService
+  ],
 })
 export class AppModule {}
