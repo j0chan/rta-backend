@@ -6,15 +6,15 @@ import { UsersService } from './users/users.service'
 import { UsersModule } from './users/users.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { typeOrmConfig } from './config/typeorm.config'
-import { StoresController } from './stores/stores.controller';
-import { StoresService } from './stores/stores.service';
-import { StoresModule } from './stores/stores.module';
-import { EventsController } from './events/events.controller';
-import { EventsService } from './events/events.service';
-import { EventsModule } from './events/events.module';
-import { ReviewsController } from './reviews/reviews.controller';
-import { ReviewsService } from './reviews/reviews.service';
-import { ReviewsModule } from './reviews/reviews.module';
+import { StoresController } from './stores/stores.controller'
+import { StoresService } from './stores/stores.service'
+import { StoresModule } from './stores/stores.module'
+import { EventsController } from './events/events.controller'
+import { EventsService } from './events/events.service'
+import { EventsModule } from './events/events.module'
+import { ReviewsController } from './reviews/reviews.controller'
+import { ReviewsService } from './reviews/reviews.service'
+import { ReviewsModule } from './reviews/reviews.module'
 
 @Module({
   imports: [
