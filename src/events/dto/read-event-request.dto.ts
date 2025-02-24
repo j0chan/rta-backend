@@ -9,7 +9,7 @@ export class ReadEventRequestDto {
     end_date: Date
     event_status: EventStatus
 
-    constructor (event: Event) {
+    constructor(event: Event) {
         this.title = event.title
         this.description = event.description
         this.start_date = event.start_date

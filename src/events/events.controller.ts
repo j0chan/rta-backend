@@ -1,11 +1,11 @@
-import { EventsService } from './events.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
-import { CreateEventRequestDto } from './dto/create-event-request.dto';
-import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto';
-import { ReadAllEventsRequestDto } from './dto/read-all-events-request.dto';
-import { ReadEventRequestDto } from './dto/read-event-request.dto';
-import { Event } from './entities/event.entity';
-import { UpdateEventRequestDto } from './dto/update-event-request.dto';
+import { EventsService } from './events.service'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { CreateEventRequestDto } from './dto/create-event-request.dto'
+import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
+import { ReadAllEventsRequestDto } from './dto/read-all-events-request.dto'
+import { ReadEventRequestDto } from './dto/read-event-request.dto'
+import { Event } from './entities/event.entity'
+import { UpdateEventRequestDto } from './dto/update-event-request.dto'
 
 @Controller('api/events')
 export class EventsController {
@@ -38,7 +38,7 @@ export class EventsController {
     @Get('/:event_id')
     async readEventByEventId(@Param('event_id') event_id: number): Promise<ApiResponseDto<ReadEventRequestDto>> {
         const foundEvent: Event = await this.eventsService.readEventByEventId(event_id)
-        
+
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Event!', new ReadEventRequestDto(foundEvent))
     }
 

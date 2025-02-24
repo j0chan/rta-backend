@@ -1,9 +1,9 @@
-import { UpdateEventRequestDto } from './dto/update-event-request.dto';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Event } from './entities/event.entity';
-import { Repository } from 'typeorm';
-import { CreateEventRequestDto } from './dto/create-event-request.dto';
+import { UpdateEventRequestDto } from './dto/update-event-request.dto'
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Event } from './entities/event.entity'
+import { Repository } from 'typeorm'
+import { CreateEventRequestDto } from './dto/create-event-request.dto'
 
 @Injectable()
 export class EventsService {
@@ -44,7 +44,7 @@ export class EventsService {
 
     // READ[1] - 모든 이벤트 조회
     // 미구현: logger, 에러 처리
-    async readAllEvents(): Promise <Event[]> {
+    async readAllEvents(): Promise<Event[]> {
 
         const foundEvents = await this.eventRepository.find()
 
