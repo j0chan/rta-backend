@@ -14,7 +14,6 @@ export class EventsService {
     ) { }
 
     // CREATE
-    // 구현: requestDto, responseDto, promise/async
     // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
     async createEvent(createEventRequestDto: CreateEventRequestDto): Promise<Event> {
@@ -40,5 +39,13 @@ export class EventsService {
         const createdEvent = await this.eventRepository.save(newEvent)
 
         return createdEvent;
+    }
+
+    // READ[1] - 모든 이벤트 조회
+    async readAllEvents(): Promise <Event[]> {
+
+        const foundEvents = await this.eventRepository.find()
+
+        return foundEvents
     }
 }

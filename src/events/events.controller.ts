@@ -1,7 +1,10 @@
 import { EventsService } from './events.service';
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
 import { CreateEventRequestDto } from './dto/create-event-request.dto';
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto';
+import { ReadAllEventsRequestDto } from './dto/read-all-events-request.dto';
+import { ReadEventRequestDto } from './dto/read-event-request.dto';
+import { Event } from './entities/event.entity';
 
 @Controller('api/events')
 export class EventsController {
@@ -10,7 +13,6 @@ export class EventsController {
     constructor(private eventsService: EventsService) { }
 
     // CREATE
-    // 구현: requestDto, responseDto, promise/async
     // 미구현: logger
     @Post('/')
     async createEvent(@Body() createEventRequestDto: CreateEventRequestDto): Promise<ApiResponseDto<Event>> {
@@ -18,8 +20,18 @@ export class EventsController {
         return new ApiResponseDto(true, HttpStatus.CREATED, 'Event Created Successfully!')
     }
 
+    // READ[1] - 모든 이벤트 조회
+    // 미구현: logger
+    @Get('/')
+    async readAllEvents(): Promise<ApiResponseDto<ReadAllEventsRequestDto[]>> {
 
-    // READ
+        const events: Event[] = await this.eventsService.readAllEvents()
+        const readAllEventsRequestDto = events.map(event => new ReadAllEventsRequestDto(event))
+
+        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Event List!', readAllEventsRequestDto)
+    }
+
+    // READ[2] - 특정 이벤트 상세 조회
 
 
     // UPDATE
