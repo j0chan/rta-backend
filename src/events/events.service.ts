@@ -1,3 +1,4 @@
+import { UpdateEventRequestDto } from './dto/update-event-request.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
@@ -52,11 +53,36 @@ export class EventsService {
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
-    async readEventById(event_id: number): Promise<Event> {
+    async readEventByEventId(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.createQueryBuilder('Event')
             .where('Event.event_id = :id', { id: event_id })
             .getOne() as Event
 
         return foundEvent
+    }
+
+    // UPDATE - by event_id
+    // 미구현: logger, 에러 처리
+    async updateEventByEventId(event_id: number, updateEventRequestDto: UpdateEventRequestDto) {
+
+        const foundEvent = await this.readEventByEventId(event_id)
+
+        const { title, description, start_date, end_date, event_status } = updateEventRequestDto
+        foundEvent.title = title
+        foundEvent.description = description
+        foundEvent.start_date = start_date
+        foundEvent.end_date = end_date
+        foundEvent.event_status = event_status
+
+        await this.eventRepository.save(foundEvent)
+    }
+
+    // DELETE
+    // 미구현: logger, 에러 처리
+    async deleteEventByEventId(event_id: number) {
+        const foundEvent = await this.readEventByEventId(event_id);
+        if (foundEvent) {
+            await this.eventRepository.remove(foundEvent);
+        }
     }
 }
