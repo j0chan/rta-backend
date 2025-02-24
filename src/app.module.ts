@@ -14,6 +14,7 @@ import { EventsModule } from './events/events.module'
 import { ReviewsController } from './reviews/reviews.controller'
 import { ReviewsService } from './reviews/reviews.service'
 import { ReviewsModule } from './reviews/reviews.module'
+import { typeOrmConfig } from './config/typeorm.config'
 
 @Module({
   imports: [
@@ -27,14 +28,12 @@ import { ReviewsModule } from './reviews/reviews.module'
     AppController,
     UsersController,
     StoresController,
-    EventsController,
     ReviewsController
   ],
   providers: [
     AppService,
     UsersService,
     StoresService,
-    EventsService,
     ReviewsService
   ],
 })
