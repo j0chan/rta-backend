@@ -23,19 +23,7 @@ import { typeOrmConfig } from './config/typeorm.config'
     StoresModule,
     EventsModule,
     ReviewsModule
-  ],
-  controllers: [
-    AppController,
-    UsersController,
-    StoresController,
-    ReviewsController
-  ],
-  providers: [
-    AppService,
-    UsersService,
-    StoresService,
-    ReviewsService
-  ],
+  ]
   // controllers: [AppController, UsersController, StoresController, EventsController],
   // providers: [AppService, UsersService, StoresService, EventsService],
 })
