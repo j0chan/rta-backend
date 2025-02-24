@@ -12,7 +12,7 @@ export class StoresController {
 
     // CREATE
     // 새로운 가게 생성하기
-    @Post('/register')
+    @Post('/')
     async createStore(@Body() createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
         await this.storesService.createStore(createStoreRequestDTO)
     }
@@ -40,7 +40,7 @@ export class StoresController {
     }
 
     // 특정 가게 주소 조회
-    @Get('/:store_id/location')
+    @Get('/:store_id')
     async getStoreAddressById(@Param('store_id') id: number): Promise<StoreAddressResponseDTO> {
         const store = await this.storesService.getStoreById(id)
         if (!store) {
@@ -51,7 +51,7 @@ export class StoresController {
     }
     
     // 가게 업종으로 검색(필터링) 조회 -- 안됨
-    @Get('/search')
+    @Get('/')
     async getStoresByCategory(@Query('category') category: StoreCategory): Promise<StoreResponseDTO[]> {
         const stores = await this.storesService.getStoresByCategory(category)
         const storeResponseDTO = stores.map(store => new StoreResponseDTO(store))
@@ -61,13 +61,13 @@ export class StoresController {
 
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
-    @Patch('/:store_id/approve')
+    @Patch('/:store_id')
     async updateStoreManager(@Param('store_id') store_id: number, @Body('user_id') user_id: number): Promise<void> {
         await this.storesService.updateStoreManager(store_id, user_id)
     }
 
     // 가게 정보 수정 (매니저 전용)
-    @Put('/:store_id/edit')
+    @Put('/:store_id')
     async updateStoreDetail(@Param('store_id') store_id: number, @Body() updateStoreDetailRequestDTO: UpdateStoreDetailRequestDTO): Promise<void> {
         
         await this.storesService.updateStoreDetail(store_id, updateStoreDetailRequestDTO)

@@ -8,6 +8,7 @@ export class Store {
     store_id: number
 
     // @ManyToOne(() => User, (user) => user.user_id)
+    @Column()
     user_id: number
 
     @Column({ nullable: false })

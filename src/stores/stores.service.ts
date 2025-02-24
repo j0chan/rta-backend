@@ -60,24 +60,26 @@ export class StoresService {
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> { 
-        const store = await this.getStoreById(store_id)
-        if (!store) { return }
+        const foundStore = await this.getStoreById(store_id)
+        if (!foundStore) { return }
 
-        store.user_id = user_id
+        await this.storesRepository.update(store_id, {user_id})
     }
 
     // 가게 정보 수정 (매니저 전용)
     async updateStoreDetail(store_id: number, updateStoreDetailRequestDTO: UpdateStoreDetailRequestDTO): Promise<void> {
-        const store = await this.getStoreById(store_id)
-        if (!store) { return }
+        const foundStore = await this.getStoreById(store_id)
+        if (!foundStore) { return }
 
         const { store_name, owner_name, category, contact_number, description } = updateStoreDetailRequestDTO
         
-        store.store_name = store_name
-        store.owner_name = owner_name
-        store.category = category
-        store.contact_number = contact_number
-        store.description = description
+        foundStore.store_name = store_name
+        foundStore.owner_name = owner_name
+        foundStore.category = category
+        foundStore.contact_number = contact_number
+        foundStore.description = description
+
+        await this.storesRepository.save(foundStore)
     }
 
     // DELETE
