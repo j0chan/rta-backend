@@ -10,7 +10,6 @@ import { StoresController } from './stores/stores.controller';
 import { StoresService } from './stores/stores.service';
 import { StoresModule } from './stores/stores.module';
 import { EventsController } from './events/events.controller';
-import { EventsService } from './events/events.service';
 import { EventsModule } from './events/events.module';
 
 @Module({
@@ -20,7 +19,16 @@ import { EventsModule } from './events/events.module';
     StoresModule,
     EventsModule
   ],
-  controllers: [AppController, UsersController, StoresController, EventsController],
-  providers: [AppService, UsersService, StoresService, EventsService],
+  controllers: [
+    AppController, 
+    UsersController,
+    StoresController,
+    EventsController
+  ],
+  providers: [
+    AppService,
+    UsersService,
+    StoresService,
+  ],
 })
 export class AppModule {}
