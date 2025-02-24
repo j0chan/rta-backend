@@ -14,7 +14,7 @@ export class StoreResponseDTO {
         this.owner_name = store.owner_name
         this.category = store.category
         this.address = store.address
-        this.contact_number = this.contact_number
-        this.description = this.description
+        this.contact_number = store.contact_number 
+        this.description = store.description    
     }
 }
