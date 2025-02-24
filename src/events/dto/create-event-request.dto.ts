@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsString } from "class-validator"
 
-export class CreateArticleRequestDto {
+export class CreateEventRequestDto {
     @IsNotEmpty()
     @IsString()
     title: string
