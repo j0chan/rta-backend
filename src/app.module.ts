@@ -20,7 +20,7 @@ import { EventsModule } from './events/events.module';
     StoresModule,
     EventsModule
   ],
-  controllers: [AppController, UsersController, StoresController, EventsController],
-  providers: [AppService, UsersService, StoresService, EventsService],
+  // controllers: [AppController, UsersController, StoresController, EventsController],
+  // providers: [AppService, UsersService, StoresService, EventsService],
 })
 export class AppModule {}
