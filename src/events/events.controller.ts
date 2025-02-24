@@ -1,5 +1,5 @@
 import { EventsService } from './events.service';
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
 import { CreateEventRequestDto } from './dto/create-event-request.dto';
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto';
 import { ReadAllEventsRequestDto } from './dto/read-all-events-request.dto';
@@ -32,7 +32,14 @@ export class EventsController {
     }
 
     // READ[2] - 특정 이벤트 상세 조회
-
+    // 미구현: logger
+    // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
+    @Get('/:id')
+    async readEventById(@Param('id') event_id: number): Promise<ApiResponseDto<ReadEventRequestDto>> {
+        const foundEvent: Event = await this.eventsService.readEventById(event_id)
+        
+        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Event List!', new ReadEventRequestDto(foundEvent))
+    }
 
     // UPDATE
 

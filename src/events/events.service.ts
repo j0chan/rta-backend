@@ -42,10 +42,21 @@ export class EventsService {
     }
 
     // READ[1] - 모든 이벤트 조회
+    // 미구현: logger, 에러 처리
     async readAllEvents(): Promise <Event[]> {
 
         const foundEvents = await this.eventRepository.find()
 
         return foundEvents
+    }
+
+    // READ[2] - 특정 이벤트 상세 조회
+    // 미구현: logger, 에러 처리
+    async readEventById(event_id: number): Promise<Event> {
+        const foundEvent = await this.eventRepository.createQueryBuilder('Event')
+            .where('Event.event_id = :id', { id: event_id })
+            .getOne() as Event
+
+        return foundEvent
     }
 }
