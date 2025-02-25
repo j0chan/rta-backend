@@ -2,6 +2,7 @@ import { StoreCategory } from "../entities/store-category.enum"
 import { Store } from "../entities/store.entity"
 
 export class StoreResponseDTO {
+    store_id: number
     store_name: string
     owner_name: string
     category: StoreCategory
@@ -10,6 +11,7 @@ export class StoreResponseDTO {
     description: string
 
     constructor(store: Store) {
+        this.store_id = store.store_id
         this.store_name = store.store_name
         this.owner_name = store.owner_name
         this.category = store.category
