@@ -15,6 +15,9 @@ import { ReviewsController } from './reviews/reviews.controller'
 import { ReviewsService } from './reviews/reviews.service'
 import { ReviewsModule } from './reviews/reviews.module'
 import { typeOrmConfig } from './config/typeorm.config'
+import { MapsController } from './maps/maps.controller'
+import { MapsService } from './maps/maps.service'
+import { MapsModule } from './maps/maps.module'
 
 @Module({
   imports: [
@@ -22,9 +25,11 @@ import { typeOrmConfig } from './config/typeorm.config'
     UsersModule,
     StoresModule,
     EventsModule,
+    MapsModule,
     ReviewsModule
-  ]
-  // controllers: [AppController, UsersController, StoresController, EventsController],
-  // providers: [AppService, UsersService, StoresService, EventsService],
+  ],
+  // controllers: [AppController, UsersController, StoresController, EventsController, MapsController],
+  // providers: [AppService, UsersService, StoresService, EventsService, MapsService],
+    
 })
 export class AppModule {}

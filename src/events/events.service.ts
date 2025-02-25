@@ -21,10 +21,10 @@ export class EventsService {
         const { store_id, title, description, start_date, end_date } = createEventRequestDto
 
         // DTO에서 받은 값을 `Date` 객체로 변환, end_date가 명시되지 않았다면 7일 뒤로 설정
-        const startDate = start_date ? new Date(start_date) : new Date();
-        const endDate = end_date ? new Date(end_date) : new Date(startDate);
+        const startDate = start_date ? new Date(start_date) : new Date()
+        const endDate = end_date ? new Date(end_date) : new Date(startDate)
         if (!end_date) {
-            endDate.setDate(endDate.getDate() + 7);
+            endDate.setDate(endDate.getDate() + 7)
         }
 
         // 임시 스토어 id
@@ -39,7 +39,7 @@ export class EventsService {
         })
         const createdEvent = await this.eventRepository.save(newEvent)
 
-        return createdEvent;
+        return createdEvent
     }
 
     // READ[1] - 모든 이벤트 조회
@@ -80,9 +80,9 @@ export class EventsService {
     // DELETE
     // 미구현: logger, 에러 처리
     async deleteEventByEventId(event_id: number) {
-        const foundEvent = await this.readEventByEventId(event_id);
+        const foundEvent = await this.readEventByEventId(event_id)
         if (foundEvent) {
-            await this.eventRepository.remove(foundEvent);
+            await this.eventRepository.remove(foundEvent)
         }
     }
 }

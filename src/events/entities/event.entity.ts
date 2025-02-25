@@ -4,26 +4,26 @@ import { EventStatus } from "./event-status.enum"
 @Entity()
 export class Event {
     @PrimaryGeneratedColumn()
-    event_id: number;
+    event_id: number
 
     @Column()
-    store_id: number;
+    store_id: number
 
     @Column()
-    title: string;
+    title: string
 
     @Column()
-    description: string;
+    description: string
 
     @Column()
-    start_date: Date;
+    start_date: Date
 
     @Column()
-    end_date: Date;
+    end_date: Date
 
     @Column()
-    event_status: EventStatus = EventStatus.ONGOING;
+    event_status: EventStatus = EventStatus.ONGOING
 
     @CreateDateColumn({ type: "timestamp" })
-    created_at: Date;
+    created_at: Date
 }

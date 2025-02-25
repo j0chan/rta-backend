@@ -49,7 +49,7 @@ export class EventsController {
         @Param('event_id') event_id: number,
         @Body() updateEventRequestDto: UpdateEventRequestDto): Promise<ApiResponseDto<void>> {
         await this.eventsService.updateEventByEventId(event_id, updateEventRequestDto)
-        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully!');
+        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully!')
     }
 
     // DELETE - by event_id
@@ -57,7 +57,7 @@ export class EventsController {
     @Delete('/:event_id')
     async deleteEventById(@Param('event_id') event_id: number): Promise<ApiResponseDto<void>> {
         await this.eventsService.deleteEventByEventId(event_id)
-        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully!');
+        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully!')
     }
 
 }
