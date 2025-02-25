@@ -1,9 +1,10 @@
 import { UpdateEventRequestDTO } from './dto/update-event-request.dto'
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
 import { Repository } from 'typeorm'
 import { CreateEventRequestDTO } from './dto/create-event-request.dto'
+import { StoresService } from 'src/stores/stores.service'
 
 @Injectable()
 export class EventsService {
@@ -11,7 +12,8 @@ export class EventsService {
     // Event 엔터티 주입
     constructor(
         @InjectRepository(Event)
-        private eventRepository: Repository<Event>
+        private eventRepository: Repository<Event>,
+        private storesService: StoresService
     ) { }
 
     // CREATE
@@ -20,6 +22,12 @@ export class EventsService {
     async createEvent(createEventRequestDto: CreateEventRequestDTO): Promise<Event> {
         const { store_id, title, description, start_date, end_date } = createEventRequestDto
 
+        // 가게 객체 가져오기
+        const store = await this.storesService.getStoreById(store_id)
+        if (!store) { 
+            throw new NotFoundException(`Store with ID ${store_id} not found`)
+        }
+
         // DTO에서 받은 값을 `Date` 객체로 변환, end_date가 명시되지 않았다면 7일 뒤로 설정
         const startDate = start_date ? new Date(start_date) : new Date()
         const endDate = end_date ? new Date(end_date) : new Date(startDate)
@@ -27,11 +35,8 @@ export class EventsService {
             endDate.setDate(endDate.getDate() + 7)
         }
 
-        // 임시 스토어 id
-        const tempStoreId: number = 1
-
         const newEvent: Event = this.eventRepository.create({
-            store_id: tempStoreId,
+            store,
             title,
             description,
             start_date: startDate,

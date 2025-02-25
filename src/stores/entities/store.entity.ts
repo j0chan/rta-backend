@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { User } from "src/users/entities/user.entity"
+import { Event } from "src/events/entities/event.entity"
 
 @Entity()
 export class Store {
@@ -37,4 +38,7 @@ export class Store {
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
+
+    @OneToMany(() => Event, (event) => event.store)
+    events: Event[]
 }
