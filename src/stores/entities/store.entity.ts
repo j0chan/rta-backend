@@ -28,7 +28,7 @@ export class Store {
     latitude: number
 
     @Column()
-    longtitude: number
+    longitude: number
 
     @Column()
     contact_number: string

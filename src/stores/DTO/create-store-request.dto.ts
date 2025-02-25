@@ -20,7 +20,7 @@ export class CreateStoreRequestDTO {
 
     @IsNotEmpty()
     @IsNumber()
-    longtitude: number
+    longitude: number
 
     @IsNotEmpty()
     @IsString()

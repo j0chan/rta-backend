@@ -18,7 +18,7 @@ export class StoresService {
     // CREATE
     // 새로운 가게 생성하기
     async createStore(createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
-        const { store_name, category, address, latitude, longtitude, contact_number, description } = createStoreRequestDTO
+        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreRequestDTO
         const temp_user_id = 1
 
         const newStore: Store = this.storesRepository.create({
@@ -27,7 +27,7 @@ export class StoresService {
             category,
             address,
             latitude,
-            longtitude,
+            longitude,
             contact_number,
             description
         })
