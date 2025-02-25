@@ -1,7 +1,7 @@
 import { StoreCategory } from "../entities/store-category.enum"
 import { Store } from "../entities/store.entity"
 
-export class StoreResponseDTO {
+export class ReadStoreResponseDTO {
     store_id: number
     store_name: string
     owner_name: string
