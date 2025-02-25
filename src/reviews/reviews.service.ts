@@ -42,4 +42,13 @@ export class ReviewsService {
 
         return createdEvent
     }
+
+    // READ - 모든 리뷰 조회
+    // 미구현: logger, 에러 처리
+    async readAllReviews(): Promise<Review[]> {
+
+        const foundReviews = await this.reviewRepository.find()
+
+        return foundReviews
+    }
 }
