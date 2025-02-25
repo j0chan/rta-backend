@@ -1,13 +1,13 @@
 import { Store } from "../entities/store.entity"
 
-export class StoreAddressResponseDTO {
+export class ReadStoreAddressResponseDTO {
     address: string
     latitude: number
-    longtitude: number
+    longitude: number
 
     constructor(store: Store) {
         this.address = store.address
         this.latitude = store.latitude
-        this.longtitude = store.longtitude
+        this.longitude = store.longitude
     }
 }
