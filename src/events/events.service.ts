@@ -1,9 +1,9 @@
-import { UpdateEventRequestDto } from './dto/update-event-request.dto'
+import { UpdateEventRequestDTO } from './dto/update-event-request.dto'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
 import { Repository } from 'typeorm'
-import { CreateEventRequestDto } from './dto/create-event-request.dto'
+import { CreateEventRequestDTO } from './dto/create-event-request.dto'
 
 @Injectable()
 export class EventsService {
@@ -17,7 +17,7 @@ export class EventsService {
     // CREATE
     // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
-    async createEvent(createEventRequestDto: CreateEventRequestDto): Promise<Event> {
+    async createEvent(createEventRequestDto: CreateEventRequestDTO): Promise<Event> {
         const { store_id, title, description, start_date, end_date } = createEventRequestDto
 
         // DTO에서 받은 값을 `Date` 객체로 변환, end_date가 명시되지 않았다면 7일 뒤로 설정
@@ -63,7 +63,7 @@ export class EventsService {
 
     // UPDATE - by event_id
     // 미구현: logger, 에러 처리
-    async updateEventByEventId(event_id: number, updateEventRequestDto: UpdateEventRequestDto) {
+    async updateEventByEventId(event_id: number, updateEventRequestDto: UpdateEventRequestDTO) {
 
         const foundEvent = await this.readEventByEventId(event_id)
 

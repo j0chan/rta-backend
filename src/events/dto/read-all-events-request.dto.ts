@@ -3,7 +3,7 @@ import { Event } from "../entities/event.entity"
 
 // 이벤트 목록을 조회할 때 사용하는 Dto
 // description 필드 존재하지 않음.
-export class ReadAllEventsRequestDto {
+export class ReadAllEventsRequestDTO {
     title: string
     start_date: Date
     end_date: Date
