@@ -12,15 +12,19 @@ import { StoresModule } from './stores/stores.module';
 import { EventsController } from './events/events.controller';
 import { EventsService } from './events/events.service';
 import { EventsModule } from './events/events.module';
+import { MapsController } from './maps/maps.controller';
+import { MapsService } from './maps/maps.service';
+import { MapsModule } from './maps/maps.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     UsersModule,
     StoresModule,
-    EventsModule
+    EventsModule,
+    MapsModule
   ],
-  controllers: [AppController, UsersController, StoresController, EventsController],
-  providers: [AppService, UsersService, StoresService, EventsService],
+  controllers: [AppController, UsersController, StoresController, EventsController, MapsController],
+  providers: [AppService, UsersService, StoresService, EventsService, MapsService],
 })
 export class AppModule {}
