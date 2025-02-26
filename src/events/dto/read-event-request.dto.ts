@@ -2,7 +2,7 @@ import { EventStatus } from "../entities/event-status.enum"
 import { Event } from "../entities/event.entity"
 
 // 특정 이벤트를 조회할 때 사용하는 Dto
-export class ReadEventRequestDto {
+export class ReadEventRequestDTO {
     title: string
     description: string
     start_date: Date

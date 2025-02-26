@@ -1,6 +1,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
+import { User } from "src/users/entities/user.entity"
+import { Event } from "src/events/entities/event.entity"
 
 @Entity()
 export class Store {
@@ -30,7 +32,7 @@ export class Store {
     latitude: number
 
     @Column()
-    longtitude: number
+    longitude: number
 
     @Column()
     contact_number: string
@@ -40,4 +42,7 @@ export class Store {
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
+
+    @OneToMany(() => Event, (event) => event.store)
+    events: Event[]
 }
