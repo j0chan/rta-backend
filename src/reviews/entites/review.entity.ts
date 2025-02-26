@@ -20,7 +20,7 @@ export class Review {
 
     // 기본적으로 null값, 수정될 때 Date 기입
     @UpdateDateColumn({ type: "timestamp", nullable: true })
-    updated_at: Date | null;
+    updated_at: Date | null
 
     @Column()
     isModified: boolean = false

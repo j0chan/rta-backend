@@ -1,4 +1,4 @@
-import { UpdateReviewRequestDTO } from './DTO/update-review-request.dto';
+import { UpdateReviewRequestDTO } from './DTO/update-review-request.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Review } from './entites/review.entity'

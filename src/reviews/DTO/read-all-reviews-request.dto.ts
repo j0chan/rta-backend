@@ -1,5 +1,5 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { Review } from "../entites/review.entity";
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { Review } from "../entites/review.entity"
 
 export class ReadAllReviewsRequestDTO {
     @IsNotEmpty()
