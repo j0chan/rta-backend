@@ -25,7 +25,6 @@ export class ReadAllReviewsRequestDTO {
     constructor(review: Review) {
         this.user_id = review.user_id
         this.content = review.content
-        this.keywords = review.keywords
         this.created_at = review.created_at
         this.isModified = review.isModified
     }

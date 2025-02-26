@@ -12,8 +12,4 @@ export class CreateReviewRequestDTO {
     @IsNotEmpty()
     @IsString()
     content: string
-
-    @IsNotEmpty()
-    @IsString()
-    keywords: string
 }
