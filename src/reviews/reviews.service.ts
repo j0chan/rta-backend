@@ -1,3 +1,4 @@
+import { UpdateReviewRequestDTO } from './DTO/update-review-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Review } from './entites/review.entity'
@@ -26,7 +27,7 @@ export class ReviewsService {
 
         // Store 객체에서 store_id가져오기
         const store = await this.storesService.getStoreById(store_id)
-        if (!store) { 
+        if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
 
@@ -50,5 +51,31 @@ export class ReviewsService {
         const foundReviews = await this.reviewRepository.find()
 
         return foundReviews
+    }
+
+    // UPDATE - 리뷰 수정
+    async updateReviewByReviewId(review_id: number, updateReviewRequestDTO: UpdateReviewRequestDTO) {
+        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+
+        if (!foundReview) {
+            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
+        }
+
+        foundReview.content = updateReviewRequestDTO.content
+        foundReview.updated_at = new Date()
+        foundReview.isModified = true
+
+        await this.reviewRepository.save(foundReview)
+    }
+
+    // DELETE - 리뷰 삭제
+    async deleteReveiwById(review_id: number) {
+        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+
+        if (!foundReview) {
+            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
+        }
+
+        await this.reviewRepository.remove(foundReview)
     }
 }
