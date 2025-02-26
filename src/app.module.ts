@@ -21,6 +21,8 @@ import { MapsModule } from './maps/maps.module'
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
+import { GlobalModule } from './global.module'
+
 
 @Module({
   imports: [
@@ -30,7 +32,8 @@ import { AuthModule } from './auth/auth.module';
     EventsModule,
     MapsModule,
     ReviewsModule,
-    AuthModule
+    AuthModule,
+    GlobalModule
   ],
   controllers: [AuthController],
   providers: [AuthService],
