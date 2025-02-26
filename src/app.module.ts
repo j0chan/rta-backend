@@ -18,6 +18,9 @@ import { typeOrmConfig } from './config/typeorm.config'
 import { MapsController } from './maps/maps.controller'
 import { MapsService } from './maps/maps.service'
 import { MapsModule } from './maps/maps.module'
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -26,8 +29,11 @@ import { MapsModule } from './maps/maps.module'
     StoresModule,
     EventsModule,
     MapsModule,
-    ReviewsModule
+    ReviewsModule,
+    AuthModule
   ],
+  controllers: [AuthController],
+  providers: [AuthService],
   // controllers: [AppController, UsersController, StoresController, EventsController, MapsController],
   // providers: [AppService, UsersService, StoresService, EventsService, MapsService],
     
