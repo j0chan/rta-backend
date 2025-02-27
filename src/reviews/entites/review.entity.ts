@@ -18,10 +18,14 @@ export class Review {
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date
 
-    // 기본적으로 null값, 수정될 때 Date 기입
-    @UpdateDateColumn({ type: "timestamp", nullable: true })
-    updated_at: Date | null
+    @CreateDateColumn({ type: "timestamp" })
+    updated_at: Date
 
+    /**
+     * if(isModified) {
+     *  "수정됨(n일 전)" 출력
+     * }
+     */
     @Column()
     isModified: boolean = false
 }

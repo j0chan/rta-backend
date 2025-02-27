@@ -23,7 +23,7 @@ export class ReviewsService {
         const { store_id, user_id, content } = createReviewRequestDTO
 
         // 임시 user_id
-        const tempUserId: number = 2
+        const tempUserId: number = 1
 
         // Store 객체에서 store_id가져오기
         const store = await this.storesService.getStoreById(store_id)
@@ -31,12 +31,14 @@ export class ReviewsService {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
 
+        const currentDate: Date = await new Date()
+
         const newReview: Review = this.reviewRepository.create({
             store,
             user_id: tempUserId,
             content,
-            created_at: new Date(),
-            updated_at: null
+            created_at: currentDate,
+            updated_at: currentDate,
         })
 
         const createdEvent: Review = await this.reviewRepository.save(newReview)
@@ -61,8 +63,10 @@ export class ReviewsService {
             throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
         }
 
+        const currentDate: Date = await new Date()
+
         foundReview.content = updateReviewRequestDTO.content
-        foundReview.updated_at = new Date()
+        foundReview.updated_at = currentDate
         foundReview.isModified = true
 
         await this.reviewRepository.save(foundReview)
