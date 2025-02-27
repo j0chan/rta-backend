@@ -16,23 +16,36 @@
                 // 네이버 지도 API 동적 로드
                 const script = document.createElement('script')
                 script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`
-                script.onload = initMap; // 스크립트가 로드된 후 실행
+                script.onload = initMap // 스크립트가 로드된 후 실행
                 document.body.appendChild(script)
             })
             .catch(error => console.error('Error fetching client ID:', error))
 
         var map
+        var marker
+
         function initMap() {
             map = new naver.maps.Map('map', {
                 center: new naver.maps.LatLng(37.5665, 126.9780), // 초기 지도 위치 (서울)
                 zoom: 15
             })
+
+            // 찍히는지 확인용
+            // marker = new naver.maps.Marker({
+            //     position: new naver.maps.LatLng(37.5665, 126.9780),
+            //     map: map
+            // })
         }
 
         function searchPlaces() {
             const query = document.getElementById('search-input').value
             if (!query) {
                 alert('검색어를 입력하세요.')
+                return
+            }
+
+            if (!map) {
+                alert("지도가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.")
                 return
             }
 
@@ -43,9 +56,54 @@
                         alert(data.error)
                         return
                     }
+
+                    // 기존 마커 삭제
+                    markers.forEach(marker => marker.setMap(null))
+                    markers = []
+
+                    // 검색 결과 마커 추가
+                    if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
+                        data.forEach(place => {
+                            // 위치 정보가 없는 경우 건너뛰기
+                            if (!place.mapx || !place.mapy) {
+                                console.warn("위치 정보가 없는 장소:", place)
+                                return
+                            }
+
+                            // 값을 string으로 나눠주기 때문에 숫자로 변환 후 계산 진행
+                            let lat = parseFloat(place.mapy)
+                            let lng = parseFloat(place.mapx)
+
+                            // 좌표 계산 테스트용 (나중에 수정 필요)
+                            if (lat > 90 || lng > 180) {
+                                lat = lat / 1e7
+                                lng = lng / 1e7
+                            } else {
+                                lat = lat / 1e6
+                                lng = lng / 1e6
+                            }
+
+                            const marker = new naver.maps.Marker({ // 마커 객체
+                                position: new naver.maps.LatLng(lat, lng), // position으로 마커 위치 지정
+                                map: map // 마커를 어디에 표시할지
+                            })
+
+                            markers.push(marker)
+                        })
+
+                        // 첫 번째 결과로 지도 이동
+                        if (data.length > 0) {
+                            map.setCenter(new naver.maps.LatLng(data[0].mapy / 1e6, data[0].mapx / 1e6))
+                            map.setZoom(16)
+                        }
+                    } else {
+                        alert('검색 결과가 없습니다.')
+                    }
                 })
                 .catch(error => console.error('Error searching places:', error))
         }
+
+        let markers = []
     </script>
 </head>
 <body>
