@@ -8,6 +8,52 @@
     <!-- favicon 에러 방지 -->
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAAQAAAC4DgAAEAAQAAEAAAAA=" type="image/x-icon">
 
+    <style>
+        /* 네이버 지도 InfoWindow의 기본 테두리와 그림자 제거 */
+        .gm-style .gm-style-iw {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    
+        /* 네이버 지도 기본 스타일 오버라이드 */
+        .gm-style div {
+            border: none !important;
+        }
+    
+        /* InfoWindow 안의 컨텐츠 스타일 */
+        .custom-infowindow {
+            position: relative;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 300px;
+            background: #fff;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 기존보다 부드러운 그림자 */
+            font-family: 'Arial', sans-serif;
+        }
+    
+        /* 닫기 버튼 스타일 */
+        .custom-infowindow button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #888;
+            padding: 3px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+    
+        .custom-infowindow button:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
     <script>
         // API로 clientId 가져오기
         fetch('/api/client-id')
@@ -102,46 +148,47 @@
 
                             const infoWindow = new naver.maps.InfoWindow({
                                 content: `
-                                    <div style="
-                                        padding: 12px; 
-                                        font-size: 14px; 
-                                        line-height: 1.6; 
-                                        max-width: 280px;
-                                        background: #fff;
-                                        border-radius: 8px;
-                                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-                                        ">
-                                        <button onclick="closeInfoWindow()" style="
-                                            position: absolute;
-                                            top: 8px;
-                                            right: 8px;
-                                            background: none;
-                                            border: none;
-                                            font-size: 16px;
-                                            cursor: pointer;
-                                            color: #666;
-                                        ">❌</button>
-                                        <strong style="font-size: 16px; color: #333;">${place.title}</strong><br>
-                                        <a href="${place.link}" target="_blank" style="font-size: 12px; color: blue; text-decoration: none;">🔗 홈페이지 방문</a>
-                                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+                                    <div class="custom-infowindow">
+                                        <!-- 닫기 버튼 -->
+                                        <button onclick="closeInfoWindow()">❌</button>
+
+                                        <!-- 제목 -->
+                                        <strong style="font-size: 18px; color: #333; display: block; margin-bottom: 8px;">
+                                            ${place.title}
+                                        </strong>
+
+                                        <!-- 홈페이지 링크 -->
+                                        <a href="${place.link}" target="_blank" style="
+                                            font-size: 13px; 
+                                            color: #007aff; 
+                                            text-decoration: none;
+                                            display: inline-block;
+                                            margin-bottom: 8px;
+                                        ">🔗 홈페이지 방문</a>
+
+                                        <!-- 정보 리스트 -->
+                                        <hr style="border: none; border-top: 1px solid #ddd; margin: 10px 0;">
                                         <dl style="margin: 0; padding: 0;">
-                                            <dt style="font-weight: bold; color: #666;">📌 카테고리:</dt>
-                                            <dd style="margin: 0 0 6px; padding: 0;">${place.category || '정보 없음'}</dd>
+                                            <dt style="font-weight: bold; color: #666; margin-bottom: 4px;">📌 카테고리:</dt>
+                                            <dd style="margin: 0 0 10px; padding: 0;">${place.category || '정보 없음'}</dd>
 
-                                            <dt style="font-weight: bold; color: #666;">📍 주소:</dt>
-                                            <dd style="margin: 0 0 6px; padding: 0;">${place.address}</dd>
+                                            <dt style="font-weight: bold; color: #666; margin-bottom: 4px;">🏢 주소:</dt>
+                                            <dd style="margin: 0 0 10px; padding: 0;">${place.address}</dd>
 
-                                            <dt style="font-weight: bold; color: #666;">🛣️ 도로명 주소:</dt>
-                                            <dd style="margin: 0 0 6px; padding: 0;">${place.roadAddress || '정보 없음'}</dd>
+                                            <dt style="font-weight: bold; color: #666; margin-bottom: 4px;">🛣️ 도로명 주소:</dt>
+                                            <dd style="margin: 0 0 10px; padding: 0;">${place.roadAddress || '정보 없음'}</dd>
 
-                                            <dt style="font-weight: bold; color: #666;">📞 전화번호:</dt>
-                                            <dd style="margin: 0 0 6px; padding: 0;">${place.telephone || '전화번호 없음'}</dd>
+                                            <dt style="font-weight: bold; color: #666; margin-bottom: 4px;">📞 전화번호:</dt>
+                                            <dd style="margin: 0 0 10px; padding: 0;">${place.telephone || '전화번호 없음'}</dd>
 
-                                            <dt style="font-weight: bold; color: #666;">ℹ️ 설명:</dt>
-                                            <dd style="margin: 0 0 6px; padding: 0;">${place.description || '설명 없음'}</dd>
+                                            <dt style="font-weight: bold; color: #666; margin-bottom: 4px;">ℹ️ 설명:</dt>
+                                            <dd style="margin: 0; padding: 0;">${place.description || '설명 없음'}</dd>
                                         </dl>
-                                    </div>`
-                            });
+                                    </div>`,
+                                disableAutoPan: false, // 자동 이동 방지
+                                borderWidth: 0, // 기본 테두리 제거
+                                backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
+                            })
 
                             // 마커 클릭 시
                             naver.maps.Event.addListener(marker, "click", function() {
