@@ -1,5 +1,5 @@
 import { Store } from "src/stores/entities/store.entity"
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class Review {
@@ -28,4 +28,7 @@ export class Review {
      */
     @Column()
     isModified: boolean = false
+
+    @Column({ default: 0 })
+    helpful_count: number
 }

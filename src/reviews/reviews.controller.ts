@@ -1,6 +1,6 @@
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewsService } from './reviews.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put } from '@nestjs/common'
 import { CreateReviewRequestDTO } from './DTO/create-review-request.dto'
 import { ReadAllReviewsRequestDTO } from './DTO/read-all-reviews-request.dto'
 import { Event } from 'src/events/entities/event.entity'
@@ -31,7 +31,7 @@ export class ReviewsController {
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsRequestDTO)
     }
 
-    // UPDATE - 리뷰 수정
+    // UPDATE[1] - 리뷰 수정
     // 미구현: logger
     @Put('/:review_id')
     async updateReviewByReviewId(
@@ -39,6 +39,20 @@ export class ReviewsController {
         @Body() updateReviewRequestDTO: UpdateReviewRequestDTO): Promise<ApiResponseDto<void>> {
         await this.reviewsService.updateReviewByReviewId(review_id, updateReviewRequestDTO)
         return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
+    }
+
+    // UPDATE[2] - 리뷰 도움됐어요 반응
+    // 미구현: logger
+    /**
+     * 비고
+     * 한번만 누를 수 있게, 취소는 불가능
+     * 취소 되게하려면 복잡해지기 때문에 일단 이렇게
+     */
+    @Patch('/:review_id/helpful')
+    async markHelpful(
+        @Param("review_id") review_id: number): Promise<ApiResponseDto<void>> {
+        await this.reviewsService.markHelpful(review_id)
+        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
     }
 
     // DELETE - 리뷰 삭제
