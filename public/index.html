@@ -70,7 +70,7 @@
         var map
         var markers = []
         var infoWindows = []
-        var activeInfoWindow = null; // 현재 열린 정보창 저장
+        var activeInfoWindow = null // 현재 열린 정보창 저장
 
         function initMap() {
             map = new naver.maps.Map('map', {
@@ -87,8 +87,8 @@
             // 지도 클릭 시 모든 InfoWindow 닫기
             naver.maps.Event.addListener(map, "click", function() {
                 if (activeInfoWindow) {
-                    activeInfoWindow.close();
-                    activeInfoWindow = null; // 열린 창이 없음을 표시
+                    activeInfoWindow.close()
+                    activeInfoWindow = null // 열린 창이 없음을 표시
                 }
             })
         }
@@ -193,11 +193,11 @@
                             // 마커 클릭 시
                             naver.maps.Event.addListener(marker, "click", function() {
                                 if (activeInfoWindow) {
-                                    activeInfoWindow.close(); // 기존 열린 창 닫기
+                                    activeInfoWindow.close() // 기존 열린 창 닫기
                                 }
-                                infoWindow.open(map, marker); // 새 창 열기
-                                activeInfoWindow = infoWindow; // 현재 창 저장
-                            });
+                                infoWindow.open(map, marker) // 새 창 열기
+                                activeInfoWindow = infoWindow // 현재 창 저장
+                            })
 
                             markers.push(marker)
                             infoWindows.push(infoWindow)
@@ -218,8 +218,8 @@
         // 닫기 버튼 클릭 시 InfoWindow 닫기
         function closeInfoWindow() {
             if (activeInfoWindow) {
-                activeInfoWindow.close();
-                activeInfoWindow = null;
+                activeInfoWindow.close()
+                activeInfoWindow = null
             }
         }
     </script>
