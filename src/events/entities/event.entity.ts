@@ -1,13 +1,14 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { EventStatus } from "./event-status.enum"
+import { Store } from "src/stores/entities/store.entity"
 
 @Entity()
 export class Event {
     @PrimaryGeneratedColumn()
     event_id: number
 
-    @Column()
-    store_id: number
+    @ManyToOne(() => Store, (store) => store.events)
+    store: Store
 
     @Column()
     title: string
