@@ -22,7 +22,8 @@
             .catch(error => console.error('Error fetching client ID:', error))
 
         var map
-        var marker
+        var markers = []
+        var infoWindows = []
 
         function initMap() {
             map = new naver.maps.Map('map', {
@@ -59,7 +60,9 @@
 
                     // 기존 마커 삭제
                     markers.forEach(marker => marker.setMap(null))
+                    infoWindows.forEach(infoWindow => infoWindow.setMap(null))
                     markers = []
+                    infoWindows = []
 
                     // 검색 결과 마커 추가
                     if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
@@ -88,7 +91,47 @@
                                 map: map // 마커를 어디에 표시할지
                             })
 
+                            const infoWindow = new naver.maps.InfoWindow({
+                                content: `
+                                    <div style="
+                                        padding: 12px; 
+                                        font-size: 14px; 
+                                        line-height: 1.6; 
+                                        max-width: 280px;
+                                        background: #fff;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                                        ">
+                                        <strong style="font-size: 16px; color: #333;">${place.title}</strong><br>
+                                        <a href="${place.link}" target="_blank" style="font-size: 12px; color: blue; text-decoration: none;">🔗 홈페이지 방문</a>
+                                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+                                        <dl style="margin: 0; padding: 0;">
+                                            <dt style="font-weight: bold; color: #666;">📌 카테고리:</dt>
+                                            <dd style="margin: 0 0 6px; padding: 0;">${place.category || '정보 없음'}</dd>
+
+                                            <dt style="font-weight: bold; color: #666;">📍 주소:</dt>
+                                            <dd style="margin: 0 0 6px; padding: 0;">${place.address}</dd>
+
+                                            <dt style="font-weight: bold; color: #666;">🛣️ 도로명 주소:</dt>
+                                            <dd style="margin: 0 0 6px; padding: 0;">${place.roadAddress || '정보 없음'}</dd>
+
+                                            <dt style="font-weight: bold; color: #666;">📞 전화번호:</dt>
+                                            <dd style="margin: 0 0 6px; padding: 0;">${place.telephone || '전화번호 없음'}</dd>
+
+                                            <dt style="font-weight: bold; color: #666;">ℹ️ 설명:</dt>
+                                            <dd style="margin: 0 0 6px; padding: 0;">${place.description || '설명 없음'}</dd>
+                                        </dl>
+                                    </div>`
+                            });
+
+                            // 마커 클릭 시
+                            naver.maps.Event.addListener(marker, "click", function() {
+                                infoWindows.forEach(win => win.close()) // 모든 정보창 닫기
+                                infoWindow.open(map, marker) // 클릭한 마커에 정보창 열기
+                            })
+
                             markers.push(marker)
+                            infoWindows.push(infoWindow)
                         })
 
                         // 첫 번째 결과로 지도 이동
@@ -102,8 +145,6 @@
                 })
                 .catch(error => console.error('Error searching places:', error))
         }
-
-        let markers = []
     </script>
 </head>
 <body>
