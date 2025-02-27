@@ -24,6 +24,7 @@
         var map
         var markers = []
         var infoWindows = []
+        var activeInfoWindow = null; // 현재 열린 정보창 저장
 
         function initMap() {
             map = new naver.maps.Map('map', {
@@ -36,6 +37,14 @@
             //     position: new naver.maps.LatLng(37.5665, 126.9780),
             //     map: map
             // })
+
+            // 지도 클릭 시 모든 InfoWindow 닫기
+            naver.maps.Event.addListener(map, "click", function() {
+                if (activeInfoWindow) {
+                    activeInfoWindow.close();
+                    activeInfoWindow = null; // 열린 창이 없음을 표시
+                }
+            })
         }
 
         function searchPlaces() {
@@ -102,6 +111,16 @@
                                         border-radius: 8px;
                                         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
                                         ">
+                                        <button onclick="closeInfoWindow()" style="
+                                            position: absolute;
+                                            top: 8px;
+                                            right: 8px;
+                                            background: none;
+                                            border: none;
+                                            font-size: 16px;
+                                            cursor: pointer;
+                                            color: #666;
+                                        ">❌</button>
                                         <strong style="font-size: 16px; color: #333;">${place.title}</strong><br>
                                         <a href="${place.link}" target="_blank" style="font-size: 12px; color: blue; text-decoration: none;">🔗 홈페이지 방문</a>
                                         <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
@@ -126,9 +145,12 @@
 
                             // 마커 클릭 시
                             naver.maps.Event.addListener(marker, "click", function() {
-                                infoWindows.forEach(win => win.close()) // 모든 정보창 닫기
-                                infoWindow.open(map, marker) // 클릭한 마커에 정보창 열기
-                            })
+                                if (activeInfoWindow) {
+                                    activeInfoWindow.close(); // 기존 열린 창 닫기
+                                }
+                                infoWindow.open(map, marker); // 새 창 열기
+                                activeInfoWindow = infoWindow; // 현재 창 저장
+                            });
 
                             markers.push(marker)
                             infoWindows.push(infoWindow)
@@ -144,6 +166,14 @@
                     }
                 })
                 .catch(error => console.error('Error searching places:', error))
+        }
+
+        // 닫기 버튼 클릭 시 InfoWindow 닫기
+        function closeInfoWindow() {
+            if (activeInfoWindow) {
+                activeInfoWindow.close();
+                activeInfoWindow = null;
+            }
         }
     </script>
 </head>
