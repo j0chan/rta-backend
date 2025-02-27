@@ -55,7 +55,8 @@ export class ReviewsService {
         return foundReviews
     }
 
-    // UPDATE - 리뷰 수정
+    // UPDATE[1] - 리뷰 수정
+    // 미구현: logger, 에러 처리
     async updateReviewByReviewId(review_id: number, updateReviewRequestDTO: UpdateReviewRequestDTO) {
         const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
 
@@ -72,7 +73,29 @@ export class ReviewsService {
         await this.reviewRepository.save(foundReview)
     }
 
+    // UPDATE[2] - 리뷰 도움됐어요 반응
+    // 미구현: logger, 에러 처리
+    /**
+     * 비고
+     * 1. 한번만 누를 수 있게, 취소는 불가능
+     *    취소 되게하려면 복잡해지기 때문에 일단 이렇게
+     * 
+     * 2. 버튼을 이미 눌렀는지 확인하는 로직은 프론트에서 구현하기
+     *    백엔드에서도 2차적으로 필터링하면 좋겠지만
+     *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
+     */
+    async markHelpful(review_id: number) {
+        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+
+        if (!foundReview) {
+            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
+        }
+        foundReview.helpful_count += 1
+        await this.reviewRepository.save(foundReview)
+    }
+
     // DELETE - 리뷰 삭제
+    // 미구현: logger, 에러 처리
     async deleteReveiwById(review_id: number) {
         const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
 
