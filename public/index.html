@@ -4,34 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>용기종기Map</title>
+
+    <!-- favicon 에러 방지 -->
+    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAAQAAAC4DgAAEAAQAAEAAAAA=" type="image/x-icon">
+
     <script>
         // API로 clientId 가져오기
         fetch('/api/client-id')
             .then(response => response.json())
             .then(data => {
                 // 네이버 지도 API 동적 로드
-                const script = document.createElement('script');
-                script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`;
-                script.onload = initMap; // 스크립트가 로드된 후 호출해야됨에 주의
-                document.body.appendChild(script);
+                const script = document.createElement('script')
+                script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`
+                script.onload = initMap; // 스크립트가 로드된 후 실행
+                document.body.appendChild(script)
             })
-            .catch(error => console.error('Error fetching client ID:', error));
-    </script>
-</head>
-<body>
-    <div id="map" style="width: 600px; height: 400px; margin: auto;">
+            .catch(error => console.error('Error fetching client ID:', error))
 
-    </div>
-
-    <script>
-        // 네이버 지도 생성 (API 스크립트 로드 후 실행 필요)
-        var map;
+        var map
         function initMap() {
             map = new naver.maps.Map('map', {
                 center: new naver.maps.LatLng(37.5665, 126.9780), // 초기 지도 위치 (서울)
-                zoom: 15 // 확대 수준 (15)
-            });
+                zoom: 15
+            })
+        }
+
+        function searchPlaces() {
+            const query = document.getElementById('search-input').value
+            if (!query) {
+                alert('검색어를 입력하세요.')
+                return
+            }
+
+            fetch(`/api/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error)
+                        return
+                    }
+                })
+                .catch(error => console.error('Error searching places:', error))
         }
     </script>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 10px;">
+        <input type="text" id="search-input" placeholder="장소 검색">
+        <button onclick="searchPlaces()">검색</button>
+    </div>
+    <div id="map" style="width: 600px; height: 400px; margin: auto;"></div>
 </body>
 </html>
