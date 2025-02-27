@@ -34,6 +34,13 @@ function initMap() {
             activeInfoWindow = null // 열린 창이 없음을 표시
         }
     })
+
+    // 엔터 키 입력 시 검색 실행
+    document.getElementById('search-input').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            searchPlaces()
+        }
+    })
 }
 
 function searchPlaces() {
