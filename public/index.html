@@ -224,11 +224,45 @@
         }
     </script>
 </head>
-<body>
-    <div style="text-align: center; margin-bottom: 10px;">
-        <input type="text" id="search-input" placeholder="장소 검색">
-        <button onclick="searchPlaces()">검색</button>
+<body style="margin: 0; padding: 0; overflow: hidden;">
+    <!-- 검색창 지도 위에 띄우기 -->
+    <div style="
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    ">
+        <input type="text" id="search-input" placeholder="장소 검색" style="
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        ">
+        <button onclick="searchPlaces()" style="
+            padding: 8px 12px;
+            font-size: 14px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        ">검색</button>
     </div>
-    <div id="map" style="width: 600px; height: 400px; margin: auto;"></div>
+
+    <!-- 지도 전체 화면 적용 -->
+    <div id="map" style="
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+    "></div>
 </body>
+
 </html>
