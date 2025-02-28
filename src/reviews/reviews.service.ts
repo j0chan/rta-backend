@@ -58,9 +58,9 @@ export class ReviewsService {
 
     // READ[2] - 특정 리뷰 조회
     async readReviewById(review_id: number): Promise<Review> {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+        const foundReview = await this.reviewRepository.findOneBy({ review_id })
 
-        if(!foundReview) {
+        if (!foundReview) {
             throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
         }
 
