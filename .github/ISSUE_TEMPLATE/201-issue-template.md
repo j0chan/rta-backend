@@ -13,14 +13,14 @@ assignees: ''
 
 Tag Prefix
 
-[Design]: 뷰 짜기
-[Feat]: 새로운 기능 구현
-[Network]: 네트워크 연결
-[Fix]: 버그, 오류 해결, 코드 수정
-[Refactor]: 전면 수정이 있을 때 사용
-[Chore]: 그 이외
-[Docs]: README나 WIKI 등의 문서 개정
-[Setting]: 세팅
+[design]: 뷰 짜기
+[feat]: 새로운 기능 구현
+[network]: 네트워크 연결
+[fix]: 버그, 오류 해결, 코드 수정
+[refactor]: 전면 수정이 있을 때 사용
+[chore]: 그 이외
+[docs]: README나 WIKI 등의 문서 개정
+[setting]: 세팅
 
 -->
 
