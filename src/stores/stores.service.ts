@@ -21,7 +21,7 @@ export class StoresService {
 
     // CREATE
     // 새로운 가게 생성하기
-    async createStore(createStoreDTO: CreateStoreDTO): Promise<void> {
+    async createStore(createStoreDTO: CreateStoreDTO): Promise<number> {
         const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
         const temp_user_id = 1
 
@@ -37,6 +37,8 @@ export class StoresService {
         })
 
         await this.storesRepository.save(newStore)
+
+        return newStore.store_id
     }
 
     // READ
@@ -50,6 +52,9 @@ export class StoresService {
     // 특정 가게 조회
     async getStoreById(store_id: number): Promise<Store | null> {
         const store = await this.storesRepository.findOneBy({ store_id: store_id })
+        if (!store) {
+            throw new NotFoundException(`No Store with ID: ${store_id}`)
+        }
 
         return store
     }
