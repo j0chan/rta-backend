@@ -5,8 +5,6 @@ import { CreateReviewDTO } from './DTO/create-review.dto'
 import { ReadAllReviewsDTO } from './DTO/read-all-reviews.dto'
 import { Review } from './entites/review.entity'
 import { UpdateReviewDTO } from './DTO/update-review.dto'
-import { CreateReviewReplyDTO } from './DTO/create-review-reply.dto'
-import { ReviewReply } from './entites/review-reply.entity'
 
 @Controller('api/reviews')
 export class ReviewsController {
@@ -14,25 +12,13 @@ export class ReviewsController {
     // 생성자 정의
     constructor(private reviewsService: ReviewsService) { }
 
-    // CREATE[1] - 리뷰 작성
+    // CREATE - 리뷰 작성
     // 미구현: logger
     @Post('/')
     async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDto<Review>> {
         await this.reviewsService.createReview(createReviewDTO)
         return new ApiResponseDto(true, HttpStatus.CREATED, 'Review Created Successfully!')
     }
-
-    // CREATE[2] - 리뷰 대댓글 (매니저 전용)
-    // 미구현: logger
-    // 비고: 매니저 여부를 판단하는 guard 必
-    @Post('/:review_id/reply')
-    async createReviewReply(
-        @Param('review_id') review_id: number,
-        @Body() CreateReviewReplyDTO: CreateReviewReplyDTO): Promise<ApiResponseDto<ReviewReply>> {
-        await this.reviewsService.createReviewReply(review_id, CreateReviewReplyDTO)
-        return new ApiResponseDto(true, HttpStatus.CREATED, 'Review Reply Created Successfully!')
-    }
-
 
     // READ - 모든 리뷰 조회
     // 미구현: logger

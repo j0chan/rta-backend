@@ -1,5 +1,6 @@
+import { Review } from "src/reviews/entites/review.entity"
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Review } from "./review.entity"
+
 
 @Entity()
 export class ReviewReply {
