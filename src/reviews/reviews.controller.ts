@@ -20,7 +20,7 @@ export class ReviewsController {
         return new ApiResponseDto(true, HttpStatus.CREATED, 'Review Created Successfully!')
     }
 
-    // READ - 모든 리뷰 조회
+    // READ[1] - 모든 리뷰 조회
     // 미구현: logger
     @Get('/')
     async readAllReviews(): Promise<ApiResponseDto<ReadAllReviewsDTO[]>> {
@@ -28,6 +28,15 @@ export class ReviewsController {
         const readAllReviewsDTO = reviews.map(review => new ReadAllReviewsDTO(review))
 
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsDTO)
+    }
+
+    // READ[2] - 특정 리뷰 조회
+    // 미구현: looger
+    @Get('/:review_id')
+    async readReviewById(review_id: number): Promise<ApiResponseDto<Review>> {
+        const foundReview: Review = await this.reviewsService.readReviewById(review_id)
+
+        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
     // UPDATE[1] - 리뷰 수정

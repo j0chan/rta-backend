@@ -4,7 +4,7 @@ import { CreateReviewReplyDTO } from './DTO/create-review-reply.dto'
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewReply } from './entities/review-reply.entity'
 
-@Controller('review-replies')
+@Controller('api/reviews')
 export class ReviewRepliesController {
 
     // 생성자 정의

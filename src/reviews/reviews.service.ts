@@ -47,7 +47,7 @@ export class ReviewsService {
         return createdEvent
     }
 
-    // READ - 모든 리뷰 조회
+    // READ[1] - 모든 리뷰 조회
     // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
 
@@ -56,10 +56,21 @@ export class ReviewsService {
         return foundReviews
     }
 
+    // READ[2] - 특정 리뷰 조회
+    async readReviewById(review_id: number): Promise<Review> {
+        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+
+        if(!foundReview) {
+            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
+        }
+
+        return foundReview
+    }
+
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
-    async updateReviewByReviewId(review_id: number, UpdateReviewDTO: UpdateReviewDTO) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+    async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO) {
+        const foundReview = await this.readReviewById(review_id)
 
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
@@ -67,9 +78,19 @@ export class ReviewsService {
 
         const currentDate: Date = await new Date()
 
-        foundReview.content = UpdateReviewDTO.content
+        foundReview.content = updateReviewDTO.content
         foundReview.updated_at = currentDate
         foundReview.isModified = true
+
+        await this.reviewRepository.save(foundReview)
+    }
+
+    // UPDATE[2] - 대댓글 달릴 시 플래그 변경
+    // 미구현: logger, 에러 처리
+    async updateReplyStatusById(review_id: number) {
+        const foundReview = await this.readReviewById(review_id)
+
+        foundReview.reply_received = true
 
         await this.reviewRepository.save(foundReview)
     }
@@ -86,11 +107,8 @@ export class ReviewsService {
      *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
      */
     async markHelpful(review_id: number) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+        const foundReview = await this.readReviewById(review_id)
 
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
-        }
         foundReview.helpful_count += 1
         await this.reviewRepository.save(foundReview)
     }
@@ -98,11 +116,7 @@ export class ReviewsService {
     // DELETE - 리뷰 삭제
     // 미구현: logger, 에러 처리
     async deleteReveiwById(review_id: number) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
-
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
-        }
+        const foundReview = await this.readReviewById(review_id)
 
         await this.reviewRepository.remove(foundReview)
     }
