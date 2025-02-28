@@ -1,6 +1,6 @@
 import { Store } from "../entities/store.entity"
 
-export class ReadStoreAddressResponseDTO {
+export class ReadStoreAddressDTO {
     address: string
     latitude: number
     longitude: number

@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator"
 import { StoreCategory } from "../entities/store-category.enum"
 
-export class CreateStoreRequestDTO {
+export class CreateStoreDTO {
     @IsNotEmpty()
     @IsString()
     store_name: string
