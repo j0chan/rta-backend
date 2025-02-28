@@ -8,7 +8,7 @@ fetch('/api/client-id')
         // API가 완전히 로드된 후 initMap() 실행되도록 수정
         script.onload = function () {
             initMap()
-        };
+        }
         document.body.appendChild(script)
     })
     .catch(error => console.error('Error fetching client ID:', error))
@@ -25,7 +25,7 @@ function initMap() {
     })
 
     // API가 로드된 후에만 검색 버튼 활성화
-    document.querySelector("button").disabled = false;
+    document.querySelector("button").disabled = false
 
     // 지도 클릭 시 모든 InfoWindow 닫기
     naver.maps.Event.addListener(map, "click", function() {
@@ -55,11 +55,11 @@ function searchPlaces() {
         return
     }
 
-    fetch(`/api/search?query=${query}`)
+    fetch(`/api/maps/search?query=${query}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                alert(data.error)
+                alert(data.message)
                 return
             }
 
@@ -71,6 +71,11 @@ function searchPlaces() {
 
             // 검색 결과 마커 추가
             if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
+                if(data.length === 0){
+                    alert('검색 결과가 없습니다.')
+                    return
+                }
+
                 data.forEach(place => {
                     // 위치 정보가 없는 경우 건너뛰기
                     if (!place.mapx || !place.mapy) {
@@ -117,11 +122,11 @@ function searchPlaces() {
                     // 마커 클릭 시
                     naver.maps.Event.addListener(marker, "click", function() {
                         if (activeInfoWindow) {
-                            activeInfoWindow.close(); // 기존 열린 창 닫기
+                            activeInfoWindow.close() // 기존 열린 창 닫기
                         }
-                        infoWindow.open(map, marker); // 새 창 열기
-                        activeInfoWindow = infoWindow; // 현재 창 저장
-                    });
+                        infoWindow.open(map, marker) // 새 창 열기
+                        activeInfoWindow = infoWindow // 현재 창 저장
+                    })
 
                     markers.push(marker)
                     infoWindows.push(infoWindow)
@@ -136,7 +141,6 @@ function searchPlaces() {
                 alert('검색 결과가 없습니다.')
             }
         })
-        .catch(error => console.error('Error searching places:', error))
 }
 
 // 닫기 버튼 클릭 시 InfoWindow 닫기
