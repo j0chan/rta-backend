@@ -4,7 +4,7 @@ import { StoreRequest } from './entities/store-request.entity'
 import { Repository } from 'typeorm'
 import { CreateStoreRequestDTO } from './DTO/create-store-request.dto'
 import { UpdateStoreRequestDTO } from './DTO/update-store-request.dto'
-import { RequestStatus } from 'src/stores/entities/request-status.enum'
+import { RequestStatus } from 'src/common/request-status.enum'
 import { StoresService } from 'src/stores/stores.service'
 
 @Injectable()

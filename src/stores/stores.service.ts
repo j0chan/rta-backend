@@ -6,7 +6,7 @@ import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { StoreRequest } from '../store-requests/entities/store-request.entity'
-import { RequestStatus } from './entities/request-status.enum'
+import { RequestStatus } from '../common/request-status.enum'
 import { UpdateStoreRequestDTO } from '../store-requests/DTO/update-store-request.dto'
 import { CreateStoreRequestDTO } from '../store-requests/DTO/create-store-request.dto'
 
