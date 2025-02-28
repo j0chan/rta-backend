@@ -20,8 +20,5 @@ import { ReviewRepliesModule } from './review-replies/review-replies.module';
     OpenaiModule,
     ReviewRepliesModule
   ],
-  // controllers: [AppController, UsersController, StoresController, EventsController, MapsController],
-  // providers: [AppService, UsersService, StoresService, EventsService, MapsService],
-    
 })
-export class AppModule {}
+export class AppModule { }
