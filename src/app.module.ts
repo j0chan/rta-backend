@@ -21,7 +21,7 @@ import { OpenaiModule } from './openai/openai.module'
     MapsModule,
     ReviewsModule,
     AuthModule,
-    GlobalModule
+    GlobalModule,
     OpenaiModule
   ]
 })
