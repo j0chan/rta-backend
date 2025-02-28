@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Store } from './entities/store.entity'
 import { Repository } from 'typeorm'
-import { CreateStoreRequestDTO } from './DTO/create-store-request.dto'
+import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
-import { UpdateStoreDetailRequestDTO } from './DTO/update-store-detail-requst.dto'
+import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
+import { StoreRequest } from '../store-requests/entities/store-request.entity'
+import { RequestStatus } from './entities/request-status.enum'
+import { UpdateStoreRequestDTO } from '../store-requests/DTO/update-store-request.dto'
+import { CreateStoreRequestDTO } from '../store-requests/DTO/create-store-request.dto'
 
 @Injectable()
 export class StoresService {
@@ -17,8 +21,8 @@ export class StoresService {
 
     // CREATE
     // 새로운 가게 생성하기
-    async createStore(createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
-        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreRequestDTO
+    async createStore(createStoreDTO: CreateStoreDTO): Promise<void> {
+        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
         const temp_user_id = 1
 
         const newStore: Store = this.storesRepository.create({
@@ -67,11 +71,11 @@ export class StoresService {
     }
 
     // 가게 정보 수정 (매니저 전용)
-    async updateStoreDetail(store_id: number, updateStoreDetailRequestDTO: UpdateStoreDetailRequestDTO): Promise<void> {
+    async updateStoreDetail(store_id: number, updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<void> {
         const foundStore = await this.getStoreById(store_id)
         if (!foundStore) { return }
 
-        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailRequestDTO
+        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
         
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
@@ -82,6 +86,13 @@ export class StoresService {
         await this.storesRepository.save(foundStore)
     }
 
-    // DELETE
+    // 가게 비공개 -> 공개 전환
+    async updateStoreToPublic(store_id: number) {
+        const foundStore = await this.getStoreById(store_id)
+        if (!foundStore) { return }
 
+        await this.storesRepository.update(store_id, { public: true })
+    }
+
+    // DELETE
 }
