@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsNumber, isNumber, IsString } from "class-validator"
 
-export class CreateEventRequestDTO {
+export class CreateEventDTO {
     @IsNotEmpty()
     @IsNumber()
     store_id: number

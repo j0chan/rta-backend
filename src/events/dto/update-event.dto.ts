@@ -1,7 +1,7 @@
 import { IsDate, IsNotEmpty, IsString } from "class-validator"
 import { EventStatus } from "../entities/event-status.enum"
 
-export class UpdateEventRequestDTO {
+export class UpdateEventDTO {
     @IsNotEmpty()
     @IsString()
     title: string

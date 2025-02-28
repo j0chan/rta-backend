@@ -8,51 +8,20 @@
     <!-- favicon 에러 방지 -->
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAAQAAAC4DgAAEAAQAAEAAAAA=" type="image/x-icon">
 
-    <script>
-        // API로 clientId 가져오기
-        fetch('/api/client-id')
-            .then(response => response.json())
-            .then(data => {
-                // 네이버 지도 API 동적 로드
-                const script = document.createElement('script')
-                script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`
-                script.onload = initMap; // 스크립트가 로드된 후 실행
-                document.body.appendChild(script)
-            })
-            .catch(error => console.error('Error fetching client ID:', error))
+    <!-- CSS 파일 연결 -->
+    <link rel="stylesheet" href="styles.css">
 
-        var map
-        function initMap() {
-            map = new naver.maps.Map('map', {
-                center: new naver.maps.LatLng(37.5665, 126.9780), // 초기 지도 위치 (서울)
-                zoom: 15
-            })
-        }
-
-        function searchPlaces() {
-            const query = document.getElementById('search-input').value
-            if (!query) {
-                alert('검색어를 입력하세요.')
-                return
-            }
-
-            fetch(`/api/search?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error)
-                        return
-                    }
-                })
-                .catch(error => console.error('Error searching places:', error))
-        }
-    </script>
+    <!-- JS 파일 연결 -->
+    <script defer src="script.js"></script>
 </head>
 <body>
-    <div style="text-align: center; margin-bottom: 10px;">
+    <!-- 검색창을 지도 위에 띄우기 -->
+    <div class="search-container">
         <input type="text" id="search-input" placeholder="장소 검색">
-        <button onclick="searchPlaces()">검색</button>
+        <button onclick="searchPlaces()" disabled>검색</button>
     </div>
-    <div id="map" style="width: 600px; height: 400px; margin: auto;"></div>
+
+    <!-- 지도 전체 화면 적용 -->
+    <div id="map"></div>
 </body>
 </html>
