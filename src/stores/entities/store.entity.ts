@@ -3,7 +3,7 @@ import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
 import { User } from "src/users/entities/user.entity"
 import { Event } from "src/events/entities/event.entity"
-import { StoreRequest } from "./store-request.entity"
+import { StoreRequest } from "../../store-requests/entities/store-request.entity"
 
 @Entity()
 export class Store {

@@ -1,5 +1,5 @@
 import { StoreRequest } from "../entities/store-request.entity"
-import { RequestStatus } from "../entities/request-status.enum"
+import { RequestStatus } from "../../stores/entities/request-status.enum"
 
 export class ReadStoreRequestDTO {
     request_id: number

@@ -11,6 +11,7 @@ import { AuthService } from './auth/auth.service'
 import { AuthModule } from './auth/auth.module'
 import { GlobalModule } from './global.module'
 import { OpenaiModule } from './openai/openai.module'
+import { StoreRequestModule } from './store-requests/store-requests.module'
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { OpenaiModule } from './openai/openai.module'
     ReviewsModule,
     AuthModule,
     GlobalModule,
-    OpenaiModule
+    OpenaiModule,
+    StoreRequestModule
   ]
 })
 export class AppModule {}

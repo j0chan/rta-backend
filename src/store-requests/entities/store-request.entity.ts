@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Store } from "./store.entity"
-import { RequestStatus } from "./request-status.enum"
+import { Store } from "../../stores/entities/store.entity"
+import { RequestStatus } from "../../stores/entities/request-status.enum"
 
 @Entity()
 export class StoreRequest {
