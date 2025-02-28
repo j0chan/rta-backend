@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Store } from './entities/store.entity'
 import { Repository } from 'typeorm'
-import { CreateStoreRequestDTO } from './DTO/create-store-request.dto'
+import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
-import { UpdateStoreDetailRequestDTO } from './DTO/update-store-detail-requst.dto'
+import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
+import { CreateStoreRequestDTO } from './DTO/create-store-request.dto'
+import { StoreRequest } from './entities/store-request.entity'
+import { StoreStatus } from './entities/store-status.enum'
+import { UpdateStoreRequestDTO } from './DTO/update-store-request.dto'
 
 @Injectable()
 export class StoresService {
@@ -12,13 +16,15 @@ export class StoresService {
     // init
     constructor(
         @InjectRepository(Store)
-        private storesRepository: Repository<Store>
+        private storesRepository: Repository<Store>,
+        @InjectRepository(StoreRequest)
+        private storeRequestRepository: Repository<StoreRequest>
     ) {}
 
     // CREATE
     // 새로운 가게 생성하기
-    async createStore(createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
-        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreRequestDTO
+    async createStore(createStoreDTO: CreateStoreDTO): Promise<void> {
+        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
         const temp_user_id = 1
 
         const newStore: Store = this.storesRepository.create({
@@ -67,11 +73,11 @@ export class StoresService {
     }
 
     // 가게 정보 수정 (매니저 전용)
-    async updateStoreDetail(store_id: number, updateStoreDetailRequestDTO: UpdateStoreDetailRequestDTO): Promise<void> {
+    async updateStoreDetail(store_id: number, updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<void> {
         const foundStore = await this.getStoreById(store_id)
         if (!foundStore) { return }
 
-        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailRequestDTO
+        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
         
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
