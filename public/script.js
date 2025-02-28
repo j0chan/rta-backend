@@ -13,16 +13,41 @@ fetch('/api/client-id')
     })
     .catch(error => console.error('Error fetching client ID:', error))
 
-var map
-var markers = []
-var infoWindows = []
-var activeInfoWindow = null // 현재 열린 정보창 저장
+let map
+let markers = []
+let infoWindows = []
+let activeInfoWindow = null // 현재 열린 정보창 저장
 
 function initMap() {
     map = new naver.maps.Map('map', {
         center: new naver.maps.LatLng(37.5665, 126.9780), // 초기 지도 위치 (서울)
         zoom: 15
     })
+
+    // 현위치 가져오기
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                let lat = position.coords.latitude  // 위도
+                let lng = position.coords.longitude // 경도
+                let currentLocation = new naver.maps.LatLng(lat, lng)
+
+                // 지도 중심을 현재 위치로 이동
+                map.setCenter(currentLocation)
+
+                // 현재 위치에 마커 추가
+                let marker = new naver.maps.Marker({
+                    position: currentLocation,
+                    map: map
+                })
+            },
+            function (error) {
+                console.error("위치 정보를 가져올 수 없습니다: ", error)
+            }
+        )
+    } else {
+        alert("위치 정보를 지원하지 않는 브라우저입니다.")
+    }
 
     // API가 로드된 후에만 검색 버튼 활성화
     document.querySelector("button").disabled = false
