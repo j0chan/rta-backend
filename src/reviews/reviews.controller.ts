@@ -33,9 +33,9 @@ export class ReviewsController {
     // READ[2] - 특정 리뷰 조회
     // 미구현: looger
     @Get('/:review_id')
-    async readReviewById(review_id: number): Promise<ApiResponseDto<Review>> {
+    async readReviewById(@Param('review_id') review_id: number): Promise<ApiResponseDto<Review>> {
         const foundReview: Review = await this.reviewsService.readReviewById(review_id)
-
+        
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
