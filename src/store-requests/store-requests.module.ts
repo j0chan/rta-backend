@@ -14,4 +14,4 @@ import { StoresModule } from 'src/stores/stores.module'
     controllers: [StoreRequestsController],
     exports: [StoreRequestsService]
 })
-export class StoreRequestModule {}
+export class StoreRequestsModule {}
