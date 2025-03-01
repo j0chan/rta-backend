@@ -16,7 +16,6 @@ export class ReviewRepliesService {
         private reviewsService: ReviewsService,
     ) { }
 
-
     // CREATE
     // 미구현: logger, 에러 처리
     async createReviewReply(review_id: number, CreateReviewReplyDTO: CreateReviewReplyDTO): Promise<ReviewReply> {
@@ -26,11 +25,9 @@ export class ReviewRepliesService {
             throw new NotFoundException(`Cannot found review_id: ${review_id}`)
         }
 
-        if (foundReview.reply_received) {
+        if (foundReview.reply) {
             throw new ForbiddenException('이미 매니저 대댓글이 등록되어 있습니다.')
         }
-        foundReview.reply_received = true
-        await this.reviewsService.updateReplyStatusById(review_id)
 
         const currentDate = await new Date()
 
@@ -45,5 +42,4 @@ export class ReviewRepliesService {
 
         return createdReviewReply
     }
-
 }

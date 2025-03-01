@@ -25,11 +25,8 @@ export class Review {
     @Column({ default: 0 })
     helpful_count: number
 
-    // 매니저 대댓글을 받았는지 여부. 여러번 받기 방지용
-    @Column()
-    reply_received: boolean = false
-
-    @OneToOne(() => ReviewReply, (reply) => reply.review, { cascade: true })
+    // null 옵션을 없애면 대댓글이 없는 상황에도 reply가 항상 존재해야하기 때문에, null 설정 필요
+    @OneToOne(() => ReviewReply, (reply) => reply.review, { cascade: true, nullable: true })
     reply: ReviewReply
 
     get isModified(): boolean {

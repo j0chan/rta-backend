@@ -84,16 +84,6 @@ export class ReviewsService {
         await this.reviewRepository.save(foundReview)
     }
 
-    // UPDATE[2] - 대댓글 달릴 시 플래그 변경
-    // 미구현: logger, 에러 처리
-    async updateReplyStatusById(review_id: number) {
-        const foundReview = await this.readReviewById(review_id)
-
-        foundReview.reply_received = true
-
-        await this.reviewRepository.save(foundReview)
-    }
-
     // UPDATE[2] - 리뷰 도움됐어요 반응
     // 미구현: logger, 에러 처리
     /**

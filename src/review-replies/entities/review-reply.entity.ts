@@ -20,12 +20,8 @@ export class ReviewReply {
 
     @CreateDateColumn({ type: "timestamp" })
     updated_at: Date
-
-    /**
-     * if(isModified) {
-     *  "수정됨(n일 전)" 출력
-     * }
-     */
-    @Column()
-    isModified: boolean = false
+    
+    get isModified(): boolean {
+        return this.created_at.getTime() !== this.updated_at.getTime()
+    }
 }
