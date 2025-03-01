@@ -1,17 +1,38 @@
-// API로 clientId 가져오기
-fetch('/api/client-id')
-    .then(response => response.json())
-    .then(data => {
-        // 네이버 지도 API 동적 로드
-        const script = document.createElement('script')
-        script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`
-        // API가 완전히 로드된 후 initMap() 실행되도록 수정
-        script.onload = function () {
-            initMap()
+window.onload = function () {
+    // API로 clientId 가져오기
+    fetch('/api/client-id')
+        .then(response => response.json())
+        .then(data => {
+            // 네이버 지도 API 동적 로드
+            const script = document.createElement('script')
+            script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${data.clientId}`
+            script.onload = function () {
+                initMap()
+            }
+            document.body.appendChild(script)
+        })
+        .catch(error => console.error('Error fetching client ID:', error))
+
+    // 엔터 키 입력 시 검색 실행
+    document.getElementById('search-input').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            searchPlaces()
         }
-        document.body.appendChild(script)
     })
-    .catch(error => console.error('Error fetching client ID:', error))
+
+    // 지도 클릭 시 모든 InfoWindow 닫기
+    if (typeof naver !== 'undefined' && naver.maps) {
+        naver.maps.Event.addListener(map, "click", function () {
+            if (activeInfoWindow) {
+                activeInfoWindow.close()
+                activeInfoWindow = null
+            }
+        })
+    }
+
+    // API가 로드된 후에만 검색 버튼 활성화
+    document.querySelector("button").disabled = false
+}
 
 let map
 let markers = []
@@ -92,24 +113,6 @@ function addPlaceMarker(place, userLat, userLng) {
         title: place.title,
     })
 }
-
-// API가 로드된 후에만 검색 버튼 활성화
-document.querySelector("button").disabled = false
-
-// 지도 클릭 시 모든 InfoWindow 닫기
-naver.maps.Event.addListener(map, "click", function() {
-    if (activeInfoWindow) {
-        activeInfoWindow.close()
-        activeInfoWindow = null // 열린 창이 없음을 표시
-    }
-})
-
-// 엔터 키 입력 시 검색 실행
-document.getElementById('search-input').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        searchPlaces()
-    }
-})
 
 function searchPlaces() {
     const query = document.getElementById('search-input').value
