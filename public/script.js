@@ -92,11 +92,12 @@ function searchNearbyPlaces(lat, lng) {
                     addPlaceMarker(place, lat, lng)
                 })
             } else {
-                alert("주변에 음식점이나 카페가 없습니다.")
+                alert("주변에 음식점이 없습니다.")
             }
         })
         .catch((error) => {
             console.error("API 호출 중 오류가 발생했습니다: ", error)
+            alert('검색 결과를 가져오는 데 문제가 발생했습니다.')
         })
 }
 
