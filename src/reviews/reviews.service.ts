@@ -80,7 +80,6 @@ export class ReviewsService {
 
         foundReview.content = updateReviewDTO.content
         foundReview.updated_at = currentDate
-        foundReview.isModified = true
 
         await this.reviewRepository.save(foundReview)
     }

@@ -2,7 +2,6 @@ import { ReviewReply } from "src/review-replies/entities/review-reply.entity"
 import { Store } from "src/stores/entities/store.entity"
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
-
 @Entity()
 export class Review {
     @PrimaryGeneratedColumn()
@@ -23,14 +22,6 @@ export class Review {
     @CreateDateColumn({ type: "timestamp" })
     updated_at: Date
 
-    /**
-     * if(isModified) {
-     *  "수정됨(n일 전)" 출력
-     * }
-     */
-    @Column()
-    isModified: boolean = false
-
     @Column({ default: 0 })
     helpful_count: number
 
@@ -40,4 +31,8 @@ export class Review {
 
     @OneToOne(() => ReviewReply, (reply) => reply.review, { cascade: true })
     reply: ReviewReply
+
+    get isModified(): boolean {
+        return this.created_at.getTime() !== this.updated_at.getTime()
+    }
 }
