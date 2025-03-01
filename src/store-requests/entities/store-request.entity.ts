@@ -11,7 +11,7 @@ export class StoreRequest {
     user_id: number
 
     @OneToOne(() => Store, { eager: true })
-    @JoinColumn()
+    @JoinColumn({ name: "store_id" })
     store: Store
 
     @CreateDateColumn({ type: 'timestamp' })

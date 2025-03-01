@@ -48,7 +48,7 @@ export class Store {
     events: Event[]
 
     @OneToOne(() => StoreRequest)
-    @JoinColumn()
+    @JoinColumn({ name: "request_id" })
     storeRequest: StoreRequest
 
     @Column({ type: 'boolean', default: false })
