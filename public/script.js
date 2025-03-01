@@ -19,11 +19,6 @@ let infoWindows = []
 let activeInfoWindow = null // 현재 열린 정보창 저장
 
 function initMap() {
-    map = new naver.maps.Map('map', {
-        center: new naver.maps.LatLng(37.5665, 126.9780), // 초기 지도 위치 (서울)
-        zoom: 15
-    })
-
     // 현위치 가져오기
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -33,40 +28,88 @@ function initMap() {
                 let currentLocation = new naver.maps.LatLng(lat, lng)
 
                 // 지도 중심을 현재 위치로 이동
-                map.setCenter(currentLocation)
+                // map.setCenter(currentLocation)
+
+                // 지도 객체 생성 (현위치를 중심으로)
+                map = new naver.maps.Map('map', {
+                    center: currentLocation,
+                    zoom: 15
+                })
 
                 // 현재 위치에 마커 추가
                 let marker = new naver.maps.Marker({
                     position: currentLocation,
-                    map: map
+                    map: map,
+                    title: "현재 위치"
                 })
+
+                // 현재 위치 주변 검색
+                searchNearbyPlaces(lat, lng)
             },
             function (error) {
                 console.error("위치 정보를 가져올 수 없습니다: ", error)
+
+                // 위치 정보를 가져오지 못한 경우, 기본 위치(서울)로 설정
+                map = new naver.maps.Map('map', {
+                    center: new naver.maps.LatLng(37.5665, 126.9780),
+                    zoom: 15
+                })
             }
         )
     } else {
         alert("위치 정보를 지원하지 않는 브라우저입니다.")
     }
+}
 
-    // API가 로드된 후에만 검색 버튼 활성화
-    document.querySelector("button").disabled = false
+// 현위치 주변 음식점, 카페 검색
+function searchNearbyPlaces(lat, lng) {
+    fetch(`/api/maps/nearby?lat=${lat}&lng=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.places && data.places.length > 0) {
+                data.places.forEach(place => {
+                    addPlaceMarker(place, lat, lng)
+                })
+            } else {
+                alert("주변에 음식점이나 카페가 없습니다.")
+            }
+        })
+        .catch((error) => {
+            console.error("API 호출 중 오류가 발생했습니다: ", error)
+        })
+}
 
-    // 지도 클릭 시 모든 InfoWindow 닫기
-    naver.maps.Event.addListener(map, "click", function() {
-        if (activeInfoWindow) {
-            activeInfoWindow.close()
-            activeInfoWindow = null // 열린 창이 없음을 표시
-        }
-    })
+// 음식점이나 카페 마커 추가
+function addPlaceMarker(place, userLat, userLng) {
+    const placeLat = parseFloat(place.mapy)
+    const placeLng = parseFloat(place.mapx)
 
-    // 엔터 키 입력 시 검색 실행
-    document.getElementById('search-input').addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            searchPlaces()
-        }
+    const position = new naver.maps.LatLng(placeLat, placeLng)
+
+    const marker = new naver.maps.Marker({
+        position: position,
+        map: map,
+        title: place.title,
     })
 }
+
+// API가 로드된 후에만 검색 버튼 활성화
+document.querySelector("button").disabled = false
+
+// 지도 클릭 시 모든 InfoWindow 닫기
+naver.maps.Event.addListener(map, "click", function() {
+    if (activeInfoWindow) {
+        activeInfoWindow.close()
+        activeInfoWindow = null // 열린 창이 없음을 표시
+    }
+})
+
+// 엔터 키 입력 시 검색 실행
+document.getElementById('search-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        searchPlaces()
+    }
+})
 
 function searchPlaces() {
     const query = document.getElementById('search-input').value
