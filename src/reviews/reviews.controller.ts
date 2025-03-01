@@ -1,11 +1,10 @@
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewsService } from './reviews.service'
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put } from '@nestjs/common'
-import { CreateReviewRequestDTO } from './DTO/create-review-request.dto'
-import { ReadAllReviewsRequestDTO } from './DTO/read-all-reviews-request.dto'
-import { Event } from 'src/events/entities/event.entity'
+import { CreateReviewDTO } from './DTO/create-review.dto'
+import { ReadAllReviewsDTO } from './DTO/read-all-reviews.dto'
 import { Review } from './entites/review.entity'
-import { UpdateReviewRequestDTO } from './DTO/update-review-request.dto'
+import { UpdateReviewDTO } from './DTO/update-review.dto'
 
 @Controller('api/reviews')
 export class ReviewsController {
@@ -16,19 +15,28 @@ export class ReviewsController {
     // CREATE - 리뷰 작성
     // 미구현: logger
     @Post('/')
-    async createReview(@Body() createReviewRequestDTO: CreateReviewRequestDTO): Promise<ApiResponseDto<Event>> {
-        await this.reviewsService.createReview(createReviewRequestDTO)
+    async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDto<Review>> {
+        await this.reviewsService.createReview(createReviewDTO)
         return new ApiResponseDto(true, HttpStatus.CREATED, 'Review Created Successfully!')
     }
 
-    // READ - 모든 리뷰 조회
+    // READ[1] - 모든 리뷰 조회
     // 미구현: logger
     @Get('/')
-    async readAllReviews(): Promise<ApiResponseDto<ReadAllReviewsRequestDTO[]>> {
+    async readAllReviews(): Promise<ApiResponseDto<ReadAllReviewsDTO[]>> {
         const reviews: Review[] = await this.reviewsService.readAllReviews()
-        const readAllReviewsRequestDTO = reviews.map(review => new ReadAllReviewsRequestDTO(review))
+        const readAllReviewsDTO = reviews.map(review => new ReadAllReviewsDTO(review))
 
-        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsRequestDTO)
+        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsDTO)
+    }
+
+    // READ[2] - 특정 리뷰 조회
+    // 미구현: looger
+    @Get('/:review_id')
+    async readReviewById(review_id: number): Promise<ApiResponseDto<Review>> {
+        const foundReview: Review = await this.reviewsService.readReviewById(review_id)
+
+        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
     // UPDATE[1] - 리뷰 수정
@@ -36,8 +44,8 @@ export class ReviewsController {
     @Put('/:review_id')
     async updateReviewByReviewId(
         @Param('review_id') review_id: number,
-        @Body() updateReviewRequestDTO: UpdateReviewRequestDTO): Promise<ApiResponseDto<void>> {
-        await this.reviewsService.updateReviewByReviewId(review_id, updateReviewRequestDTO)
+        @Body() updateReviewDTO: UpdateReviewDTO): Promise<ApiResponseDto<void>> {
+        await this.reviewsService.updateReviewByReviewId(review_id, updateReviewDTO)
         return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
 

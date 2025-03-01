@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator"
 
-export class CreateReviewRequestDTO {
+export class CreateReviewDTO {
     @IsNotEmpty()
     @IsNumber()
     store_id: number

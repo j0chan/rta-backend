@@ -6,12 +6,8 @@ import { EventsModule } from './events/events.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { typeOrmConfig } from './config/typeorm.config'
 import { MapsModule } from './maps/maps.module'
-import { AuthController } from './auth/auth.controller'
-import { AuthService } from './auth/auth.service'
-import { AuthModule } from './auth/auth.module'
-import { GlobalModule } from './global.module'
 import { OpenaiModule } from './openai/openai.module'
-import { StoreRequestModule } from './store-requests/store-requests.module'
+import { ReviewRepliesModule } from './review-replies/review-replies.module'
 
 @Module({
   imports: [
@@ -21,10 +17,8 @@ import { StoreRequestModule } from './store-requests/store-requests.module'
     EventsModule,
     MapsModule,
     ReviewsModule,
-    AuthModule,
-    GlobalModule,
     OpenaiModule,
-    StoreRequestModule
-  ]
+    ReviewRepliesModule
+  ],
 })
-export class AppModule {}
+export class AppModule { }

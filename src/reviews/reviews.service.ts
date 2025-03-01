@@ -1,26 +1,27 @@
-import { UpdateReviewRequestDTO } from './DTO/update-review-request.dto'
+import { UpdateReviewDTO } from './DTO/update-review.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Review } from './entites/review.entity'
 import { Repository } from 'typeorm'
-import { CreateReviewRequestDTO } from './DTO/create-review-request.dto'
+import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
 
 @Injectable()
 export class ReviewsService {
 
-    // Review 엔터티 주입
     constructor(
+        // Review 엔터티 주입
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
+
         private storesService: StoresService
     ) { }
 
-    // CREATE
+    // CREATE [1]
     // 미구현: logger, 에러 처리
     // 비고: store_id, user_id, keywords는 원래 DTO로 전달해야 한다. 지금은 안되므로 임시값 사용.
-    async createReview(createReviewRequestDTO: CreateReviewRequestDTO): Promise<Review> {
-        const { store_id, user_id, content } = createReviewRequestDTO
+    async createReview(CreateReviewDTO: CreateReviewDTO): Promise<Review> {
+        const { store_id, user_id, content } = CreateReviewDTO
 
         // 임시 user_id
         const tempUserId: number = 1
@@ -46,7 +47,7 @@ export class ReviewsService {
         return createdEvent
     }
 
-    // READ - 모든 리뷰 조회
+    // READ[1] - 모든 리뷰 조회
     // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
 
@@ -55,10 +56,21 @@ export class ReviewsService {
         return foundReviews
     }
 
+    // READ[2] - 특정 리뷰 조회
+    async readReviewById(review_id: number): Promise<Review> {
+        const foundReview = await this.reviewRepository.findOneBy({ review_id })
+
+        if (!foundReview) {
+            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
+        }
+
+        return foundReview
+    }
+
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
-    async updateReviewByReviewId(review_id: number, updateReviewRequestDTO: UpdateReviewRequestDTO) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+    async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO) {
+        const foundReview = await this.readReviewById(review_id)
 
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
@@ -66,9 +78,8 @@ export class ReviewsService {
 
         const currentDate: Date = await new Date()
 
-        foundReview.content = updateReviewRequestDTO.content
+        foundReview.content = updateReviewDTO.content
         foundReview.updated_at = currentDate
-        foundReview.isModified = true
 
         await this.reviewRepository.save(foundReview)
     }
@@ -85,11 +96,8 @@ export class ReviewsService {
      *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
      */
     async markHelpful(review_id: number) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
+        const foundReview = await this.readReviewById(review_id)
 
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
-        }
         foundReview.helpful_count += 1
         await this.reviewRepository.save(foundReview)
     }
@@ -97,11 +105,7 @@ export class ReviewsService {
     // DELETE - 리뷰 삭제
     // 미구현: logger, 에러 처리
     async deleteReveiwById(review_id: number) {
-        const foundReview = await this.reviewRepository.findOne({ where: { review_id } })
-
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
-        }
+        const foundReview = await this.readReviewById(review_id)
 
         await this.reviewRepository.remove(foundReview)
     }

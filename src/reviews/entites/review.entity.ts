@@ -1,5 +1,6 @@
+import { ReviewReply } from "src/review-replies/entities/review-reply.entity"
 import { Store } from "src/stores/entities/store.entity"
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class Review {
@@ -21,14 +22,14 @@ export class Review {
     @CreateDateColumn({ type: "timestamp" })
     updated_at: Date
 
-    /**
-     * if(isModified) {
-     *  "수정됨(n일 전)" 출력
-     * }
-     */
-    @Column()
-    isModified: boolean = false
-
     @Column({ default: 0 })
     helpful_count: number
+
+    // null 옵션을 없애면 대댓글이 없는 상황에도 reply가 항상 존재해야하기 때문에, null 설정 필요
+    @OneToOne(() => ReviewReply, (reply) => reply.review, { cascade: true, nullable: true })
+    reply: ReviewReply
+
+    get isModified(): boolean {
+        return this.created_at.getTime() !== this.updated_at.getTime()
+    }
 }

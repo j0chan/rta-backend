@@ -1,7 +1,7 @@
 import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator"
 import { Review } from "../entites/review.entity"
 
-export class ReadAllReviewsRequestDTO {
+export class ReadAllReviewsDTO {
     @IsNotEmpty()
     @IsNumber()
     user_id: number
