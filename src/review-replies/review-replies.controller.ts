@@ -6,7 +6,7 @@ import { ReviewReply } from './entities/review-reply.entity'
 import { ReadAllRepliesDTO } from './DTO/read-all-replies.dto'
 import { UpdateReplyDTO } from './DTO/upate-reply.dto'
 
-@Controller('api/reviews')
+@Controller('api/replies')
 export class ReviewRepliesController {
 
     // 생성자 정의
@@ -15,7 +15,7 @@ export class ReviewRepliesController {
     // CREATE - 리뷰 대댓글 (매니저 전용)
     // 미구현: logger
     // 비고: 매니저 여부를 판단하는 guard 必
-    @Post('/:review_id/reply')
+    @Post('/:review_id')
     async createReply(
         @Param('review_id') review_id: number,
         @Body() createReplyDTO: CreateReplyDTO): Promise<ApiResponseDto<ReviewReply>> {
