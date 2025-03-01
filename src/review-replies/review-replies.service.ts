@@ -81,4 +81,12 @@ export class ReviewRepliesService {
 
         await this.reviewReplyRepository.save(foundReply)
     }
+
+    // DELETE - 대댓글 삭제
+    // 미구현: logger, 에러 처리
+    async deleteReplyByReplyId(reply_id: number) {
+        const foundReply = await this.readReplyById(reply_id)
+
+        await this.reviewReplyRepository.remove(foundReply)
+    }
 }

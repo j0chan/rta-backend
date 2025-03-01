@@ -1,5 +1,5 @@
 import { ReviewRepliesService } from './review-replies.service'
-import { Body, Controller, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
 import { CreateReplyDTO } from './DTO/create-reply.dto'
 import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewReply } from './entities/review-reply.entity'
@@ -42,7 +42,7 @@ export class ReviewRepliesController {
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review Reply!', foundReply)
     }
 
-    // UPDATE[1] - 리뷰 수정
+    // UPDATE - 리뷰 수정
     // 미구현: logger
     @Put('/:reply_id')
     async updateReplyByReplyId(
@@ -50,5 +50,13 @@ export class ReviewRepliesController {
         @Body() updateReplyDTO: UpdateReplyDTO): Promise<ApiResponseDto<void>> {
         await this.reviewRepliesService.updateReplyByReplyId(reply_id, updateReplyDTO)
         return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Reply Updated Successfully!')
+    }
+
+    // DELETE - 대댓글 삭제
+    // 미구현: logger
+    @Delete('/:reply_id')
+    async deleteReplyByReplyId(@Param('reply_id') reply_id: number): Promise<ApiResponseDto<void>> {
+        await this.reviewRepliesService.deleteReplyByReplyId(reply_id)
+        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Reply Deleted Successfully!');
     }
 }
