@@ -42,4 +42,25 @@ export class ReviewRepliesService {
 
         return createdReviewReply
     }
+
+    // READ[1] - 모든 대댓글 조회 (매니저 전용)
+    // 미구현: logger, 에러 처리
+    async readAllReviewReplies(): Promise<ReviewReply[]> {
+
+        const foundReplies = await this.reviewReplyRepository.find()
+
+        return foundReplies
+    }
+
+    // READ[2] - 특정 리뷰 조회
+    // 미구현: logger, 에러 처리
+    async readReviewReplyById(reply_id: number): Promise<ReviewReply> {
+        const foundReply = await this.reviewReplyRepository.findOneBy({ reply_id })
+
+        if (!foundReply) {
+            throw new NotFoundException(`Cannot Find reply_id: ${reply_id}`)
+        }
+
+        return foundReply
+    }
 }
