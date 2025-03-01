@@ -70,5 +70,4 @@ export class ReviewsController {
         await this.reviewsService.deleteReveiwById(review_id)
         return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully!');
     }
-
 }

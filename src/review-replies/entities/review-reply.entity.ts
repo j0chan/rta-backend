@@ -20,7 +20,7 @@ export class ReviewReply {
 
     @CreateDateColumn({ type: "timestamp" })
     updated_at: Date
-    
+
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()
     }
