@@ -21,6 +21,7 @@ import { ReviewRepliesModule } from './review-replies/review-replies.module'
     ReviewsModule,
     OpenaiModule,
     StoreRequestsModule,
+    ManagerRequestsModule,
     ReviewRepliesModule
   ]
 })
