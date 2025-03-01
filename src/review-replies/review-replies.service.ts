@@ -27,7 +27,7 @@ export class ReviewRepliesService {
         }
 
         if (foundReview.reply) {
-            throw new ForbiddenException('이미 매니저 대댓글이 등록되어 있습니다.')
+            throw new ForbiddenException('Reply already exists for this review.')
         }
 
         const currentDate = await new Date()
@@ -39,9 +39,12 @@ export class ReviewRepliesService {
             review: foundReview,
         })
 
-        const createdReviewReply: ReviewReply = await this.reviewReplyRepository.save(newReviewReply)
+        const createdReply: ReviewReply = await this.reviewReplyRepository.save(newReviewReply)
 
-        return createdReviewReply
+        // review엔터티의 reply컬럼 변경 수행
+        await this.reviewsService.updateReviewReplyId(review_id, createdReply)
+
+        return createdReply
     }
 
     // READ[1] - 모든 대댓글 조회 (매니저 전용)

@@ -5,6 +5,7 @@ import { Review } from './entites/review.entity'
 import { Repository } from 'typeorm'
 import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
+import { ReviewReply } from 'src/review-replies/entities/review-reply.entity'
 
 @Injectable()
 export class ReviewsService {
@@ -99,6 +100,14 @@ export class ReviewsService {
         const foundReview = await this.readReviewById(review_id)
 
         foundReview.helpful_count += 1
+        await this.reviewRepository.save(foundReview)
+    }
+
+    // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
+    async updateReviewReplyId(review_id: number, reply: ReviewReply): Promise<void> {
+        const foundReview = await this.readReviewById(review_id)
+
+        foundReview.reply = reply
         await this.reviewRepository.save(foundReview)
     }
 
