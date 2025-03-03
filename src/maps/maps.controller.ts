@@ -13,10 +13,15 @@ export class MapsController {
 
     // 주변 장소 검색
     @Get('/nearby')
-    async searchNearbyPlaces(
+    async getNearbyPlaces(
         @Query('lat') lat: string, // 위도
         @Query('lng') lng: string  // 경도
-    ) {
-        return this.mapsService.searchNearbyPlaces(lat, lng)
-    }
+      ) {
+            if (!lat || !lng) {
+                return { message: '위도와 경도를 입력하세요.' }
+            }
+        
+            const places = await this.mapsService.getNearbyPlaces(parseFloat(lat), parseFloat(lng))
+            return places
+        }
 }

@@ -43,13 +43,10 @@ function initMap() {
     // 현위치 가져오기
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            function (position) {
+            async function (position) {
                 let lat = position.coords.latitude  // 위도
                 let lng = position.coords.longitude // 경도
                 let currentLocation = new naver.maps.LatLng(lat, lng)
-
-                // 지도 중심을 현재 위치로 이동
-                // map.setCenter(currentLocation)
 
                 // 지도 객체 생성 (현위치를 중심으로)
                 map = new naver.maps.Map('map', {
@@ -65,7 +62,14 @@ function initMap() {
                 })
 
                 // 현재 위치 주변 검색
-                searchNearbyPlaces(lat, lng)
+                try {
+                    const response = await fetch(`/api/maps/nearby?lat=${lat}&lng=${lng}`)
+                    const places = await response.json()
+                    console.log(places) // API로부터 받은 데이터 출력
+                    places.forEach(place => addPlaceMarker(place))
+                } catch (error) {
+                    console.error("음식점 정보를 불러오지 못했습니다.", error)
+                }
             },
             function (error) {
                 console.error("위치 정보를 가져올 수 없습니다: ", error)
@@ -82,37 +86,58 @@ function initMap() {
     }
 }
 
-// 현위치 주변 음식점, 카페 검색
-function searchNearbyPlaces(lat, lng) {
-    fetch(`/api/maps/nearby?lat=${lat}&lng=${lng}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.places && data.places.length > 0) {
-                data.places.forEach(place => {
-                    addPlaceMarker(place, lat, lng)
-                })
-            } else {
-                alert("주변에 음식점이 없습니다.")
-            }
-        })
-        .catch((error) => {
-            console.error("API 호출 중 오류가 발생했습니다: ", error)
-            alert('검색 결과를 가져오는 데 문제가 발생했습니다.')
-        })
-}
+// 음식점 마커 추가
+async function addPlaceMarker(place) {
+    const lat = place.lat / 1e7
+    const lng = place.lng / 1e7
 
-// 음식점이나 카페 마커 추가
-function addPlaceMarker(place, userLat, userLng) {
-    const placeLat = parseFloat(place.mapy)
-    const placeLng = parseFloat(place.mapx)
-
-    const position = new naver.maps.LatLng(placeLat, placeLng)
-
+    const position = new naver.maps.LatLng(lat, lng)
     const marker = new naver.maps.Marker({
         position: position,
         map: map,
-        title: place.title,
+        title: place.name
     })
+
+     // 추가 정보 가져오기
+     let addData = {}
+     try {
+         const response = await fetch(`/api/maps/search?query=${encodeURIComponent(place.name)}`)
+         const searchData = await response.json()
+ 
+         if (searchData.length > 0) {
+            addData = searchData[0] // 첫 번째 검색 결과 사용
+         }
+     } catch (error) {
+         console.error("추가 정보 가져오기 실패:", error)
+     }
+
+    const infoWindow = new naver.maps.InfoWindow({
+        content: `<div class="custom-infowindow">
+                    <button onclick="closeInfoWindow()">❌</button>
+                    <strong style="font-size: 18px; color: #333;">${place.name}</strong><br>
+                    <a href="${addData.link}" target="_blank" style="color: #007aff;">🔗 홈페이지 방문</a>
+                    <hr>
+                    <p>📌 카테고리: ${addData.category || '정보 없음'}</p>
+                    <p>🏢 주소: ${place.address}</p>
+                    <p>🛣️ 도로명 주소: ${addData.roadAddress || '정보 없음'}</p>
+                    <p>📞 전화번호: ${addData.telephone || '전화번호 없음'}</p>
+                    <p>ℹ️ 설명: ${addData.description || '설명 없음'}</p>
+                </div>`,
+                disableAutoPan: false, // 자동 이동 방지
+                borderWidth: 0, // 기본 테두리 제거
+                backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
+    })
+
+    naver.maps.Event.addListener(marker, "click", function () {
+        if (activeInfoWindow) {
+            activeInfoWindow.close()
+        }
+        infoWindow.open(map, marker)
+        activeInfoWindow = infoWindow
+    })
+
+    markers.push(marker)
+    infoWindows.push(infoWindow)
 }
 
 function searchPlaces() {
@@ -143,7 +168,7 @@ function searchPlaces() {
 
             // 검색 결과 마커 추가
             if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
-                if(data.length === 0){
+                if (data.length === 0) {
                     alert('검색 결과가 없습니다.')
                     return
                 }
@@ -186,13 +211,13 @@ function searchPlaces() {
                                 <p>📞 전화번호: ${place.telephone || '전화번호 없음'}</p>
                                 <p>ℹ️ 설명: ${place.description || '설명 없음'}</p>
                             </div>`,
-                            disableAutoPan: false, // 자동 이동 방지
-                            borderWidth: 0, // 기본 테두리 제거
-                            backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
+                        disableAutoPan: false, // 자동 이동 방지
+                        borderWidth: 0, // 기본 테두리 제거
+                        backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
                     })
 
                     // 마커 클릭 시
-                    naver.maps.Event.addListener(marker, "click", function() {
+                    naver.maps.Event.addListener(marker, "click", function () {
                         if (activeInfoWindow) {
                             activeInfoWindow.close() // 기존 열린 창 닫기
                         }
