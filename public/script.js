@@ -24,10 +24,12 @@ window.onload = function () {
     document.querySelector("button").disabled = false
 }
 
-let map
-let markers = []
-let infoWindows = []
-let activeInfoWindow = null // 현재 열린 정보창 저장
+const mapConfig = {
+    map: null,
+    markers: [],
+    infoWindows: [],
+    activeInfoWindow: null
+}
 
 function initMap() {
     // 현위치 가져오기
@@ -39,23 +41,23 @@ function initMap() {
                 let currentLocation = new naver.maps.LatLng(lat, lng)
 
                 // 지도 객체 생성 (현위치를 중심으로)
-                map = new naver.maps.Map('map', {
+                mapConfig.map = new naver.maps.Map('map', {
                     center: currentLocation,
                     zoom: 15
                 })
 
                 // 지도 클릭 시 모든 InfoWindow 닫기
-                naver.maps.Event.addListener(map, "click", function () {
-                    if (activeInfoWindow) {
-                        activeInfoWindow.close()
-                        activeInfoWindow = null
+                naver.maps.Event.addListener(mapConfig.map, "click", function () {
+                    if (mapConfig.activeInfoWindow) {
+                        mapConfig.activeInfoWindow.close()
+                        mapConfig.activeInfoWindow = null
                     }
                 })
 
                 // 현재 위치에 마커 추가
                 let marker = new naver.maps.Marker({
                     position: currentLocation,
-                    map: map,
+                    map: mapConfig.map,
                     title: "현재 위치"
                 })
 
@@ -73,7 +75,7 @@ function initMap() {
                 console.error("위치 정보를 가져올 수 없습니다: ", error)
 
                 // 위치 정보를 가져오지 못한 경우, 기본 위치(서울)로 설정
-                map = new naver.maps.Map('map', {
+                mapConfig.map = new naver.maps.Map('map', {
                     center: new naver.maps.LatLng(37.5665, 126.9780),
                     zoom: 15
                 })
@@ -107,7 +109,7 @@ async function addPlaceMarker(place) {
     const position = new naver.maps.LatLng(lat, lng)
     const marker = new naver.maps.Marker({
         position: position,
-        map: map,
+        map: mapConfig.map,
         title: place.name
     })
 
@@ -132,17 +134,18 @@ async function addPlaceMarker(place) {
     })
 
     naver.maps.Event.addListener(marker, "click", function () {
-        if (activeInfoWindow) {
-            activeInfoWindow.close()
+        if (mapConfig.activeInfoWindow) {
+            mapConfig.activeInfoWindow.close()
         }
-        infoWindow.open(map, marker)
-        activeInfoWindow = infoWindow
+        infoWindow.open(mapConfig.map, marker)
+        mapConfig.activeInfoWindow = infoWindow
     })
 
-    markers.push(marker)
-    infoWindows.push(infoWindow)
+    mapConfig.markers.push(marker)
+    mapConfig.infoWindows.push(infoWindow)
 }
 
+// 장소 검색
 function searchPlaces() {
     const query = document.getElementById('search-input').value
     if (!query) {
@@ -150,7 +153,7 @@ function searchPlaces() {
         return
     }
 
-    if (!map) {
+    if (!mapConfig.map) {
         alert("지도가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.")
         return
     }
@@ -164,10 +167,10 @@ function searchPlaces() {
             }
 
             // 기존 마커 삭제
-            markers.forEach(marker => marker.setMap(null))
-            infoWindows.forEach(infoWindow => infoWindow.setMap(null))
-            markers = []
-            infoWindows = []
+            mapConfig.markers.forEach(marker => marker.setMap(null))
+            mapConfig.infoWindows.forEach(infoWindow => infoWindow.setMap(null))
+            mapConfig.markers = []
+            mapConfig.infoWindows = []
 
             // 검색 결과 마커 추가
             if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
@@ -198,7 +201,7 @@ function searchPlaces() {
 
                     const marker = new naver.maps.Marker({ // 마커 객체
                         position: new naver.maps.LatLng(lat, lng), // position으로 마커 위치 지정
-                        map: map // 마커를 어디에 표시할지
+                        map: mapConfig.map // 마커를 어디에 표시할지
                     })
 
                     const infoWindow = new naver.maps.InfoWindow({
@@ -210,21 +213,21 @@ function searchPlaces() {
 
                     // 마커 클릭 시
                     naver.maps.Event.addListener(marker, "click", function () {
-                        if (activeInfoWindow) {
-                            activeInfoWindow.close()
+                        if (mapConfig.activeInfoWindow) {
+                            mapConfig.activeInfoWindow.close()
                         }
-                        infoWindow.open(map, marker)
-                        activeInfoWindow = infoWindow
+                        infoWindow.open(mapConfig.map, marker)
+                        mapConfig.activeInfoWindow = infoWindow
                     })
 
-                    markers.push(marker)
-                    infoWindows.push(infoWindow)
+                    mapConfig.markers.push(marker)
+                    mapConfig.infoWindows.push(infoWindow)
                 })
 
                 // 첫 번째 결과로 지도 이동
                 if (data.length > 0) {
-                    map.setCenter(new naver.maps.LatLng(data[0].mapy / 1e7, data[0].mapx / 1e7))
-                    map.setZoom(16)
+                    mapConfig.map.setCenter(new naver.maps.LatLng(data[0].mapy / 1e7, data[0].mapx / 1e7))
+                    mapConfig.map.setZoom(16)
                 }
             } else {
                 alert('검색 결과가 없습니다.')
@@ -234,8 +237,8 @@ function searchPlaces() {
 
 // 닫기 버튼 클릭 시 InfoWindow 닫기
 window.closeInfoWindow = function (button) {
-    if (activeInfoWindow) {
-        activeInfoWindow.close()
-        activeInfoWindow = null
+    if (mapConfig.activeInfoWindow) {
+        mapConfig.activeInfoWindow.close()
+        mapConfig.activeInfoWindow = null
     }
 }
