@@ -20,16 +20,6 @@ window.onload = function () {
         }
     })
 
-    // 지도 클릭 시 모든 InfoWindow 닫기
-    if (typeof naver !== 'undefined' && naver.maps) {
-        naver.maps.Event.addListener(map, "click", function () {
-            if (activeInfoWindow) {
-                activeInfoWindow.close()
-                activeInfoWindow = null
-            }
-        })
-    }
-
     // API가 로드된 후에만 검색 버튼 활성화
     document.querySelector("button").disabled = false
 }
@@ -52,6 +42,14 @@ function initMap() {
                 map = new naver.maps.Map('map', {
                     center: currentLocation,
                     zoom: 15
+                })
+
+                // 지도 클릭 시 모든 InfoWindow 닫기
+                naver.maps.Event.addListener(map, "click", function () {
+                    if (activeInfoWindow) {
+                        activeInfoWindow.close()
+                        activeInfoWindow = null
+                    }
                 })
 
                 // 현재 위치에 마커 추가
@@ -241,9 +239,9 @@ function searchPlaces() {
 }
 
 // 닫기 버튼 클릭 시 InfoWindow 닫기
-function closeInfoWindow() {
+window.closeInfoWindow = function (button) {
     if (activeInfoWindow) {
         activeInfoWindow.close()
         activeInfoWindow = null
     }
-}
+};
