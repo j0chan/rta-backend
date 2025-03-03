@@ -146,93 +146,80 @@ async function addPlaceMarker(place) {
 }
 
 // 장소 검색
-function searchPlaces() {
-    const query = document.getElementById('search-input').value
+async function searchPlaces() {
+    const query = document.getElementById('search-input').value.trim()
     if (!query) {
         alert('검색어를 입력하세요.')
         return
     }
-
     if (!mapConfig.map) {
         alert("지도가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.")
         return
     }
 
-    fetch(`/api/maps/search?query=${query}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.message)
-                return
-            }
+    try {
+        const response = await fetch(`/api/maps/search?query=${query}`)
+        const places = await response.json()
 
-            // 기존 마커 삭제
-            mapConfig.markers.forEach(marker => marker.setMap(null))
-            mapConfig.infoWindows.forEach(infoWindow => infoWindow.setMap(null))
-            mapConfig.markers = []
-            mapConfig.infoWindows = []
+        if (places.error){
+            alert(places.message)
+            return
+        }
 
-            // 검색 결과 마커 추가
-            if (data && Array.isArray(data)) { // data가 존재하고 배열인지 확인
-                if (data.length === 0) {
-                    alert('검색 결과가 없습니다.')
-                    return
-                }
+        if (!Array.isArray(places) || places.length === 0) {
+            alert('검색 결과가 없습니다.')
+            return 
+        }
 
-                data.forEach(place => {
-                    // 위치 정보가 없는 경우 건너뛰기
-                    if (!place.mapx || !place.mapy) {
-                        console.warn("위치 정보가 없는 장소:", place)
-                        return
-                    }
+        // 기존 마커 삭제
+        clearMarkers()
 
-                    // 값을 string으로 나눠주기 때문에 숫자로 변환 후 계산 진행
-                    let lat = parseFloat(place.mapy)
-                    let lng = parseFloat(place.mapx)
+        // 위치 정보가 없는 경우 해당 장소를 추가하지 않음
+        for (const place of places) {
+            if (!place.mapx || !place.mapy) continue
 
-                    // 좌표 계산 테스트용 (나중에 수정 필요)
-                    if (lat > 90 || lng > 180) {
-                        lat = lat / 1e7
-                        lng = lng / 1e7
-                    } else {
-                        lat = lat / 1e6
-                        lng = lng / 1e6
-                    }
+            // 값을 string으로 나눠주기 때문에 숫자로 변환 후 계산 진행
+            const lat = parseFloat(place.mapy) / 1e7
+            const lng = parseFloat(place.mapx) / 1e7
 
-                    const marker = new naver.maps.Marker({ // 마커 객체
-                        position: new naver.maps.LatLng(lat, lng), // position으로 마커 위치 지정
-                        map: mapConfig.map // 마커를 어디에 표시할지
-                    })
+            const marker = new naver.maps.Marker({ // 마커 생성
+                position: new naver.maps.LatLng(lat, lng), // position으로 마커 위치 지정
+                map: mapConfig.map // 마커를 어디에 표시할지
+            })
 
-                    const infoWindow = new naver.maps.InfoWindow({
-                        content: infoWindowContent(place),
-                        disableAutoPan: false,
-                        borderWidth: 0,
-                        backgroundColor: "rgba(0,0,0,0)"
-                    })
+            const infoWindow = new naver.maps.InfoWindow({
+                content: infoWindowContent(place),
+                disableAutoPan: false,
+                borderWidth: 0,
+                backgroundColor: "rgba(0,0,0,0)"
+            })
 
-                    // 마커 클릭 시
-                    naver.maps.Event.addListener(marker, "click", function () {
-                        if (mapConfig.activeInfoWindow) {
-                            mapConfig.activeInfoWindow.close()
-                        }
-                        infoWindow.open(mapConfig.map, marker)
-                        mapConfig.activeInfoWindow = infoWindow
-                    })
+            // 마커 클릭 시 정보창 표시
+            naver.maps.Event.addListener(marker, "click", function () {
+                if (mapConfig.activeInfoWindow) mapConfig.activeInfoWindow.close()
+                infoWindow.open(mapConfig.map, marker)
+                mapConfig.activeInfoWindow = infoWindow
+            })
 
-                    mapConfig.markers.push(marker)
-                    mapConfig.infoWindows.push(infoWindow)
-                })
+            // 검색 결과를 마커, 정보창에 추가
+            mapConfig.markers.push(marker)
+            mapConfig.infoWindows.push(infoWindow)
+        }
 
-                // 첫 번째 결과로 지도 이동
-                if (data.length > 0) {
-                    mapConfig.map.setCenter(new naver.maps.LatLng(data[0].mapy / 1e7, data[0].mapx / 1e7))
-                    mapConfig.map.setZoom(16)
-                }
-            } else {
-                alert('검색 결과가 없습니다.')
-            }
-        })
+        // 검색 결과 중 첫 번째 장소로 지도 이동
+        mapConfig.map.setCenter(new naver.maps.LatLng(places[0].mapy / 1e7, places[0].mapx / 1e7))
+        mapConfig.map.setZoom(16)
+    } catch (error) {
+        console.error("검색 요청 실패:", error)
+    }
+}
+
+// 마커 초기화
+function clearMarkers() {
+    mapConfig.markers.forEach(marker => marker.setMap(null))
+    mapConfig.infoWindows.forEach(infoWindow => infoWindow.setMap(null))
+    mapConfig.markers = []
+    mapConfig.infoWindows = []
 }
 
 // 닫기 버튼 클릭 시 InfoWindow 닫기
