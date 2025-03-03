@@ -84,11 +84,26 @@ function initMap() {
     }
 }
 
+// InfoWindow HTML
+function infoWindowContent(place) {
+    return `
+        <div class="custom-infowindow">
+            <button onclick="closeInfoWindow()">❌</button>
+            <strong style="font-size: 18px; color: #333;">${place.name || place.title}</strong><br>
+            <a href="${place.link || '#'}" target="_blank" style="color: #007aff;">🔗 홈페이지 방문</a>
+            <hr>
+            <p>📌 카테고리: ${place.category || '정보 없음'}</p>
+            <p>🏢 주소: ${place.address}</p>
+            <p>🛣️ 도로명 주소: ${place.roadAddress || '정보 없음'}</p>
+            <p>📞 전화번호: ${place.telephone || '전화번호 없음'}</p>
+            <p>ℹ️ 설명: ${place.description || '설명 없음'}</p>
+        </div>`;
+}
+
 // 음식점 마커 추가
 async function addPlaceMarker(place) {
     const lat = place.lat / 1e7
     const lng = place.lng / 1e7
-
     const position = new naver.maps.LatLng(lat, lng)
     const marker = new naver.maps.Marker({
         position: position,
@@ -109,21 +124,11 @@ async function addPlaceMarker(place) {
          console.error("추가 정보 가져오기 실패:", error)
      }
 
-    const infoWindow = new naver.maps.InfoWindow({
-        content: `<div class="custom-infowindow">
-                    <button onclick="closeInfoWindow()">❌</button>
-                    <strong style="font-size: 18px; color: #333;">${place.name}</strong><br>
-                    <a href="${addData.link}" target="_blank" style="color: #007aff;">🔗 홈페이지 방문</a>
-                    <hr>
-                    <p>📌 카테고리: ${addData.category || '정보 없음'}</p>
-                    <p>🏢 주소: ${place.address}</p>
-                    <p>🛣️ 도로명 주소: ${addData.roadAddress || '정보 없음'}</p>
-                    <p>📞 전화번호: ${addData.telephone || '전화번호 없음'}</p>
-                    <p>ℹ️ 설명: ${addData.description || '설명 없음'}</p>
-                </div>`,
-                disableAutoPan: false, // 자동 이동 방지
-                borderWidth: 0, // 기본 테두리 제거
-                backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
+     const infoWindow = new naver.maps.InfoWindow({
+        content: infoWindowContent({ ...place, ...addData }),
+        disableAutoPan: false,
+        borderWidth: 0,
+        backgroundColor: "rgba(0,0,0,0)"
     })
 
     naver.maps.Event.addListener(marker, "click", function () {
@@ -197,30 +202,19 @@ function searchPlaces() {
                     })
 
                     const infoWindow = new naver.maps.InfoWindow({
-                        content: `
-                            <div class="custom-infowindow">
-                                <button onclick="closeInfoWindow()">❌</button>
-                                <strong style="font-size: 18px; color: #333;">${place.title}</strong><br>
-                                <a href="${place.link}" target="_blank" style="color: #007aff;">🔗 홈페이지 방문</a>
-                                <hr>
-                                <p>📌 카테고리: ${place.category || '정보 없음'}</p>
-                                <p>🏢 주소: ${place.address}</p>
-                                <p>🛣️ 도로명 주소: ${place.roadAddress || '정보 없음'}</p>
-                                <p>📞 전화번호: ${place.telephone || '전화번호 없음'}</p>
-                                <p>ℹ️ 설명: ${place.description || '설명 없음'}</p>
-                            </div>`,
-                        disableAutoPan: false, // 자동 이동 방지
-                        borderWidth: 0, // 기본 테두리 제거
-                        backgroundColor: "rgba(0,0,0,0)" // 투명 배경 적용
+                        content: infoWindowContent(place),
+                        disableAutoPan: false,
+                        borderWidth: 0,
+                        backgroundColor: "rgba(0,0,0,0)"
                     })
 
                     // 마커 클릭 시
                     naver.maps.Event.addListener(marker, "click", function () {
                         if (activeInfoWindow) {
-                            activeInfoWindow.close() // 기존 열린 창 닫기
+                            activeInfoWindow.close()
                         }
-                        infoWindow.open(map, marker) // 새 창 열기
-                        activeInfoWindow = infoWindow // 현재 창 저장
+                        infoWindow.open(map, marker)
+                        activeInfoWindow = infoWindow
                     })
 
                     markers.push(marker)
@@ -244,4 +238,4 @@ window.closeInfoWindow = function (button) {
         activeInfoWindow.close()
         activeInfoWindow = null
     }
-};
+}
