@@ -114,17 +114,7 @@ async function addPlaceMarker(place) {
     })
 
      // 추가 정보 가져오기
-     let addData = {}
-     try {
-         const response = await fetch(`/api/maps/search?query=${encodeURIComponent(place.name)}`)
-         const searchData = await response.json()
- 
-         if (searchData.length > 0) {
-            addData = searchData[0] // 첫 번째 검색 결과 사용
-         }
-     } catch (error) {
-         console.error("추가 정보 가져오기 실패:", error)
-     }
+     const addData = await placeDetails(place.name)
 
      const infoWindow = new naver.maps.InfoWindow({
         content: infoWindowContent({ ...place, ...addData }),
@@ -220,6 +210,18 @@ function clearMarkers() {
     mapConfig.infoWindows.forEach(infoWindow => infoWindow.setMap(null))
     mapConfig.markers = []
     mapConfig.infoWindows = []
+}
+
+// 공통 API 호출 함수
+async function placeDetails(query) {
+    try {
+        const response = await fetch(`/api/maps/search?query=${encodeURIComponent(query)}`)
+        const data = await response.json()
+        return data.length > 0 ? data[0] : {}
+    } catch (error) {
+        console.error("추가 정보 가져오기 실패:", error)
+        return {}
+    }
 }
 
 // 닫기 버튼 클릭 시 InfoWindow 닫기
