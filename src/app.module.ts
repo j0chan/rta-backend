@@ -8,6 +8,7 @@ import { typeOrmConfig } from './config/typeorm.config'
 import { MapsModule } from './maps/maps.module'
 import { OpenaiModule } from './openai/openai.module'
 import { ReviewRepliesModule } from './review-replies/review-replies.module'
+import { StoreRequestModule } from './store-requests/store-requests.module'
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { ReviewRepliesModule } from './review-replies/review-replies.module'
     MapsModule,
     ReviewsModule,
     OpenaiModule,
-    ReviewRepliesModule
+    ReviewRepliesModule,
+    StoreRequestModule
   ],
 })
 export class AppModule { }
