@@ -7,6 +7,8 @@ import { ReviewsModule } from './reviews/reviews.module'
 import { typeOrmConfig } from './config/typeorm.config'
 import { MapsModule } from './maps/maps.module'
 import { OpenaiModule } from './openai/openai.module'
+import { StoreRequestsModule } from './store-requests/store-requests.module'
+import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { ReviewRepliesModule } from './review-replies/review-replies.module'
 import { StoreRequestModule } from './store-requests/store-requests.module'
 
@@ -19,8 +21,9 @@ import { StoreRequestModule } from './store-requests/store-requests.module'
     MapsModule,
     ReviewsModule,
     OpenaiModule,
-    ReviewRepliesModule,
-    StoreRequestModule
-  ],
+    StoreRequestsModule,
+    ManagerRequestsModule,
+    ReviewRepliesModule
+  ]
 })
 export class AppModule { }
