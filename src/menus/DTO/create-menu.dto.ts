@@ -6,10 +6,6 @@ export class CreateMenuDTO {
     store_id: number
 
     @IsNotEmpty()
-    @IsNumber()
-    menu_id: number
-
-    @IsNotEmpty()
     @IsString()
     menu_name: string
 
