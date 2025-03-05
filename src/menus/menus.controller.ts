@@ -33,8 +33,8 @@ export class MenusController {
     // READ[2] - 해당 가게 특정 메뉴 조회
     // 미구현: logger
     @Get('/:menu_id')
-    async readMenuByMenuId(@Param('menu_id') menu_id: number): Promise<ApiResponseDto<ReadMenuDTO>> {
-        const foundMenu: Menu = await this.menusService.readMenuByMenuId(menu_id)
+    async readMenuById(@Param('menu_id') menu_id: number): Promise<ApiResponseDto<ReadMenuDTO>> {
+        const foundMenu: Menu = await this.menusService.readMenuById(menu_id)
 
         return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Event!', new ReadMenuDTO(foundMenu))
     }
@@ -42,10 +42,10 @@ export class MenusController {
     // UPDATE - by menu_id
     // 미구현: logger
     @Put('/:menu_id')
-    async updateMenuByMenuId(
+    async updateMenuById(
         @Param('menu_id') menu_id: number,
         @Body() updateMenuDTO: UpdateMenuDTO): Promise<ApiResponseDto<void>> {
-        await this.menusService.updateMenuByMenuId(menu_id, updateMenuDTO)
+        await this.menusService.updateMenuById(menu_id, updateMenuDTO)
         return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Menu Updated Successfully!')
     }
 

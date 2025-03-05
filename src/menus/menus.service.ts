@@ -50,7 +50,7 @@ export class MenusService {
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
-    async readMenuByMenuId(menu_id: number): Promise<Menu> {
+    async readMenuById(menu_id: number): Promise<Menu> {
         const foundMenu = await this.menusRepository.createQueryBuilder('Menu')
             .where('Menu.menu_id = :id', { id: menu_id })
             .getOne() as Menu
@@ -60,8 +60,8 @@ export class MenusService {
 
     // UPDATE - by menu_id
     // 미구현: logger, 에러 처리
-    async updateMenuByMenuId(menu_id: number, updateMenuDTO: UpdateMenuDTO) {
-        const foundMenu = await this.readMenuByMenuId(menu_id)
+    async updateMenuById(menu_id: number, updateMenuDTO: UpdateMenuDTO) {
+        const foundMenu = await this.readMenuById(menu_id)
 
         const { menu_name, description, price, manager_container } = updateMenuDTO
         foundMenu.menu_name = menu_name
@@ -75,7 +75,7 @@ export class MenusService {
     // DELETE
     // 미구현: logger, 에러 처리
     async deleteMenuById(menu_id: number) {
-        const foundMenu = await this.readMenuByMenuId(menu_id)
+        const foundMenu = await this.readMenuById(menu_id)
         if(foundMenu) {
             await this.menusRepository.remove(foundMenu)
         }
