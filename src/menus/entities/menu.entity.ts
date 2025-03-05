@@ -7,7 +7,7 @@ export class Menu {
     menu_id: number
 
     @Column()
-    name: string
+    menu_name: string
 
     @Column()
     price: number
