@@ -9,7 +9,7 @@ export class Menu {
     @Column()
     menu_name: string
 
-    @Column()
+    @Column({ nullable: true })
     price: number
 
     @Column({ nullable: true })
