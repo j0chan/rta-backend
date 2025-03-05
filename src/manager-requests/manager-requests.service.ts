@@ -6,7 +6,7 @@ import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { UpdateManagerRequestDTO } from './DTO/update-manager-request.dto'
 import { RequestStatus } from 'src/common/request-status.enum'
-import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 
 @Injectable()
 export class ManagerRequestsService {

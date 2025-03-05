@@ -1,4 +1,4 @@
-import { ApiResponseDto } from 'src/common/api-reponse-dto/api-response.dto'
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewsService } from './reviews.service'
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put } from '@nestjs/common'
 import { CreateReviewDTO } from './DTO/create-review.dto'
@@ -15,28 +15,28 @@ export class ReviewsController {
     // CREATE - 리뷰 작성
     // 미구현: logger
     @Post('/')
-    async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDto<Review>> {
+    async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDTO<Review>> {
         await this.reviewsService.createReview(createReviewDTO)
-        return new ApiResponseDto(true, HttpStatus.CREATED, 'Review Created Successfully!')
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
     }
 
     // READ[1] - 모든 리뷰 조회
     // 미구현: logger
     @Get('/')
-    async readAllReviews(): Promise<ApiResponseDto<ReadAllReviewsDTO[]>> {
+    async readAllReviews(): Promise<ApiResponseDTO<ReadAllReviewsDTO[]>> {
         const reviews: Review[] = await this.reviewsService.readAllReviews()
         const readAllReviewsDTO = reviews.map(review => new ReadAllReviewsDTO(review))
 
-        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review List!', readAllReviewsDTO)
     }
 
     // READ[2] - 특정 리뷰 조회
     // 미구현: looger
     @Get('/:review_id')
-    async readReviewById(@Param('review_id') review_id: number): Promise<ApiResponseDto<Review>> {
+    async readReviewById(@Param('review_id') review_id: number): Promise<ApiResponseDTO<Review>> {
         const foundReview: Review = await this.reviewsService.readReviewById(review_id)
         
-        return new ApiResponseDto(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
     // UPDATE[1] - 리뷰 수정
@@ -44,9 +44,9 @@ export class ReviewsController {
     @Put('/:review_id')
     async updateReviewByReviewId(
         @Param('review_id') review_id: number,
-        @Body() updateReviewDTO: UpdateReviewDTO): Promise<ApiResponseDto<void>> {
+        @Body() updateReviewDTO: UpdateReviewDTO): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.updateReviewByReviewId(review_id, updateReviewDTO)
-        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
 
     // UPDATE[2] - 리뷰 도움됐어요 반응
@@ -58,16 +58,16 @@ export class ReviewsController {
      */
     @Patch('/:review_id/helpful')
     async markHelpful(
-        @Param("review_id") review_id: number): Promise<ApiResponseDto<void>> {
+        @Param("review_id") review_id: number): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.markHelpful(review_id)
-        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
     }
 
     // DELETE - 리뷰 삭제
     // 미구현: logger
     @Delete('/:review_id')
-    async deleteReviewByReviewId(@Param('review_id') review_id: number): Promise<ApiResponseDto<void>> {
+    async deleteReviewByReviewId(@Param('review_id') review_id: number): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.deleteReveiwById(review_id)
-        return new ApiResponseDto(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully!');
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully!');
     }
 }
