@@ -43,7 +43,7 @@ export class StoreRequestsService {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
 
-        // 가게신청서 생성
+        // 가게 신청서 생성
         const newStoreRequest: StoreRequest = this.storeRequestRepository.create({
             user_id,
             store,
@@ -55,7 +55,7 @@ export class StoreRequestsService {
 
     // READ
     // 모든 가게 신청서 조회 (관리자 전용)
-    async getAllStoreRequest(): Promise<StoreRequest[]> {
+    async readAllStoreRequest(): Promise<StoreRequest[]> {
         const storeRequests = await this.storeRequestRepository.find()
         if (!storeRequests) {
             throw new NotFoundException('No storeRequests')
@@ -65,10 +65,10 @@ export class StoreRequestsService {
     }
 
     // 특정 가게 신청서 조회
-    async getStoreRequestById(request_id: number): Promise<StoreRequest> {
+    async readStoreRequestById(request_id: number): Promise<StoreRequest> {
         const storeRequest = await this.storeRequestRepository.findOneBy({ request_id: request_id })
         if (!storeRequest) {
-            throw new NotFoundException(`Cannot Find request_id: ${request_id}`)
+            throw new NotFoundException(`Cannot Find request with id ${request_id}`)
         }
 
         return storeRequest
@@ -78,8 +78,7 @@ export class StoreRequestsService {
     // 가게 신청서 처리 (관리자 전용)
     async updateStoreRequest(request_id: number, updateStoreRequestDTO: UpdateStoreRequestDTO): Promise<void> {
         // request_id를 이용해 storeRequest 가져오기
-        const foundStoreRequest = await this.getStoreRequestById(request_id)
-        if (!foundStoreRequest) { return }
+        const foundStoreRequest = await this.readStoreRequestById(request_id)
 
         const { status, remark } = updateStoreRequestDTO
 
@@ -99,10 +98,7 @@ export class StoreRequestsService {
     // 가게 신청서 삭제
     async deleteStoreRequest(request_id: number) {
         // request_id를 이용해 storeRequest 가져오기
-        const foundStoreRequest = await this.storeRequestRepository.findOneBy({ request_id: request_id })
-        if (!foundStoreRequest) {
-            throw new NotFoundException(`Cannot Find request_id: ${request_id}`)
-        }
+        const foundStoreRequest = await this.readStoreRequestById(request_id)
 
         await this.storeRequestRepository.remove(foundStoreRequest)
     }
