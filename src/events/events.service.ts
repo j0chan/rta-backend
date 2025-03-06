@@ -73,10 +73,11 @@ export class EventsService {
 
     // UPDATE - by event_id
     // 미구현: logger, 에러 처리
-    async updateEventById(event_id: number, updateEventRequestDto: UpdateEventDTO) {
+    async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
         const foundEvent = await this.readEventById(event_id)
+        
+        const { title, description, start_date, end_date, event_status } = updateEventDTO
 
-        const { title, description, start_date, end_date, event_status } = updateEventDto
         foundEvent.title = title
         foundEvent.description = description
         foundEvent.start_date = start_date
