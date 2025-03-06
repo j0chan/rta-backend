@@ -46,6 +46,7 @@ export class ReviewsController {
         @Param('review_id') review_id: number,
         @Body() updateReviewDTO: UpdateReviewDTO): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.updateReviewByReviewId(review_id, updateReviewDTO)
+
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
 
@@ -60,6 +61,7 @@ export class ReviewsController {
     async markHelpful(
         @Param("review_id") review_id: number): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.markHelpful(review_id)
+
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
     }
 
@@ -68,6 +70,7 @@ export class ReviewsController {
     @Delete('/:review_id')
     async deleteReviewByReviewId(@Param('review_id') review_id: number): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.deleteReveiwById(review_id)
+        
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully!');
     }
 }
