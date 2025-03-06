@@ -45,7 +45,7 @@ export class ManagerRequestsService {
 
     // READ
     // 모든 점주 신청서 조회 (관리자 전용)
-    async getAllManagerRequests(): Promise<ManagerRequest[]> {
+    async readAllManagerRequests(): Promise<ManagerRequest[]> {
         const managerRequests = await this.managerRequestRepository.find()
         if(!managerRequests) {
             throw new NotFoundException('No ManagerRequests')
@@ -55,10 +55,10 @@ export class ManagerRequestsService {
     }
 
     // 특정 점주 신청서 조회 
-    async getManagerRequestById(request_id: number): Promise<ManagerRequest> {
+    async readManagerRequestById(request_id: number): Promise<ManagerRequest> {
         const managerRequest = await this.managerRequestRepository.findOneBy({ request_id: request_id })
         if(!managerRequest) {
-            throw new NotFoundException(`Cannot Find request_id: ${request_id}`)
+            throw new NotFoundException(`Cannot Find request_id ${request_id}`)
         }
 
         return managerRequest
@@ -67,9 +67,8 @@ export class ManagerRequestsService {
 
     // UPDATE
     // 점주 신청서 처리 (관리자 전용)
-    async updateManagerRequest(request_id: number, updateManagerRequestDTO: UpdateManagerRequestDTO) {
-        const foundManagerRequest = await this.getManagerRequestById(request_id)
-        if (!foundManagerRequest) { return }
+    async updateManagerRequest(request_id: number, updateManagerRequestDTO: UpdateManagerRequestDTO): Promise<void> {
+        const foundManagerRequest = await this.readManagerRequestById(request_id)
 
         const { status, remark } = updateManagerRequestDTO
 
@@ -90,10 +89,7 @@ export class ManagerRequestsService {
     // DELETE
     // 점주 신청서 삭제
     async deleteManagerRequest(request_id: number): Promise<void> {
-        const foundManagerRequest = await this.managerRequestRepository.findOneBy({ request_id: request_id })
-        if (!foundManagerRequest) {
-            throw new NotFoundException(`Cannot Find request_id: ${request_id}`)
-        }
+        const foundManagerRequest = await this.readManagerRequestById(request_id)
 
         await this.managerRequestRepository.remove(foundManagerRequest)
     }
