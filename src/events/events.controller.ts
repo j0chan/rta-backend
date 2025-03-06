@@ -1,5 +1,5 @@
 import { EventsService } from './events.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put } from '@nestjs/common'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadAllEventsDTO } from './dto/read-all-events.dto'
@@ -18,46 +18,47 @@ export class EventsController {
     @Post('/')
     async createEvent(@Body() createEventDto: CreateEventDTO): Promise<ApiResponseDTO<Event>> {
         await this.eventsService.createEvent(createEventDto)
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully!')
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
     }
 
     // READ[1] - 모든 이벤트 조회
     // 미구현: logger
     @Get('/')
     async readAllEvents(): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
-
         const events: Event[] = await this.eventsService.readAllEvents()
         const readAllEventsDto = events.map(event => new ReadAllEventsDTO(event))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Event List!', readAllEventsDto)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDto)
     }
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger
     // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
     @Get('/:event_id')
-    async readEventByEventId(@Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
-        const foundEvent: Event = await this.eventsService.readEventByEventId(event_id)
+    async readEventById(@Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent: Event = await this.eventsService.readEventById(event_id)
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Event!', new ReadEventDTO(foundEvent))
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
     }
 
     // UPDATE - by event_id
     // 미구현: logger
     @Put('/:event_id')
-    async updateEventByEventId(
+    async updateEventById(
         @Param('event_id') event_id: number,
         @Body() updateEventDto: UpdateEventDTO): Promise<ApiResponseDTO<void>> {
-        await this.eventsService.updateEventByEventId(event_id, updateEventDto)
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully!')
+        await this.eventsService.updateEventById(event_id, updateEventDto)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
     }
 
     // DELETE - by event_id
     // 미구현: logger
     @Delete('/:event_id')
     async deleteEventById(@Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
-        await this.eventsService.deleteEventByEventId(event_id)
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully!')
+        await this.eventsService.deleteEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
     }
 
 }
