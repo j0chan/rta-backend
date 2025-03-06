@@ -39,14 +39,14 @@ export class StoresService {
 
     // READ
     // 모든 가게 조회
-    async getAllStores(): Promise<Store[]> {
+    async readAllStores(): Promise<Store[]> {
         const foundStores = await this.storesRepository.find()
 
         return foundStores
     }
 
     // 특정 가게 조회
-    async getStoreById(store_id: number): Promise<Store> {
+    async readStoreById(store_id: number): Promise<Store> {
         const foundStore = await this.storesRepository.findOneBy({ store_id: store_id })
         if (!foundStore) {
             throw new NotFoundException(`Cannot Find Store with ID ${store_id}`)
@@ -56,7 +56,7 @@ export class StoresService {
     }
 
     // 가게 업종(category)으로 검색 조회
-    async getStoresByCategory(category: StoreCategory): Promise<Store[]> {
+    async readStoresByCategory(category: StoreCategory): Promise<Store[]> {
         const foundStores = await this.storesRepository.findBy({ category: category })
 
         return foundStores
@@ -65,14 +65,14 @@ export class StoresService {
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> { 
-        const foundStore = await this.getStoreById(store_id)
+        const foundStore = await this.readStoreById(store_id)
 
         await this.storesRepository.update(store_id, {user_id})
     }
 
     // 가게 정보 수정 (매니저 전용)
     async updateStoreDetail(store_id: number, updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<void> {
-        const foundStore = await this.getStoreById(store_id)
+        const foundStore = await this.readStoreById(store_id)
 
         const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
         
@@ -87,7 +87,7 @@ export class StoresService {
 
     // 가게 비공개 -> 공개 전환
     async updateStoreToPublic(store_id: number): Promise<void> {
-        const foundStore = await this.getStoreById(store_id)
+        const foundStore = await this.readStoreById(store_id)
 
         await this.storesRepository.update(store_id, { public: true })
     }
@@ -95,7 +95,7 @@ export class StoresService {
     // DELETE
     // 가게 삭제하기
     async deleteStore(store_id: number): Promise<void> {
-        const foundStore = await this.getStoreById(store_id)
+        const foundStore = await this.readStoreById(store_id)
 
         await this.storesRepository.remove(foundStore)
     }

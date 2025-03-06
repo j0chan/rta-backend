@@ -27,7 +27,7 @@ export class ReviewsService {
         const tempUserId: number = 1
 
         // store_id로 Store 객체 가져오기
-        const store = await this.storesService.getStoreById(store_id)
+        const store = await this.storesService.readStoreById(store_id)
 
         const currentDate: Date = await new Date()
 

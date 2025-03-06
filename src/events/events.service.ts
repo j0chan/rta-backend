@@ -23,7 +23,7 @@ export class EventsService {
         const { store_id, title, description, start_date, end_date } = createEventRequestDto
 
         // 가게 객체 가져오기
-        const store = await this.storesService.getStoreById(store_id)
+        const store = await this.storesService.readStoreById(store_id)
         if (!store) { 
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }

@@ -23,8 +23,8 @@ export class StoresController {
     // READ
     // 모든 가게 조회
     @Get('/')
-    async getAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
-        const stores = await this.storesService.getAllStores()
+    async readAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+        const stores = await this.storesService.readAllStores()
         const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
         
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTO)
@@ -32,24 +32,24 @@ export class StoresController {
 
     // 특정 가게 상세 정보 조회
     @Get('/:store_id')
-    async getStoreById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreDTO>> {
-        const store = await this.storesService.getStoreById(id)
+    async readStoreById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreDTO>> {
+        const store = await this.storesService.readStoreById(id)
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Retrieved Successfully", new ReadStoreDTO(store))
     }
 
     // 특정 가게 주소 조회
     @Get('/:store_id')
-    async getStoreAddressById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreAddressDTO>> {
-        const store = await this.storesService.getStoreById(id)
+    async readStoreAddressById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreAddressDTO>> {
+        const store = await this.storesService.readStoreById(id)
         
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Address Retrieved by Id Successfully", new ReadStoreAddressDTO(store))
     }
     
     // 가게 업종으로 검색(필터링) 조회
     @Get('/')
-    async getStoresByCategory(@Query('category') category: StoreCategory): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
-        const stores = await this.storesService.getStoresByCategory(category)
+    async readStoresByCategory(@Query('category') category: StoreCategory): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+        const stores = await this.storesService.readStoresByCategory(category)
         const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)

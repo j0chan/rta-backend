@@ -26,7 +26,7 @@ export class ManagerRequestsService {
         // user_id를 이용해 user 가져오기
 
         // store_id를 이용해 store 가져오기
-        const store = await this.storesService.getStoreById(store_id)
+        const store = await this.storesService.readStoreById(store_id)
         if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
