@@ -22,7 +22,7 @@ export class MenusService {
         const { store_id, menu_name, price, description, manager_container } = createMenuDTO
 
         // 가게 객체 가져오기
-        const store = await this.storesService.getStoreById(store_id)
+        const store = await this.storesService.readStoreById(store_id)
         if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
