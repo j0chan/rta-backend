@@ -9,6 +9,13 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule)
 
+  // CORS 설정 추가
+  app.enableCors({
+    origin: 'http://localhost:8100',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  })
+
   // 정적 파일 제공 (public 폴더)
   app.use('/test', express.static(path.join(__dirname, '..', 'public'))) // 루트까지(..) 이동한 뒤, public을 찾는다.
 
