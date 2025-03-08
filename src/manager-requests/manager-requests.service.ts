@@ -6,7 +6,6 @@ import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { UpdateManagerRequestDTO } from './DTO/update-manager-request.dto'
 import { RequestStatus } from 'src/common/request-status.enum'
-import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 
 @Injectable()
 export class ManagerRequestsService {
@@ -16,7 +15,7 @@ export class ManagerRequestsService {
         @InjectRepository(ManagerRequest)
         private managerRequestRepository: Repository<ManagerRequest>,
         private storesService: StoresService
-    ) {}
+    ) { }
 
     // CREATE
     // 점주 신청서 생성 (store가 존재하는 경우)
@@ -47,7 +46,7 @@ export class ManagerRequestsService {
     // 모든 점주 신청서 조회 (관리자 전용)
     async readAllManagerRequests(): Promise<ManagerRequest[]> {
         const managerRequests = await this.managerRequestRepository.find()
-        if(!managerRequests) {
+        if (!managerRequests) {
             throw new NotFoundException('No ManagerRequests')
         }
 
@@ -56,8 +55,11 @@ export class ManagerRequestsService {
 
     // 특정 점주 신청서 조회 
     async readManagerRequestById(request_id: number): Promise<ManagerRequest> {
-        const managerRequest = await this.managerRequestRepository.findOneBy({ request_id: request_id })
-        if(!managerRequest) {
+        const managerRequest = await this.managerRequestRepository.findOne({
+            where: { request_id },
+            relations: ["store"]
+        })
+        if (!managerRequest) {
             throw new NotFoundException(`Cannot Find request_id ${request_id}`)
         }
 
