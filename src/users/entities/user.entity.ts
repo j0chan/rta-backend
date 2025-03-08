@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
 
+@Entity()
 export class User {
     @PrimaryGeneratedColumn()
     user_id: number
@@ -17,7 +18,7 @@ export class User {
     @Column()
     phone_number: string
 
-    @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+    @Column()
     role: UserRole
 
     @CreateDateColumn({ type: 'timestamp' })
