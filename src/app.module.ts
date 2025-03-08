@@ -26,7 +26,8 @@ import { MenusModule } from './menus/menus.module';
     StoreRequestsModule,
     ManagerRequestsModule,
     ReviewRepliesModule,
-    MenusModule
+    MenusModule,
+    UsersModule
   ],
 })
 export class AppModule { }
