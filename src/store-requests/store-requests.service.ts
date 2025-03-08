@@ -66,7 +66,10 @@ export class StoreRequestsService {
 
     // 특정 가게 신청서 조회
     async readStoreRequestById(request_id: number): Promise<StoreRequest> {
-        const storeRequest = await this.storeRequestRepository.findOneBy({ request_id: request_id })
+        const storeRequest = await this.storeRequestRepository.findOne({ 
+            where: {request_id},
+            relations: ["store"]
+        })
         if (!storeRequest) {
             throw new NotFoundException(`Cannot Find request with id ${request_id}`)
         }
