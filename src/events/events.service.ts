@@ -24,7 +24,7 @@ export class EventsService {
 
         // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
-        if (!store) { 
+        if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
 
@@ -54,7 +54,7 @@ export class EventsService {
         if (!foundEvents) {
             throw new NotFoundException(`Cannot Find Events`)
         }
-    
+
         return foundEvents
     }
 
@@ -75,7 +75,7 @@ export class EventsService {
     // 미구현: logger, 에러 처리
     async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
         const foundEvent = await this.readEventById(event_id)
-        
+
         const { title, description, start_date, end_date, event_status } = updateEventDTO
 
         foundEvent.title = title

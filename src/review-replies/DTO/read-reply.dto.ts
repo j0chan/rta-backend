@@ -2,7 +2,6 @@ import { ReviewReply } from "../entities/review-reply.entity"
 import { Review } from "src/reviews/entites/review.entity"
 
 export class ReadReplyDTO {
-
     content: string
     created_at: Date
     updated_at: Date

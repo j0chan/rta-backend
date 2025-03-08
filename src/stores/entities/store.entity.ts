@@ -1,7 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
-import { User } from "src/users/entities/user.entity"
 import { Event } from "src/events/entities/event.entity"
 import { StoreRequest } from "../../store-requests/entities/store-request.entity"
 import { Menu } from "src/menus/entities/menu.entity"

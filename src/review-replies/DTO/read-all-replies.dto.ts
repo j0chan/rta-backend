@@ -1,17 +1,10 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator"
 import { ReviewReply } from "../entities/review-reply.entity"
 
 export class ReadAllRepliesDTO {
-    @IsNotEmpty()
-    @IsString()
     content: string
 
-    @IsNotEmpty()
-    @IsDate()
     created_at: Date
 
-    @IsNotEmpty()
-    @IsDate()
     updated_at: Date
 
     constructor(reviewReply: ReviewReply) {

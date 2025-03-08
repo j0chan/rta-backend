@@ -1,9 +1,9 @@
-import { UpdateUserDTO } from './DTO/update-user.dto';
-import { CreateUserDTO } from './DTO/create-user.dto';
+import { UpdateUserDTO } from './DTO/update-user.dto'
+import { CreateUserDTO } from './DTO/create-user.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from './entities/user.entity'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class UsersService {
@@ -36,7 +36,7 @@ export class UsersService {
     // 미구현: logger, 에러 처리
     async readAllUsers(): Promise<User[]> {
         const foundUsers: User[] = await this.userRepository.find()
-        if(!foundUsers) {
+        if (!foundUsers) {
             throw new NotFoundException(`Cannot Find Events`)
         }
 
@@ -47,9 +47,9 @@ export class UsersService {
     // 미구현: logger, 에러 처리
     async readUserById(user_id: number): Promise<User> {
         const foundUser = await this.userRepository.createQueryBuilder('User')
-            .where('User.user_id = :id', {id: user_id})
+            .where('User.user_id = :id', { id: user_id })
             .getOne() as User
-        if(!foundUser) {
+        if (!foundUser) {
             throw new NotFoundException(`Cannot Find Event By Id ${user_id}`)
         }
 

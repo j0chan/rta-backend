@@ -35,7 +35,7 @@ export class ReviewsController {
     @Get('/:review_id')
     async readReviewById(@Param('review_id') review_id: number): Promise<ApiResponseDTO<Review>> {
         const foundReview: Review = await this.reviewsService.readReviewById(review_id)
-        
+
         return new ApiResponseDTO(true, HttpStatus.OK, 'Review Retrieved Successfully', foundReview)
     }
 
@@ -71,6 +71,6 @@ export class ReviewsController {
     async deleteReviewByReviewId(@Param('review_id') review_id: number): Promise<ApiResponseDTO<void>> {
         await this.reviewsService.deleteReveiwById(review_id)
 
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully');
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully')
     }
 }

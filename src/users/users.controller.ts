@@ -1,13 +1,11 @@
-import { ReadAllEventsDTO } from './../events/dto/read-all-events.dto';
-import { EventsService } from './../events/events.service';
-import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
-import { CreateUserDTO } from './DTO/create-user.dto';
-import { UsersService } from './users.service';
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
+import { CreateUserDTO } from './DTO/create-user.dto'
+import { UsersService } from './users.service'
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
-import { User } from './entities/user.entity';
-import { ReadUserDTO } from './DTO/read-user.dto';
-import { UpdateUserDTO } from './DTO/update-user.dto';
-import { ReadAllUsersDTO } from './DTO/read-all-users.dto';
+import { User } from './entities/user.entity'
+import { ReadUserDTO } from './DTO/read-user.dto'
+import { UpdateUserDTO } from './DTO/update-user.dto'
+import { ReadAllUsersDTO } from './DTO/read-all-users.dto'
 
 @Controller('api/users')
 export class UsersController {

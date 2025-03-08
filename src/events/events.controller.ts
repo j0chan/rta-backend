@@ -1,5 +1,5 @@
 import { EventsService } from './events.service'
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadAllEventsDTO } from './dto/read-all-events.dto'

@@ -1,6 +1,6 @@
-import { UpdateMenuDTO } from './DTO/update-menu.dto';
-import { StoresService } from './../stores/stores.service';
-import { CreateMenuDTO } from './DTO/create-menu.dto';
+import { UpdateMenuDTO } from './DTO/update-menu.dto'
+import { StoresService } from './../stores/stores.service'
+import { CreateMenuDTO } from './DTO/create-menu.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Menu } from './entities/menu.entity'

@@ -60,7 +60,7 @@ export class ReviewsService {
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find Review with Id ${review_id}`)
         }
-    
+
         return foundReview
     }
 
