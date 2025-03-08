@@ -16,7 +16,7 @@ export class EventsController {
     // CREATE
     // 미구현: logger
     @Post('/')
-    async createEvent(@Body() createEventDto: CreateEventDTO): Promise<ApiResponseDTO<Event>> {
+    async createEvent(@Body() createEventDto: CreateEventDTO): Promise<ApiResponseDTO<void>> {
         await this.eventsService.createEvent(createEventDto)
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
     }
