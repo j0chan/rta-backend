@@ -10,7 +10,7 @@ export class StoreRequest {
     @Column()
     user_id: number
 
-    @OneToOne(() => Store, { eager: true })
+    @OneToOne(() => Store, { eager: false })
     @JoinColumn({ name: "store_id" })
     store: Store
 

@@ -1,5 +1,5 @@
 import { EventsService } from './events.service'
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadAllEventsDTO } from './dto/read-all-events.dto'
@@ -16,7 +16,7 @@ export class EventsController {
     // CREATE
     // 미구현: logger
     @Post('/')
-    async createEvent(@Body() createEventDto: CreateEventDTO): Promise<ApiResponseDTO<Event>> {
+    async createEvent(@Body() createEventDto: CreateEventDTO): Promise<ApiResponseDTO<void>> {
         await this.eventsService.createEvent(createEventDto)
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
     }

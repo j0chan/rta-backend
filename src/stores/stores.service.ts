@@ -13,7 +13,7 @@ export class StoresService {
     constructor(
         @InjectRepository(Store)
         private storesRepository: Repository<Store>
-    ) {}
+    ) { }
 
     // CREATE
     // 새로운 가게 생성하기
@@ -64,10 +64,10 @@ export class StoresService {
 
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
-    async updateStoreManager(store_id: number, user_id: number): Promise<void> { 
+    async updateStoreManager(store_id: number, user_id: number): Promise<void> {
         const foundStore = await this.readStoreById(store_id)
 
-        await this.storesRepository.update(store_id, {user_id})
+        await this.storesRepository.update(store_id, { user_id })
     }
 
     // 가게 정보 수정 (매니저 전용)
@@ -75,7 +75,7 @@ export class StoresService {
         const foundStore = await this.readStoreById(store_id)
 
         const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
-        
+
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
         foundStore.category = category

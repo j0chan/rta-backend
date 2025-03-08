@@ -1,6 +1,6 @@
 import { RequestStatus } from "src/common/request-status.enum"
 import { Store } from "src/stores/entities/store.entity"
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class ManagerRequest {
@@ -10,7 +10,8 @@ export class ManagerRequest {
     @Column()
     user_id: number
 
-    @ManyToOne(() => Store, { eager: true })
+    @ManyToOne(() => Store, { eager: false })
+    @JoinColumn({ name: "store_id" })
     store: Store
 
     @CreateDateColumn({ type: 'timestamp' })

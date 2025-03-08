@@ -5,6 +5,7 @@ import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewReply } from './entities/review-reply.entity'
 import { ReadAllRepliesDTO } from './DTO/read-all-replies.dto'
 import { UpdateReplyDTO } from './DTO/upate-reply.dto'
+import { ReadReplyDTO } from './DTO/read-reply.dto'
 
 @Controller('api/replies')
 export class ReviewRepliesController {
@@ -37,8 +38,8 @@ export class ReviewRepliesController {
     // READ[2] - 특정 대댓글 조회
     // 미구현: looger
     @Get('/:reply_id')
-    async readReplyById(@Param('reply_id') reply_id: number): Promise<ApiResponseDTO<ReviewReply>> {
-        const foundReply: ReviewReply = await this.reviewRepliesService.readReplyById(reply_id)
+    async readReplyById(@Param('reply_id') reply_id: number): Promise<ApiResponseDTO<ReadReplyDTO>> {
+        const foundReply = new ReadReplyDTO(await this.reviewRepliesService.readReplyById(reply_id))
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Reply Retrieved Successfully', foundReply)
     }

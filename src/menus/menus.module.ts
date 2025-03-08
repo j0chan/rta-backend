@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Menu } from './entities/menu.entity';
-import { MenusService } from './menus.service';
-import { MenusController } from './menus.controller';
-import { StoresModule } from 'src/stores/stores.module';
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Menu } from './entities/menu.entity'
+import { MenusService } from './menus.service'
+import { MenusController } from './menus.controller'
+import { StoresModule } from 'src/stores/stores.module'
 
 @Module({
     imports: [

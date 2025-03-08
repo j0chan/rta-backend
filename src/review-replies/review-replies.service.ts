@@ -34,10 +34,12 @@ export class ReviewRepliesService {
             review: foundReview,
         })
 
-        const createdReply: ReviewReply = await this.reviewReplyRepository.save(newReviewReply)
+        await this.reviewReplyRepository.save(newReviewReply)
+        // const createdReply: ReviewReply = await this.reviewReplyRepository.save(newReviewReply)
 
         // review엔터티의 reply컬럼 변경 수행
-        await this.reviewsService.updateReviewReplyId(review_id, createdReply)
+        // await this.reviewsService.updateReviewReplyId(review_id, createdReply)
+        return
     }
 
     // READ[1] - 모든 대댓글 조회 (매니저 전용)
@@ -51,7 +53,10 @@ export class ReviewRepliesService {
     // READ[2] - 특정 리뷰 조회
     // 미구현: logger, 에러 처리
     async readReplyById(reply_id: number): Promise<ReviewReply> {
-        const foundReply = await this.reviewReplyRepository.findOneBy({ reply_id })
+        const foundReply = await this.reviewReplyRepository.findOne({
+            where: { reply_id },
+            relations: ["review"],
+        });
         if (!foundReply) {
             throw new NotFoundException(`Cannot Find reply_id: ${reply_id}`)
         }

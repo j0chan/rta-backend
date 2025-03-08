@@ -1,11 +1,11 @@
-import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
-import { CreateMenuDTO } from './DTO/create-menu.dto';
-import { MenusService } from './menus.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
-import { Menu } from './entities/menu.entity';
-import { ReadAllMenusDTO } from './DTO/read-all-menus.dto';
-import { ReadMenuDTO } from './DTO/read-menu.dto';
-import { UpdateMenuDTO } from './DTO/update-menu.dto';
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
+import { CreateMenuDTO } from './DTO/create-menu.dto'
+import { MenusService } from './menus.service'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Menu } from './entities/menu.entity'
+import { ReadAllMenusDTO } from './DTO/read-all-menus.dto'
+import { ReadMenuDTO } from './DTO/read-menu.dto'
+import { UpdateMenuDTO } from './DTO/update-menu.dto'
 
 @Controller('api/menus')
 export class MenusController {

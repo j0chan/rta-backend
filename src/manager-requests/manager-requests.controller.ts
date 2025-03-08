@@ -23,7 +23,7 @@ export class ManagerRequestsController {
     @Get('/')
     async readAllManagerRequests(): Promise<ApiResponseDTO<ReadManagerRequestDTO[]>> {
         const managerRequests = await this.managerRequestsService.readAllManagerRequests()
-        if (!managerRequests) { 
+        if (!managerRequests) {
             throw new NotFoundException('No managerRequests')
         }
 
@@ -55,7 +55,7 @@ export class ManagerRequestsController {
 
     // DELETE
     // 가게 신청서 삭제 
-    @Delete('/:request_id') 
+    @Delete('/:request_id')
     async deleteManagerRequest(@Param('request_id') request_id: number): Promise<ApiResponseDTO<void>> {
         await this.managerRequestsService.deleteManagerRequest(request_id)
 

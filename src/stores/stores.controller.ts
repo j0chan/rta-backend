@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query } from '@nestjs/common'
 import { StoresService } from './stores.service'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { ReadStoreDTO } from './DTO/read-store.dto'
@@ -26,7 +26,7 @@ export class StoresController {
     async readAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         const stores = await this.storesService.readAllStores()
         const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
-        
+
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTO)
     }
 
@@ -42,10 +42,10 @@ export class StoresController {
     @Get('/:store_id')
     async readStoreAddressById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreAddressDTO>> {
         const store = await this.storesService.readStoreById(id)
-        
+
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Address Retrieved by Id Successfully", new ReadStoreAddressDTO(store))
     }
-    
+
     // 가게 업종으로 검색(필터링) 조회
     @Get('/')
     async readStoresByCategory(@Query('category') category: StoreCategory): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
@@ -79,5 +79,5 @@ export class StoresController {
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Deleted Successfully")
     }
-    
+
 }
