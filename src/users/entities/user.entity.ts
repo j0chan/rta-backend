@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
+import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 
 @Entity()
 export class User {
@@ -23,4 +24,7 @@ export class User {
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
+
+    @ManyToOne(()=> ManagerRequest, (managerRequest) => managerRequest.user)
+    manager_requests: ManagerRequest[]
 }
