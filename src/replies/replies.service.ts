@@ -1,19 +1,18 @@
-import { ReviewsService } from './../reviews/reviews.service'
+import { ReviewsService } from '../reviews/reviews.service'
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { CreateReplyDTO } from './DTO/create-reply.dto'
-import { ReviewReply } from './entities/review-reply.entity'
+import { Reply as Reply } from './entities/reply.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UpdateReplyDTO } from './DTO/upate-reply.dto'
 
 @Injectable()
-export class ReviewRepliesService {
+export class RepliesService {
 
     constructor(
-        // ReviewReply 엔터티 주입
-        @InjectRepository(ReviewReply)
-        private reviewReplyRepository: Repository<ReviewReply>,
-
+        // Reply 엔터티 주입
+        @InjectRepository(Reply)
+        private replyRepository: Repository<Reply>,
         private reviewsService: ReviewsService,
     ) { }
 
@@ -27,36 +26,30 @@ export class ReviewRepliesService {
 
         const currentDate = new Date()
 
-        const newReviewReply: ReviewReply = this.reviewReplyRepository.create({
+        const newReply: Reply = this.replyRepository.create({
             content: createReplyDTO.content,
             created_at: currentDate,
             updated_at: currentDate,
             review: foundReview,
         })
 
-        await this.reviewReplyRepository.save(newReviewReply)
-        // const createdReply: ReviewReply = await this.reviewReplyRepository.save(newReviewReply)
-
-        // review엔터티의 reply컬럼 변경 수행
-        // await this.reviewsService.updateReviewReplyId(review_id, createdReply)
+        await this.replyRepository.save(newReply)
         return
     }
 
     // READ[1] - 모든 대댓글 조회 (매니저 전용)
     // 미구현: logger, 에러 처리
-    async readAllReplies(): Promise<ReviewReply[]> {
-        const foundReplies = await this.reviewReplyRepository.find()
+    async readAllReplies(): Promise<Reply[]> {
+        const foundReplies = await this.replyRepository.find()
 
         return foundReplies
     }
 
     // READ[2] - 특정 리뷰 조회
     // 미구현: logger, 에러 처리
-    async readReplyById(reply_id: number): Promise<ReviewReply> {
-        const foundReply = await this.reviewReplyRepository.findOne({
-            where: { reply_id },
-            relations: ["review"],
-        });
+    async readReplyById(reply_id: number): Promise<Reply> {
+        const foundReply = await this.replyRepository.findOneBy({ reply_id: reply_id })
+
         if (!foundReply) {
             throw new NotFoundException(`Cannot Find reply_id: ${reply_id}`)
         }
@@ -68,13 +61,12 @@ export class ReviewRepliesService {
     // 미구현: logger, 에러 처리
     async updateReplyByReplyId(reply_id: number, updateReviewDTO: UpdateReplyDTO) {
         const foundReply = await this.readReplyById(reply_id)
-
-        const currentDate: Date = new Date()
+        const currentDate = new Date()
 
         foundReply.content = updateReviewDTO.content
         foundReply.updated_at = currentDate
 
-        await this.reviewReplyRepository.save(foundReply)
+        await this.replyRepository.save(foundReply)
     }
 
     // DELETE - 대댓글 삭제
@@ -82,6 +74,6 @@ export class ReviewRepliesService {
     async deleteReplyByReplyId(reply_id: number) {
         const foundReply = await this.readReplyById(reply_id)
 
-        await this.reviewReplyRepository.remove(foundReply)
+        await this.replyRepository.remove(foundReply)
     }
 }

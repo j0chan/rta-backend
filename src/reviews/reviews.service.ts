@@ -5,10 +5,12 @@ import { Review } from './entites/review.entity'
 import { Repository } from 'typeorm'
 import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
-import { ReviewReply } from 'src/review-replies/entities/review-reply.entity'
+import { Reply } from 'src/replies/entities/reply.entity'
 
 @Injectable()
 export class ReviewsService {
+    // !!!! user 수정 완료되면 relation에 추가해야됨
+    private reviewRelations = ["reply", "store"]
 
     constructor(
         // Review 엔터티 주입
@@ -29,7 +31,7 @@ export class ReviewsService {
         // store_id로 Store 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
 
-        const currentDate: Date = await new Date()
+        const currentDate: Date = new Date()
 
         const newReview: Review = this.reviewRepository.create({
             store,
@@ -45,7 +47,9 @@ export class ReviewsService {
     // READ[1] - 모든 리뷰 조회
     // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
-        const foundReviews = await this.reviewRepository.find()
+        const foundReviews = await this.reviewRepository.find({
+            relations: this.reviewRelations,
+        })
 
         return foundReviews
     }
@@ -55,13 +59,31 @@ export class ReviewsService {
         const foundReview = await this.reviewRepository.findOne({
             where: { review_id },
             // reply 관계를 포함하여 조회
-            relations: ["reply"],
+            relations: this.reviewRelations, 
         })
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find Review with Id ${review_id}`)
         }
 
         return foundReview
+    }
+    
+    // READ[3] - 사용자로 리뷰 필터링
+    // async readReviewsByUser(user_id: number): Promise<Review[]> {
+    //     // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
+    //     const foundReviews = await this.reviewRepository.findBy({ user_id: user_id })
+
+    //     return foundReviews
+    // }
+
+    // READ[4] - 가게로 리뷰 필터링
+    async readReviewsByStore(store_id: number): Promise<Review[]> {
+        const foundReviews = await this.reviewRepository.find({ 
+            where: { store: { store_id: store_id }},
+            relations: this.reviewRelations,
+        })
+
+        return foundReviews
     }
 
     // UPDATE[1] - 리뷰 수정
@@ -96,7 +118,7 @@ export class ReviewsService {
     }
 
     // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
-    async updateReviewReplyId(review_id: number, reply: ReviewReply): Promise<void> {
+    async updateReplyId(review_id: number, reply: Reply): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
         foundReview.reply = reply
 
