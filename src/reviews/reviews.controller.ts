@@ -39,24 +39,6 @@ export class ReviewsController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
-    // READ[3] - 사용자로 리뷰 필터링
-    @Get('/') // !!!! id를 어떻게 넘기지? -> Body? Query?
-    async readReviewsByUser(@Body() user_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
-        const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
-        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
-
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Review Retrieved Successfully', readReviewDTOs)
-    }
-
-    // READ[4] - 가게로 리뷰 필터링
-    @Get('/')
-    async readReviewsByStore(@Body() store_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
-        const foundReviews = await this.reviewsService.readReviewsByStore(store_id)
-        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
-
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Review Retrieved Successfully', readReviewDTOs)
-    }
-
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger
     @Put('/:review_id')

@@ -6,10 +6,15 @@ import { ReadStoreAddressDTO } from './DTO/read-store-address.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
+import { ReadReviewDTO } from 'src/reviews/DTO/read-review.dto'
+import { ReviewsService } from 'src/reviews/reviews.service'
 
 @Controller('api/stores')
 export class StoresController {
-    constructor(private storesService: StoresService) { }
+    constructor(
+        private storesService: StoresService,
+        private reviewsService: ReviewsService,
+    ) { }
 
     // CREATE
     // 새로운 가게 생성하기
@@ -53,6 +58,15 @@ export class StoresController {
         const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)
+    }
+
+    // 가게 리뷰 조회
+    @Get('/:store_id/reviews')
+    async readStoreReviews(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        const foundReviews = await this.reviewsService.readReviewsByStore(id)
+        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
 
     // UPDATE
