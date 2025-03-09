@@ -1,4 +1,4 @@
-import { ReadReplyDTO } from "src/review-replies/DTO/read-reply.dto"
+import { ReadReplyDTO } from "src/replies/DTO/read-reply.dto"
 import { Review } from "../entites/review.entity"
 
 export class ReadReviewDTO {

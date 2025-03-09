@@ -5,11 +5,10 @@ import { Review } from './entites/review.entity'
 import { Repository } from 'typeorm'
 import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
-import { ReviewReply } from 'src/review-replies/entities/review-reply.entity'
+import { Reply } from 'src/replies/entities/reply.entity'
 
 @Injectable()
 export class ReviewsService {
-    // !!!! relations가 반복되는데, 한 곳에서 불러오는 식으로 쓰고싶음. service 내에 배열 만들어서 보관해도 ㄱㅊ은지?
     // !!!! user 수정 완료되면 relation에 추가해야됨
     private reviewRelations = ["reply", "store"]
 
@@ -78,17 +77,17 @@ export class ReviewsService {
     }
 
     // READ[4] - 가게로 리뷰 필터링
-    // async readReviewsByStore(store_id: number): Promise<Review[]> {
-    //     // store_id로 Store 객체 가져오기
-    //     // const store = await this.storesService.readStoreById(store_id)
+    async readReviewsByStore(store_id: number): Promise<Review[]> {
+        // store_id로 Store 객체 가져오기
+        const store = await this.storesService.readStoreById(store_id)
 
-    //     // const foundReviews = await this.reviewRepository.find({
-    //     //     where: { store },
-    //     //     relations: this.reviewRelations,
-    //     // })
+        const foundReviews = await this.reviewRepository.find({
+            where: { store },
+            relations: this.reviewRelations,
+        })
 
-    //     // return foundReviews
-    // }
+        return foundReviews
+    }
 
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
@@ -122,7 +121,7 @@ export class ReviewsService {
     }
 
     // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
-    async updateReviewReplyId(review_id: number, reply: ReviewReply): Promise<void> {
+    async updateReplyId(review_id: number, reply: Reply): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
         foundReview.reply = reply
 

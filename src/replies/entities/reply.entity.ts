@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGenerate
 
 
 @Entity()
-export class ReviewReply {
+export class Reply {
     @PrimaryGeneratedColumn()
     reply_id: number
 

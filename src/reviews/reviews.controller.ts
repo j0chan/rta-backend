@@ -49,13 +49,13 @@ export class ReviewsController {
     }
 
     // READ[4] - 가게로 리뷰 필터링
-    // @Get('/')
-    // async readReviewsByStore(@Body() store_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
-    //     const foundReviews = await this.reviewsService.readReviewsByStore(store_id)
-    //     const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
+    @Get('/')
+    async readReviewsByStore(@Body() store_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        const foundReviews = await this.reviewsService.readReviewsByStore(store_id)
+        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
 
-    //     return new ApiResponseDTO(true, HttpStatus.OK, 'Review Retrieved Successfully', readReviewDTOs)
-    // }
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Review Retrieved Successfully', readReviewDTOs)
+    }
 
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger
