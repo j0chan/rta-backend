@@ -9,6 +9,9 @@ import { ReviewReply } from 'src/review-replies/entities/review-reply.entity'
 
 @Injectable()
 export class ReviewsService {
+    // !!!! relations가 반복되는데, 한 곳에서 불러오는 식으로 쓰고싶음. service 내에 배열 만들어서 보관해도 ㄱㅊ은지?
+    // !!!! user 수정 완료되면 relation에 추가해야됨
+    private reviewRelations = ["reply", "store"]
 
     constructor(
         // Review 엔터티 주입
@@ -33,7 +36,7 @@ export class ReviewsService {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
 
-        const currentDate: Date = await new Date()
+        const currentDate: Date = new Date()
 
         const newReview: Review = this.reviewRepository.create({
             store,
@@ -51,8 +54,9 @@ export class ReviewsService {
     // READ[1] - 모든 리뷰 조회
     // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
-
-        const foundReviews = await this.reviewRepository.find()
+        const foundReviews = await this.reviewRepository.find({
+            relations: this.reviewRelations,
+        })
 
         return foundReviews
     }
@@ -62,15 +66,35 @@ export class ReviewsService {
         const foundReview = await this.reviewRepository.findOne({
             where: { review_id },
             // reply 관계를 포함하여 조회
-            relations: ["reply"],
-        });
-    
+            relations: this.reviewRelations, 
+        })
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find review_id: ${review_id}`);
         }
-    
+
         return foundReview
     }
+    
+    // READ[3] - 사용자로 리뷰 필터링
+    async readReviewsByUser(user_id: number): Promise<Review[]> {
+        // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
+        const foundReviews = await this.reviewRepository.findBy({ user_id: user_id })
+
+        return foundReviews
+    }
+
+    // READ[4] - 가게로 리뷰 필터링
+    // async readReviewsByStore(store_id: number): Promise<Review[]> {
+    //     // store_id로 Store 객체 가져오기
+    //     // const store = await this.storesService.readStoreById(store_id)
+
+    //     // const foundReviews = await this.reviewRepository.find({
+    //     //     where: { store },
+    //     //     relations: this.reviewRelations,
+    //     // })
+
+    //     // return foundReviews
+    // }
 
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
