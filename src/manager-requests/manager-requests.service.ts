@@ -6,15 +6,18 @@ import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { UpdateManagerRequestDTO } from './DTO/update-manager-request.dto'
 import { RequestStatus } from 'src/common/request-status.enum'
+import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class ManagerRequestsService {
+    private managerRequestRelations = ["store", "user"]
 
     // init
     constructor(
         @InjectRepository(ManagerRequest)
         private managerRequestRepository: Repository<ManagerRequest>,
-        private storesService: StoresService
+        private storesService: StoresService,
+        private usersService: UsersService,
     ) { }
 
     // CREATE
@@ -23,6 +26,7 @@ export class ManagerRequestsService {
         const { user_id, store_id } = createManagerRequestDTO
 
         // user_id를 이용해 user 가져오기
+        const user = await this.usersService.readUserById(user_id)
 
         // store_id를 이용해 store 가져오기
         const store = await this.storesService.readStoreById(store_id)
@@ -32,7 +36,7 @@ export class ManagerRequestsService {
 
         // manager request 생성
         const newManagerRequest = this.managerRequestRepository.create({
-            user_id,
+            user,
             store,
             status: RequestStatus.SUBMITTED
         })
@@ -45,7 +49,9 @@ export class ManagerRequestsService {
     // READ
     // 모든 점주 신청서 조회 (관리자 전용)
     async readAllManagerRequests(): Promise<ManagerRequest[]> {
-        const managerRequests = await this.managerRequestRepository.find()
+        const managerRequests = await this.managerRequestRepository.find({
+            relations: this.managerRequestRelations
+        })
         if (!managerRequests) {
             throw new NotFoundException('No ManagerRequests')
         }
@@ -57,7 +63,7 @@ export class ManagerRequestsService {
     async readManagerRequestById(request_id: number): Promise<ManagerRequest> {
         const managerRequest = await this.managerRequestRepository.findOne({
             where: { request_id },
-            relations: ["store"]
+            relations: this.managerRequestRelations
         })
         if (!managerRequest) {
             throw new NotFoundException(`Cannot Find request_id ${request_id}`)
@@ -66,6 +72,15 @@ export class ManagerRequestsService {
         return managerRequest
     }
 
+    // 특정 사용자의 점주 신청서 조회
+    async readManagerRequestByUser(user_id: number): Promise<ManagerRequest[]> {
+        const managerRequests = await this.managerRequestRepository.find({ 
+            where: { user: { user_id: user_id }},
+            relations: this.managerRequestRelations,
+        })
+
+        return managerRequests
+    }
 
     // UPDATE
     // 점주 신청서 처리 (관리자 전용)
@@ -82,7 +97,7 @@ export class ManagerRequestsService {
         // 신청서 승인 시, 가게 점주 변경
         if (status == RequestStatus.APPROVED) {
             const store_id = foundManagerRequest.store.store_id
-            const manager_id = foundManagerRequest.user_id
+            const manager_id = foundManagerRequest.user.user_id
 
             await this.storesService.updateStoreManager(store_id, manager_id)
         }
