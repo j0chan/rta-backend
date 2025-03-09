@@ -1,6 +1,6 @@
 import { UpdateUserDTO } from './DTO/update-user.dto'
 import { CreateUserDTO } from './DTO/create-user.dto'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { Repository } from 'typeorm'
@@ -10,7 +10,7 @@ export class UsersService {
     // User 엔터티 주입
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        private usersRepository: Repository<User>,
     ) { }
 
     // CREATE - 회원가입
@@ -18,7 +18,7 @@ export class UsersService {
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
         const { email, password, nickname, phone_number, role } = createUserDTO
 
-        const newUser: User = this.userRepository.create({
+        const newUser: User = this.usersRepository.create({
             email: email,
             password: password,
             nickname: nickname,
@@ -27,7 +27,7 @@ export class UsersService {
             created_at: new Date()
         })
 
-        const createdUser = await this.userRepository.save(newUser)
+        const createdUser = await this.usersRepository.save(newUser)
 
         return createdUser
     }
@@ -35,7 +35,7 @@ export class UsersService {
     // READ[1] - 모든 유저 조회
     // 미구현: logger, 에러 처리
     async readAllUsers(): Promise<User[]> {
-        const foundUsers: User[] = await this.userRepository.find()
+        const foundUsers: User[] = await this.usersRepository.find()
         if (!foundUsers) {
             throw new NotFoundException(`Cannot Find Events`)
         }
@@ -46,7 +46,7 @@ export class UsersService {
     // READ[2] - 내 정보 조회
     // 미구현: logger, 에러 처리
     async readUserById(user_id: number): Promise<User> {
-        const foundUser = await this.userRepository.createQueryBuilder('User')
+        const foundUser = await this.usersRepository.createQueryBuilder('User')
             .where('User.user_id = :id', { id: user_id })
             .getOne() as User
         if (!foundUser) {
@@ -66,7 +66,7 @@ export class UsersService {
         foundUser.password = password
         foundUser.nickname = nickname
 
-        await this.userRepository.save(foundUser)
+        await this.usersRepository.save(foundUser)
     }
 
     // DELETE
@@ -74,6 +74,14 @@ export class UsersService {
     async deleteUserById(user_id: number) {
         const foundUser = await this.readUserById(user_id)
 
-        await this.userRepository.remove(foundUser)
+        await this.usersRepository.remove(foundUser)
+    }
+
+    // 이메일 존재(중복) 여부 체크
+    async checkEmailExist(email: string): Promise<void> {
+        const existingUser = await this.usersRepository.findOne({ where: { email } })
+        if(existingUser) {
+            throw new ConflictException('Email Already Exists!')
+        }
     }
 }
