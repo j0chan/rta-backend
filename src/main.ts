@@ -9,8 +9,19 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule)
 
+  // CORS 설정 추가
+  app.enableCors({
+    origin: 'http://localhost:8100',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  })
+
   // 정적 파일 제공 (public 폴더)
   app.use('/test', express.static(path.join(__dirname, '..', 'public'))) // 루트까지(..) 이동한 뒤, public을 찾는다.
+
+  app.enableCors({
+    origin: 'http://localhost:4200',
+  })
 
   // /api/client-id 요청 시 CLIENT_ID 값을 JSON 형태로 반환하도록 추가
   app.getHttpAdapter().get('/api/client-id', (req, res) => {

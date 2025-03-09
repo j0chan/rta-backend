@@ -17,24 +17,20 @@ export class ReviewsService {
         // Review 엔터티 주입
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
-
         private storesService: StoresService
     ) { }
 
     // CREATE [1]
     // 미구현: logger, 에러 처리
     // 비고: store_id, user_id, keywords는 원래 DTO로 전달해야 한다. 지금은 안되므로 임시값 사용.
-    async createReview(CreateReviewDTO: CreateReviewDTO): Promise<Review> {
+    async createReview(CreateReviewDTO: CreateReviewDTO): Promise<void> {
         const { store_id, user_id, content } = CreateReviewDTO
 
         // 임시 user_id
         const tempUserId: number = 1
 
-        // Store 객체에서 store_id가져오기
-        const store = await this.storesService.getStoreById(store_id)
-        if (!store) {
-            throw new NotFoundException(`Store with ID ${store_id} not found`)
-        }
+        // store_id로 Store 객체 가져오기
+        const store = await this.storesService.readStoreById(store_id)
 
         const currentDate: Date = new Date()
 
@@ -46,9 +42,7 @@ export class ReviewsService {
             updated_at: currentDate,
         })
 
-        const createdEvent: Review = await this.reviewRepository.save(newReview)
-
-        return createdEvent
+        await this.reviewRepository.save(newReview)
     }
 
     // READ[1] - 모든 리뷰 조회
@@ -69,7 +63,7 @@ export class ReviewsService {
             relations: this.reviewRelations, 
         })
         if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`);
+            throw new NotFoundException(`Cannot Find Review with Id ${review_id}`)
         }
 
         return foundReview
@@ -98,14 +92,10 @@ export class ReviewsService {
 
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
-    async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO) {
+    async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
 
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot Find review_id: ${review_id}`)
-        }
-
-        const currentDate: Date = await new Date()
+        const currentDate: Date = new Date()
 
         foundReview.content = updateReviewDTO.content
         foundReview.updated_at = currentDate
@@ -124,7 +114,7 @@ export class ReviewsService {
      *    백엔드에서도 2차적으로 필터링하면 좋겠지만
      *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
      */
-    async markHelpful(review_id: number) {
+    async markHelpful(review_id: number): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
 
         foundReview.helpful_count += 1
@@ -134,14 +124,14 @@ export class ReviewsService {
     // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
     async updateReviewReplyId(review_id: number, reply: ReviewReply): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
-
         foundReview.reply = reply
+
         await this.reviewRepository.save(foundReview)
     }
 
     // DELETE - 리뷰 삭제
     // 미구현: logger, 에러 처리
-    async deleteReveiwById(review_id: number) {
+    async deleteReveiwById(review_id: number): Promise<void> {
         const foundReview = await this.readReviewById(review_id)
 
         await this.reviewRepository.remove(foundReview)

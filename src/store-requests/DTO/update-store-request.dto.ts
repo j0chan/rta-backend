@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsString } from "class-validator"
+import { IsEnum, IsString } from "class-validator"
 import { RequestStatus } from "../../common/request-status.enum"
 
 export class UpdateStoreRequestDTO {

@@ -21,16 +21,11 @@ export class ReviewRepliesService {
     // 미구현: logger, 에러 처리
     async createReply(review_id: number, createReplyDTO: CreateReplyDTO): Promise<void> {
         const foundReview = await this.reviewsService.readReviewById(review_id)
-
-        if (!foundReview) {
-            throw new NotFoundException(`Cannot found review_id: ${review_id}`)
-        }
-
         if (foundReview.reply) {
             throw new ForbiddenException('Reply already exists for this review.')
         }
 
-        const currentDate = await new Date()
+        const currentDate = new Date()
 
         const newReviewReply: ReviewReply = this.reviewReplyRepository.create({
             content: createReplyDTO.content,
@@ -46,7 +41,6 @@ export class ReviewRepliesService {
     // READ[1] - 모든 대댓글 조회 (매니저 전용)
     // 미구현: logger, 에러 처리
     async readAllReplies(): Promise<ReviewReply[]> {
-
         const foundReplies = await this.reviewReplyRepository.find()
 
         return foundReplies

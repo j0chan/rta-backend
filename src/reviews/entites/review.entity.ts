@@ -27,7 +27,6 @@ export class Review {
     helpful_count: number
 
     @OneToOne(() => ReviewReply, (reply) => reply.review, { cascade: true, nullable: true })
-    @JoinColumn({name: "reply_id"})
     reply: ReviewReply
 
     get isModified(): boolean {

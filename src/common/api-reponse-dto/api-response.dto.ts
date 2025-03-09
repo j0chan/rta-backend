@@ -1,4 +1,4 @@
-export class ApiResponseDto<T> {
+export class ApiResponseDTO<T> {
     success: boolean;
     statusCode?: number;
     message?: string;

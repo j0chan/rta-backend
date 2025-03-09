@@ -1,9 +1,10 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
-import { User } from "src/users/entities/user.entity"
 import { Event } from "src/events/entities/event.entity"
 import { StoreRequest } from "../../store-requests/entities/store-request.entity"
+import { Menu } from "src/menus/entities/menu.entity"
+import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 
 @Entity()
 export class Store {
@@ -48,9 +49,14 @@ export class Store {
     events: Event[]
 
     @OneToOne(() => StoreRequest)
-    @JoinColumn({ name: "request_id" })
     storeRequest: StoreRequest
+
+    @OneToMany(() => ManagerRequest, (managerRequest) => managerRequest.store)
+    managerRequest: ManagerRequest[]
 
     @Column({ type: 'boolean', default: false })
     public: boolean
+
+    @OneToMany(() => Menu, (menu) => menu.store)
+    menus: Menu[]
 }

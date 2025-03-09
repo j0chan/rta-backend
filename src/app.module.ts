@@ -10,6 +10,7 @@ import { OpenaiModule } from './openai/openai.module'
 import { StoreRequestsModule } from './store-requests/store-requests.module'
 import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { ReviewRepliesModule } from './review-replies/review-replies.module'
+import { MenusModule } from './menus/menus.module'
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { ReviewRepliesModule } from './review-replies/review-replies.module'
     OpenaiModule,
     StoreRequestsModule,
     ManagerRequestsModule,
-    ReviewRepliesModule
-  ]
+    ReviewRepliesModule,
+    MenusModule,
+    UsersModule
+  ],
 })
 export class AppModule { }
