@@ -1,10 +1,10 @@
-import { SignInDTO } from './DTO/sign-in.dto';
-import { UsersService } from 'src/users/users.service';
-import { CreateUserDTO } from './../users/DTO/create-user.dto';
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { SignInDTO } from './DTO/sign-in.dto'
+import { UsersService } from 'src/users/users.service'
+import { CreateUserDTO } from './../users/DTO/create-user.dto'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
-import { JwtService } from '@nestjs/jwt';
-import { error } from 'console';
+import { JwtService } from '@nestjs/jwt'
+import { error } from 'console'
 
 
 @Injectable()

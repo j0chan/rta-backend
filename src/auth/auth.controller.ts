@@ -1,9 +1,9 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common'
-import { AuthService } from './auth.service';
-import { CreateUserDTO } from 'src/users/DTO/create-user.dto';
-import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
-import { SignInDTO } from './DTO/sign-in.dto';
-import { Response } from 'express';
+import { AuthService } from './auth.service'
+import { CreateUserDTO } from 'src/users/DTO/create-user.dto'
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
+import { SignInDTO } from './DTO/sign-in.dto'
+import { Response } from 'express'
 
 @Controller('api/auth')
 export class AuthController {
