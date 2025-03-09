@@ -46,9 +46,9 @@ export class UsersService {
     // READ[2] - 내 정보 조회
     // 미구현: logger, 에러 처리
     async readUserById(user_id: number): Promise<User> {
-        const foundUser = await this.usersRepository.createQueryBuilder('User')
-            .where('User.user_id = :id', { id: user_id })
-            .getOne() as User
+        const foundUser = await this.usersRepository.findOne({
+            where: { user_id }
+        })
         if (!foundUser) {
             throw new NotFoundException(`Cannot Find Event By Id ${user_id}`)
         }

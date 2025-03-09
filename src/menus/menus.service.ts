@@ -51,10 +51,12 @@ export class MenusService {
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
     async readMenuById(menu_id: number): Promise<Menu> {
-        const foundMenu = await this.menusRepository.createQueryBuilder('Menu')
-            .where('Menu.menu_id = :id', { id: menu_id })
-            .getOne() as Menu
-
+        const foundMenu = await this.menusRepository.findOne({
+            where: { menu_id }
+        })
+        if(!foundMenu) {
+            throw new NotFoundException(`Cannot Find Event By Id ${menu_id}`)
+        }
         return foundMenu
     }
 
@@ -71,12 +73,12 @@ export class MenusService {
 
         await this.menusRepository.save(foundMenu)
     }
-    
+
     // DELETE
     // 미구현: logger, 에러 처리
     async deleteMenuById(menu_id: number) {
         const foundMenu = await this.readMenuById(menu_id)
-        if(foundMenu) {
+        if (foundMenu) {
             await this.menusRepository.remove(foundMenu)
         }
     }

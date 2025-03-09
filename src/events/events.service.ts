@@ -61,9 +61,9 @@ export class EventsService {
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
     async readEventById(event_id: number): Promise<Event> {
-        const foundEvent = await this.eventRepository.createQueryBuilder('Event')
-            .where('Event.event_id = :id', { id: event_id })
-            .getOne() as Event
+        const foundEvent = await this.eventRepository.findOne({
+            where: { event_id }
+        })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
         }
