@@ -56,6 +56,16 @@ export class UsersService {
         return foundUser
     }
 
+    // READ[3] - 이메일로 유저 찾기
+    // 미구현: logger, 에러 처리
+    async findUserByEmail(email: string): Promise<User> {
+        const existingUser = await this.usersRepository.findOne({ where: { email } })
+        if(!existingUser){
+            throw new NotFoundException('User Not Found!')
+        }
+        return existingUser
+    }
+
     // UPDATE - 내 정보 수정
     // 미구현: logger, 에러 처리
     async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO) {
@@ -80,7 +90,7 @@ export class UsersService {
     // 이메일 존재(중복) 여부 체크
     async checkEmailExist(email: string): Promise<void> {
         const existingUser = await this.usersRepository.findOne({ where: { email } })
-        if(existingUser) {
+        if (existingUser) {
             throw new ConflictException('Email Already Exists!')
         }
     }
