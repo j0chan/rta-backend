@@ -1,5 +1,4 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
-import { CreateUserDTO } from './DTO/create-user.dto'
 import { UsersService } from './users.service'
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
 import { User } from './entities/user.entity'
@@ -11,14 +10,6 @@ import { ReadAllUsersDTO } from './DTO/read-all-users.dto'
 export class UsersController {
     // init
     constructor(private usersService: UsersService) { }
-
-    // CREATE - 회원가입
-    // 미구현: logger
-    @Post('/')
-    async createUser(@Body() createUserDTO: CreateUserDTO): Promise<ApiResponseDTO<void>> {
-        await this.usersService.createUser(createUserDTO)
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'User Created Successfully!')
-    }
 
     // READ[1] - 모든 유저 정보 조회
     // 미구현: logger
