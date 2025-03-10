@@ -7,6 +7,8 @@ import { UpdateUserDTO } from './DTO/update-user.dto'
 import { ReadAllUsersDTO } from './DTO/read-all-users.dto'
 import { ReadManagerRequestDTO } from 'src/manager-requests/DTO/read-manager-request.dto'
 import { ManagerRequestsService } from 'src/manager-requests/manager-requests.service'
+import { StoreRequestsService } from 'src/store-requests/store-requests.service'
+import { ReadStoreRequestDTO } from 'src/store-requests/DTO/read-store-request.dto'
 
 @Controller('api/users')
 export class UsersController {
@@ -14,6 +16,7 @@ export class UsersController {
     constructor(
         private usersService: UsersService,
         private managerRequestsService: ManagerRequestsService,
+        private storeRequestsService: StoreRequestsService,
     ) { }
 
     // READ[1] - 모든 유저 정보 조회
@@ -44,6 +47,15 @@ export class UsersController {
         const readManagerRequestDTO = foundRequests.map((request) => new ReadManagerRequestDTO(request))
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'My ManagerRequests Retrieved Successfully', readManagerRequestDTO)
+    }
+
+    // 나의 가게 신청서 조회
+    @Get('/:user_id/store-requests')
+    async readMyStoreRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
+        const foundRequests = await this.storeRequestsService.readStoreRequestByUser(user_id)
+        const readStoreRequestDTO = foundRequests.map((request) => new ReadStoreRequestDTO(request))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTO)
     }
 
     // UPDATE - by user_id
