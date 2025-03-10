@@ -1,12 +1,13 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
+import { Store } from "src/stores/entities/store.entity"
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
     user_id: number
 
-    @Column({ unique: true }) 
+    @Column({ unique: true })
     email: string
 
     @Column()
@@ -23,4 +24,7 @@ export class User {
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
+
+    @OneToMany(() => Store, (store) => store.user)
+    stores: Store[]
 }
