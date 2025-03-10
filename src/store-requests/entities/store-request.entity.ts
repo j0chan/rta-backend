@@ -1,14 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Store } from "../../stores/entities/store.entity"
 import { RequestStatus } from "../../common/request-status.enum"
+import { User } from "src/users/entities/user.entity"
 
 @Entity()
 export class StoreRequest {
     @PrimaryGeneratedColumn()
     request_id: number
 
-    @Column()
-    user_id: number
+    @ManyToOne(()=> User, { eager: false })
+    @JoinColumn({ name: "user_id"})
+    user: User
 
     @OneToOne(() => Store, { eager: false })
     @JoinColumn({ name: "store_id" })

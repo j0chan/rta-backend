@@ -4,7 +4,7 @@ import { ManagerRequest } from "../entities/manager-requests.entity"
 export class ReadManagerRequestDTO {
     request_id: number
     user_id: number
-    // user_name: string
+    user_name: string
     store_id: number
     store_name: string
     created_at: Date
@@ -13,8 +13,8 @@ export class ReadManagerRequestDTO {
 
     constructor(managerRequest: ManagerRequest) {
         this.request_id = managerRequest.request_id
-        this.user_id = managerRequest.user_id
-        //this.user_name
+        this.user_id = managerRequest.user.user_id
+        this.user_name = managerRequest.user.nickname
         this.store_id = managerRequest.store.store_id
         this.store_name = managerRequest.store.store_name
         this.created_at = managerRequest.created_at
