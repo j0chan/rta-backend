@@ -19,11 +19,6 @@ async function bootstrap() {
   // 정적 파일 제공 (public 폴더)
   app.use('/test', express.static(path.join(__dirname, '..', 'public'))) // 루트까지(..) 이동한 뒤, public을 찾는다.
 
-  // /api/client-id 요청 시 CLIENT_ID 값을 JSON 형태로 반환하도록 추가
-  app.getHttpAdapter().get('/api/client-id', (req, res) => {
-    res.json({ clientId: process.env.MAP_CLIENT_ID })
-  })
-
   await app.listen(process.env.PORT ?? 3000)
 }
 bootstrap()

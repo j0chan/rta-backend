@@ -12,12 +12,16 @@ export class MapsService {
 
     constructor(private readonly httpService: HttpService) {}
 
+    // 클라이언트 ID 반환
+    getClientId() {
+        return { clientId: this.MAP_CLIENT_ID }
+    }
+
     // 장소 검색
     async searchPlaces(query: string) {
         if (!query) {
             throw new BadRequestException('검색어를 입력하세요.')
         }
-
 
         const url = `https://openapi.naver.com/v1/search/local.json?query=${encodeURIComponent(query)}&display=5&start=1&sort=random`
         const headers = {
