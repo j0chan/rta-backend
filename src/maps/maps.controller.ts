@@ -5,6 +5,12 @@ import { MapsService } from './maps.service'
 export class MapsController {
     constructor(private readonly mapsService: MapsService) {}
 
+    // 클라이언트 ID
+    @Get('/client-id')
+    getClientId() {
+        return this.mapsService.getClientId()
+    }
+
     // 장소 검색
     @Get('/search')
     async searchPlaces(@Query('query') query: string) {
