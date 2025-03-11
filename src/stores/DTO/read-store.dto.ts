@@ -9,6 +9,8 @@ export class ReadStoreDTO {
     address: string
     contact_number: string
     description: string
+    latitude: number
+    longitude: number
 
     constructor(store: Store) {
         this.store_id = store.store_id
@@ -17,6 +19,8 @@ export class ReadStoreDTO {
         this.category = store.category
         this.address = store.address
         this.contact_number = store.contact_number 
-        this.description = store.description    
+        this.description = store.description
+        this.latitude = store.latitude
+        this.longitude = store.longitude
     }
 }
