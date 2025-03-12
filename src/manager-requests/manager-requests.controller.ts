@@ -47,7 +47,7 @@ export class ManagerRequestsController {
     // UPDATE
     // 가게 신청서 처리 (관리자 전용)
     @Put('/:request_id')
-    async updateManagerRequest(@Param('request_id') request_id: number, updateManagerRequestDTO: UpdateManagerRequestDTO): Promise<ApiResponseDTO<void>> {
+    async updateManagerRequest(@Param('request_id') request_id: number, @Body() updateManagerRequestDTO: UpdateManagerRequestDTO): Promise<ApiResponseDTO<void>> {
         await this.managerRequestsService.updateManagerRequest(request_id, updateManagerRequestDTO)
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Request Updated Successfully")
