@@ -64,9 +64,9 @@ export class StoresController {
     @Get('/:store_id/reviews')
     async readStoreReviews(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
         const foundReviews = await this.reviewsService.readReviewsByStore(id)
-        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
+        const readReviewDTO = foundReviews.map(review => new ReadReviewDTO(review))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTO)
     }
 
     // UPDATE
