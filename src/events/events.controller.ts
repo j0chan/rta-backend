@@ -25,7 +25,7 @@ export class EventsController {
     // 미구현: logger
     @Get('/')
     async readAllEvents(): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
-        const events: Event[] = await this.eventsService.readAllEvents()
+        const events = await this.eventsService.readAllEvents()
         const readAllEventsDto = events.map(event => new ReadAllEventsDTO(event))
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDto)
@@ -36,7 +36,16 @@ export class EventsController {
     // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
     @Get('/:event_id')
     async readEventById(@Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
-        const foundEvent: Event = await this.eventsService.readEventById(event_id)
+        const foundEvent = await this.eventsService.readEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
+    }
+
+    // READ[3] - 최근 등록 이벤트 조회
+    // 미구현: logger
+    @Get('/latest/:store_id')
+    async readEventByCreatedDate(@Body() store_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent = await this.eventsService.readEventByCreatedDate(store_id)
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
     }

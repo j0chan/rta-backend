@@ -71,6 +71,21 @@ export class EventsService {
         return foundEvent
     }
 
+    // READ[3] - 최근 등록 이벤트 조회
+    // 미구현: logger, 에러 처리
+    async readEventByCreatedDate(store_id: number): Promise<Event> {
+        const foundEvent = await this.eventRepository.findOne({
+            where: { store: { store_id } },
+            order: { created_at: 'DESC' },
+            relations: ['store']
+        })
+        if (!foundEvent) {
+            throw new NotFoundException(`Cannot Find Event In This Store`)
+        }
+
+        return foundEvent
+    }
+
     // UPDATE - by event_id
     // 미구현: logger, 에러 처리
     async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
