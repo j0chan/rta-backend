@@ -19,8 +19,8 @@ export class EventsService {
     // CREATE
     // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
-    async createEvent(createEventDto: CreateEventDTO): Promise<Event> {
-        const { store_id, title, description, start_date, end_date } = createEventDto
+    async createEvent(store_id: number, createEventDto: CreateEventDTO): Promise<Event> {
+        const { title, description, start_date, end_date } = createEventDto
 
         // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
@@ -49,8 +49,10 @@ export class EventsService {
 
     // READ[1] - 모든 이벤트 조회
     // 미구현: logger, 에러 처리
-    async readAllEvents(): Promise<Event[]> {
-        const foundEvents = await this.eventRepository.find()
+    async readAllEvents(store_id: number): Promise<Event[]> {
+        const foundEvents = await this.eventRepository.find({
+            where: { store: { store_id } }
+        })
         if (!foundEvents) {
             throw new NotFoundException(`Cannot Find Events`)
         }
@@ -60,9 +62,12 @@ export class EventsService {
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
-    async readEventById(event_id: number): Promise<Event> {
+    async readEventById(store_id: number, event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
-            where: { event_id }
+            where: {
+                store: { store_id },
+                event_id
+            }
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
@@ -88,8 +93,8 @@ export class EventsService {
 
     // UPDATE - by event_id
     // 미구현: logger, 에러 처리
-    async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
-        const foundEvent = await this.readEventById(event_id)
+    async updateEventById(store_id: number, event_id: number, updateEventDTO: UpdateEventDTO) {
+        const foundEvent = await this.readEventById(store_id, event_id)
 
         const { title, description, start_date, end_date, event_status } = updateEventDTO
 
@@ -104,8 +109,8 @@ export class EventsService {
 
     // DELETE
     // 미구현: logger, 에러 처리
-    async deleteEventById(event_id: number) {
-        const foundEvent = await this.readEventById(event_id)
+    async deleteEventById(store_id: number, event_id: number) {
+        const foundEvent = await this.readEventById(store_id, event_id)
 
         await this.eventRepository.remove(foundEvent)
     }
