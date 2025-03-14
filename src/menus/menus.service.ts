@@ -18,8 +18,8 @@ export class MenusService {
 
     // CREATE - 새로운 메뉴 등록
     // 미구현: logger, 에러 처리
-    async createMenu(createMenuDTO: CreateMenuDTO): Promise<Menu> {
-        const { store_id, menu_name, price, description, manager_container } = createMenuDTO
+    async createMenu(store_id: number, createMenuDTO: CreateMenuDTO): Promise<Menu> {
+        const { menu_name, price, description, manager_container } = createMenuDTO
 
         // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
@@ -42,19 +42,27 @@ export class MenusService {
 
     // READ[1] - 해당 가게 모든 메뉴 조회
     // 미구현: logger, 에러 처리
-    async readAllMenus(): Promise<Menu[]> {
-        const foundMenus = await this.menusRepository.find()
+    async readAllMenus(store_id: number): Promise<Menu[]> {
+        const foundMenus = await this.menusRepository.find({
+            where: { store: { store_id } }
+        })
+        if (!foundMenus) {
+            throw new NotFoundException(`Cannot Find Menus`)
+        }
 
         return foundMenus
     }
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
-    async readMenuById(menu_id: number): Promise<Menu> {
+    async readMenuById(store_id: number, menu_id: number): Promise<Menu> {
         const foundMenu = await this.menusRepository.findOne({
-            where: { menu_id }
+            where: {
+                store: { store_id }, 
+                menu_id
+            }
         })
-        if(!foundMenu) {
+        if (!foundMenu) {
             throw new NotFoundException(`Cannot Find Event By Id ${menu_id}`)
         }
         return foundMenu
@@ -62,8 +70,8 @@ export class MenusService {
 
     // UPDATE - by menu_id
     // 미구현: logger, 에러 처리
-    async updateMenuById(menu_id: number, updateMenuDTO: UpdateMenuDTO) {
-        const foundMenu = await this.readMenuById(menu_id)
+    async updateMenuById(store_id: number, menu_id: number, updateMenuDTO: UpdateMenuDTO) {
+        const foundMenu = await this.readMenuById(store_id, menu_id)
 
         const { menu_name, description, price, manager_container } = updateMenuDTO
         foundMenu.menu_name = menu_name
@@ -76,8 +84,8 @@ export class MenusService {
 
     // DELETE
     // 미구현: logger, 에러 처리
-    async deleteMenuById(menu_id: number) {
-        const foundMenu = await this.readMenuById(menu_id)
+    async deleteMenuById(store_id: number, menu_id: number) {
+        const foundMenu = await this.readMenuById(store_id, menu_id)
         if (foundMenu) {
             await this.menusRepository.remove(foundMenu)
         }

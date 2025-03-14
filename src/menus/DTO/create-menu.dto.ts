@@ -2,10 +2,6 @@ import { IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class CreateMenuDTO {
     @IsNotEmpty()
-    @IsNumber()
-    store_id: number
-
-    @IsNotEmpty()
     @IsString()
     menu_name: string
 
