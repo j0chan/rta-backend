@@ -63,7 +63,7 @@ export class MenusService {
             }
         })
         if (!foundMenu) {
-            throw new NotFoundException(`Cannot Find Event By Id ${menu_id}`)
+            throw new NotFoundException(`Cannot Find Menu By Id ${menu_id}`)
         }
         return foundMenu
     }
