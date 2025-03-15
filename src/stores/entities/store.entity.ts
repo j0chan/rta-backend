@@ -1,3 +1,4 @@
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
@@ -13,7 +14,8 @@ export class Store {
     store_id: number
 
     @ManyToOne(() => User, (user) => user.stores)
-    user: User
+    @JoinColumn({ name: "manager_id" })
+    manager: User
 
     @OneToMany(() => Review, (review) => review.store)
     reviews: Review[]

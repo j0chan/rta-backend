@@ -6,17 +6,18 @@ import { Repository } from 'typeorm'
 import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { Reply } from 'src/replies/entities/reply.entity'
+import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class ReviewsService {
-    // !!!! user 수정 완료되면 relation에 추가해야됨
-    private reviewRelations = ["reply", "store"]
+    private reviewRelations = ["user", "reply", "store"]
 
     constructor(
         // Review 엔터티 주입
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
-        private storesService: StoresService
+        private storesService: StoresService,
+        private usersService: UsersService,
     ) { }
 
     // CREATE [1]
@@ -25,8 +26,8 @@ export class ReviewsService {
     async createReview(CreateReviewDTO: CreateReviewDTO): Promise<void> {
         const { store_id, user_id, content } = CreateReviewDTO
 
-        // 임시 user_id
-        const tempUserId: number = 1
+        // user_id로 User 객체 가져오기
+        const user = await this.usersService.readUserById(user_id)
 
         // store_id로 Store 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
@@ -35,7 +36,7 @@ export class ReviewsService {
 
         const newReview: Review = this.reviewRepository.create({
             store,
-            user_id: tempUserId,
+            user,
             content,
             created_at: currentDate,
             updated_at: currentDate,
@@ -69,12 +70,15 @@ export class ReviewsService {
     }
     
     // READ[3] - 사용자로 리뷰 필터링
-    // async readReviewsByUser(user_id: number): Promise<Review[]> {
-    //     // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
-    //     const foundReviews = await this.reviewRepository.findBy({ user_id: user_id })
+    async readReviewsByUser(user_id: number): Promise<Review[]> {
+        // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
+        const foundReviews = await this.reviewRepository.find({
+            where: { user: { user_id: user_id }},
+            relations: this.reviewRelations,
+        })
 
-    //     return foundReviews
-    // }
+        return foundReviews
+    }
 
     // READ[4] - 가게로 리뷰 필터링
     async readReviewsByStore(store_id: number): Promise<Review[]> {

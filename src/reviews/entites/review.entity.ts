@@ -1,5 +1,6 @@
 import { Reply } from "src/replies/entities/reply.entity"
 import { Store } from "src/stores/entities/store.entity"
+import { User } from "src/users/entities/user.entity"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
@@ -11,8 +12,9 @@ export class Review {
     @JoinColumn({name: "store_id"})
     store: Store
 
-    @Column()
-    user_id: number
+    @ManyToOne(() => User, (user) => user.reviews)
+    @JoinColumn({ name: "user_id" })
+    user: User
 
     @Column()
     content: string

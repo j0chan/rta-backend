@@ -3,6 +3,8 @@ import { UserRole } from "./user-role.enum"
 import { Store } from "src/stores/entities/store.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
+import { Review } from "src/reviews/entites/review.entity"
+import { Store } from "src/stores/entities/store.entity"
 
 
 @Entity()
@@ -28,11 +30,10 @@ export class User {
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
 
+    @OneToMany(()=> Review, (review) => review.user)
+    reviews: Review[]
 
-    @OneToMany(() => Store, (store) => store.user)
-    stores: Store[]
-
-    @OneToMany(() => ManagerRequest, (managerRequest) => managerRequest.user)
+    @OneToMany(()=> ManagerRequest, (managerRequest) => managerRequest.user)
     manager_requests: ManagerRequest[]
 
     @OneToMany(() => StoreRequest, (storeRequest) => storeRequest.user)
