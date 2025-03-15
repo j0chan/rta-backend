@@ -19,8 +19,8 @@ export class EventsService {
     // CREATE
     // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
-    async createEvent(store_id: number, createEventDto: CreateEventDTO): Promise<Event> {
-        const { title, description, start_date, end_date } = createEventDto
+    async createEvent(store_id: number, createEventDTO: CreateEventDTO): Promise<Event> {
+        const { title, description, start_date, end_date } = createEventDTO
 
         // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)

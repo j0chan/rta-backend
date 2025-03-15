@@ -30,9 +30,9 @@ export class StoresController {
     @Get('/')
     async readAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         const stores = await this.storesService.readAllStores()
-        const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
+        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTOs)
     }
 
     // 특정 가게 상세 정보 조회
@@ -64,9 +64,9 @@ export class StoresController {
     @Get('/:store_id/reviews')
     async readStoreReviews(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
         const foundReviews = await this.reviewsService.readReviewsByStore(id)
-        const readReviewDTO = foundReviews.map(review => new ReadReviewDTO(review))
+        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
 
     // UPDATE

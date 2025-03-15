@@ -42,7 +42,7 @@ export class MenusService {
 
     // READ[1] - 해당 가게 모든 메뉴 조회
     // 미구현: logger, 에러 처리
-    async readAllMenus(store_id: number): Promise<Menu[]> {
+    async readMenusByStore(store_id: number): Promise<Menu[]> {
         const foundMenus = await this.menusRepository.find({
             where: { store: { store_id } }
         })
@@ -53,7 +53,7 @@ export class MenusService {
         return foundMenus
     }
 
-    // READ[2] - 특정 이벤트 상세 조회
+    // READ[2] - 특정 메뉴 상세 조회
     // 미구현: logger, 에러 처리
     async readMenuById(menu_id: number): Promise<Menu> {
         const foundMenu = await this.menusRepository.findOne({

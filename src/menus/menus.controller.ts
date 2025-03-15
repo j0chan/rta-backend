@@ -25,8 +25,8 @@ export class MenusController {
     // READ[1] - 해당 가게 모든 메뉴 조회
     // 미구현: logger
     @Get('/')
-    async readAllMenus(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllMenusDTO[]>> {
-        const menus: Menu[] = await this.menusService.readAllMenus(store_id)
+    async readMenusByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllMenusDTO[]>> {
+        const menus: Menu[] = await this.menusService.readMenusByStore(store_id)
         const readAllMenusDTO = menus.map(menu => new ReadAllMenusDTO(menu))
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved All Menus!', readAllMenusDTO)
