@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
+import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class StoresService {
@@ -12,17 +13,16 @@ export class StoresService {
     // init
     constructor(
         @InjectRepository(Store)
-        private storesRepository: Repository<Store>
+        private storesRepository: Repository<Store>,
+        private usersService: UsersService,
     ) { }
 
     // CREATE
     // 새로운 가게 생성하기
     async createStore(createStoreDTO: CreateStoreDTO): Promise<number> {
         const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
-        const temp_user_id = 1
 
         const newStore: Store = this.storesRepository.create({
-            user_id: temp_user_id,
             store_name,
             category,
             address,
@@ -65,9 +65,10 @@ export class StoresService {
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
-        const foundStore = await this.readStoreById(store_id)
+        // const foundStore = await this.readStoreById(store_id)
+        const foundUser = await this.usersService.readUserById(user_id)
 
-        await this.storesRepository.update(store_id, { user_id })
+        await this.storesRepository.update(store_id, { manager: foundUser })
     }
 
     // 가게 정보 수정 (매니저 전용)
