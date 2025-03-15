@@ -18,8 +18,8 @@ export class MenusController {
         @Param('store_id') store_id: number,
         @Body() createMenuDTO: CreateMenuDTO): Promise<ApiResponseDTO<Menu>> {
         await this.menusService.createMenu(store_id, createMenuDTO)
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Menu Registered Successfully!')
 
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Menu Registered Successfully!')
     }
 
     // READ[1] - 해당 가게 모든 메뉴 조회
@@ -36,9 +36,8 @@ export class MenusController {
     // 미구현: logger
     @Get('/:menu_id')
     async readMenuById(
-        @Param('store_id') store_id: number,
         @Param('menu_id') menu_id: number): Promise<ApiResponseDTO<ReadMenuDTO>> {
-        const foundMenu: Menu = await this.menusService.readMenuById(store_id, menu_id)
+        const foundMenu: Menu = await this.menusService.readMenuById(menu_id)
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Event!', new ReadMenuDTO(foundMenu))
     }
@@ -47,10 +46,10 @@ export class MenusController {
     // 미구현: logger
     @Put('/:menu_id')
     async updateMenuById(
-        @Param('store_id') store_id: number,
         @Param('menu_id') menu_id: number,
         @Body() updateMenuDTO: UpdateMenuDTO): Promise<ApiResponseDTO<void>> {
-        await this.menusService.updateMenuById(store_id, menu_id, updateMenuDTO)
+        await this.menusService.updateMenuById(menu_id, updateMenuDTO)
+
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Menu Updated Successfully!')
     }
 
@@ -58,9 +57,9 @@ export class MenusController {
     // 미구현: logger
     @Delete('/:menu_id')
     async deleteMenuById(
-        @Param('store_id') store_id: number,
         @Param('menu_id') menu_id: number): Promise<ApiResponseDTO<void>> {
-        await this.menusService.deleteMenuById(store_id, menu_id)
+        await this.menusService.deleteMenuById(menu_id)
+
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Menu Deleted Successfully!')
     }
 }

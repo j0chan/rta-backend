@@ -1,9 +1,9 @@
-import { UpdateEventDTO } from './dto/update-event.dto'
+import { UpdateEventDTO } from './DTO/update-event.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
 import { Repository } from 'typeorm'
-import { CreateEventDTO } from './dto/create-event.dto'
+import { CreateEventDTO } from './DTO/create-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
 @Injectable()
@@ -49,7 +49,7 @@ export class EventsService {
 
     // READ[1] - 모든 이벤트 조회
     // 미구현: logger, 에러 처리
-    async readAllEvents(store_id: number): Promise<Event[]> {
+    async readAllEventsByStore(store_id: number): Promise<Event[]> {
         const foundEvents = await this.eventRepository.find({
             where: { store: { store_id } }
         })
@@ -62,12 +62,9 @@ export class EventsService {
 
     // READ[2] - 특정 이벤트 상세 조회
     // 미구현: logger, 에러 처리
-    async readEventById(store_id: number, event_id: number): Promise<Event> {
+    async readEventById(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
-            where: {
-                store: { store_id },
-                event_id
-            }
+            where: { event_id }
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
@@ -78,7 +75,7 @@ export class EventsService {
 
     // READ[3] - 최근 등록 이벤트 조회
     // 미구현: logger, 에러 처리
-    async readEventByCreatedDate(store_id: number): Promise<Event> {
+    async readRecentEventByStore(store_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
             where: { store: { store_id } },
             order: { created_at: 'DESC' },
@@ -93,8 +90,8 @@ export class EventsService {
 
     // UPDATE - by event_id
     // 미구현: logger, 에러 처리
-    async updateEventById(store_id: number, event_id: number, updateEventDTO: UpdateEventDTO) {
-        const foundEvent = await this.readEventById(store_id, event_id)
+    async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
+        const foundEvent = await this.readEventById(event_id)
 
         const { title, description, start_date, end_date, event_status } = updateEventDTO
 
@@ -109,8 +106,8 @@ export class EventsService {
 
     // DELETE
     // 미구현: logger, 에러 처리
-    async deleteEventById(store_id: number, event_id: number) {
-        const foundEvent = await this.readEventById(store_id, event_id)
+    async deleteEventById(event_id: number) {
+        const foundEvent = await this.readEventById(event_id)
 
         await this.eventRepository.remove(foundEvent)
     }
