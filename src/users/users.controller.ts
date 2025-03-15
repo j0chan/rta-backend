@@ -9,6 +9,8 @@ import { ReadManagerRequestDTO } from 'src/manager-requests/DTO/read-manager-req
 import { ManagerRequestsService } from 'src/manager-requests/manager-requests.service'
 import { StoreRequestsService } from 'src/store-requests/store-requests.service'
 import { ReadStoreRequestDTO } from 'src/store-requests/DTO/read-store-request.dto'
+import { ReadReviewDTO } from 'src/reviews/DTO/read-review.dto'
+import { ReviewsService } from 'src/reviews/reviews.service'
 
 @Controller('api/users')
 export class UsersController {
@@ -17,6 +19,7 @@ export class UsersController {
         private usersService: UsersService,
         private managerRequestsService: ManagerRequestsService,
         private storeRequestsService: StoreRequestsService,
+        private reviewsService: ReviewsService,
     ) { }
 
     // READ[1] - 모든 유저 정보 조회
@@ -56,6 +59,15 @@ export class UsersController {
         const readStoreRequestDTO = foundRequests.map((request) => new ReadStoreRequestDTO(request))
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTO)
+    }
+
+    // 나의 리뷰 조회
+    @Get('/:user_id/reviews')
+    async readMyReviews(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
+        const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'My Reviews Retrieved Successfully', readReviewDTOs)
     }
 
     // UPDATE - by user_id

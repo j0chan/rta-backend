@@ -69,12 +69,12 @@ export class ReviewsService {
     }
     
     // READ[3] - 사용자로 리뷰 필터링
-    // async readReviewsByUser(user_id: number): Promise<Review[]> {
-    //     // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
-    //     const foundReviews = await this.reviewRepository.findBy({ user_id: user_id })
+    async readReviewsByUser(user_id: number): Promise<Review[]> {
+        // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
+        const foundReviews = await this.reviewRepository.findBy({ user_id: user_id })
 
-    //     return foundReviews
-    // }
+        return foundReviews
+    }
 
     // READ[4] - 가게로 리뷰 필터링
     async readReviewsByStore(store_id: number): Promise<Review[]> {
