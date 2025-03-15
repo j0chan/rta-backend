@@ -1,3 +1,4 @@
+import { UsersService } from 'src/users/users.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Store } from './entities/store.entity'
@@ -65,7 +66,6 @@ export class StoresService {
     // UPDATE
     // 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
-        // const foundStore = await this.readStoreById(store_id)
         const foundUser = await this.usersService.readUserById(user_id)
 
         await this.storesRepository.update(store_id, { manager: foundUser })

@@ -1,16 +1,18 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
+import { Store } from "src/stores/entities/store.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
 import { Review } from "src/reviews/entites/review.entity"
 import { Store } from "src/stores/entities/store.entity"
+
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
     user_id: number
 
-    @Column({ unique: true }) 
+    @Column({ unique: true })
     email: string
 
     @Column()
@@ -31,12 +33,10 @@ export class User {
     @OneToMany(()=> Review, (review) => review.user)
     reviews: Review[]
 
-    @OneToMany(()=> Store, (store) => store.manager)
-    stores: Store[]
-
     @OneToMany(()=> ManagerRequest, (managerRequest) => managerRequest.user)
     manager_requests: ManagerRequest[]
 
-    @OneToMany(()=> StoreRequest, (storeRequest)=> storeRequest.user)
+    @OneToMany(() => StoreRequest, (storeRequest) => storeRequest.user)
     store_requests: StoreRequest[]
+
 }

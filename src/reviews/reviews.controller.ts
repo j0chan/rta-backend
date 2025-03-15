@@ -25,9 +25,9 @@ export class ReviewsController {
     @Get('/')
     async readAllReviews(): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
         const reviews: Review[] = await this.reviewsService.readAllReviews()
-        const readReviewDTOs = reviews.map(review => new ReadReviewDTO(review))
+        const readReviewDTO = reviews.map(review => new ReadReviewDTO(review))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Reviews Retrieved Successfully', readReviewDTOs)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Reviews Retrieved Successfully', readReviewDTO)
     }
 
     // READ[2] - 특정 리뷰 조회
