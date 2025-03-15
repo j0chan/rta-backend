@@ -1,9 +1,9 @@
-import { UpdateEventDTO } from './dto/update-event.dto'
+import { UpdateEventDTO } from './DTO/update-event.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
 import { Repository } from 'typeorm'
-import { CreateEventDTO } from './dto/create-event.dto'
+import { CreateEventDTO } from './DTO/create-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
 @Injectable()
@@ -19,8 +19,8 @@ export class EventsService {
     // CREATE
     // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
-    async createEvent(createEventDto: CreateEventDTO): Promise<Event> {
-        const { store_id, title, description, start_date, end_date } = createEventDto
+    async createEvent(store_id: number, createEventDTO: CreateEventDTO): Promise<Event> {
+        const { title, description, start_date, end_date } = createEventDTO
 
         // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
@@ -49,8 +49,10 @@ export class EventsService {
 
     // READ[1] - 모든 이벤트 조회
     // 미구현: logger, 에러 처리
-    async readAllEvents(): Promise<Event[]> {
-        const foundEvents = await this.eventRepository.find()
+    async readAllEventsByStore(store_id: number): Promise<Event[]> {
+        const foundEvents = await this.eventRepository.find({
+            where: { store: { store_id } }
+        })
         if (!foundEvents) {
             throw new NotFoundException(`Cannot Find Events`)
         }
@@ -66,6 +68,21 @@ export class EventsService {
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
+        }
+
+        return foundEvent
+    }
+
+    // READ[3] - 최근 등록 이벤트 조회
+    // 미구현: logger, 에러 처리
+    async readRecentEventByStore(store_id: number): Promise<Event> {
+        const foundEvent = await this.eventRepository.findOne({
+            where: { store: { store_id } },
+            order: { created_at: 'DESC' },
+            relations: ['store']
+        })
+        if (!foundEvent) {
+            throw new NotFoundException(`Cannot Find Event In This Store`)
         }
 
         return foundEvent

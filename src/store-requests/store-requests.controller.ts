@@ -29,9 +29,9 @@ export class StoreRequestsController {
             throw new NotFoundException(`Cannot Find Requests`)
         }
 
-        const readStoreRequestDTO = storeRequests.map(storeRequest => new ReadStoreRequestDTO(storeRequest))
+        const readStoreRequestDTOs = storeRequests.map(storeRequest => new ReadStoreRequestDTO(storeRequest))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Requests Retrieved Successfully', readStoreRequestDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Requests Retrieved Successfully', readStoreRequestDTOs)
     }
 
     // 특정 가게 신청서 조회

@@ -30,9 +30,9 @@ export class StoresController {
     @Get('/')
     async readAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         const stores = await this.storesService.readAllStores()
-        const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
+        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTOs)
     }
 
     // 특정 가게 상세 정보 조회
@@ -75,7 +75,7 @@ export class StoresController {
     async updateStoreManager(@Param('store_id') store_id: number, @Body('user_id') user_id: number): Promise<ApiResponseDTO<void>> {
         await this.storesService.updateStoreManager(store_id, user_id)
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Store Updated Successfully")
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Manager Updated Successfully")
     }
 
     // 가게 정보 수정 (매니저 전용)
@@ -83,7 +83,7 @@ export class StoresController {
     async updateStoreDetail(@Param('store_id') store_id: number, @Body() updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<ApiResponseDTO<void>> {
         await this.storesService.updateStoreDetail(store_id, updateStoreDetailDTO)
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Store Updated Successfully")
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Information Updated Successfully")
     }
 
     // DELETE

@@ -1,3 +1,4 @@
+import { UsersService } from 'src/users/users.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Store } from './entities/store.entity'
@@ -12,17 +13,23 @@ export class StoresService {
     // init
     constructor(
         @InjectRepository(Store)
-        private storesRepository: Repository<Store>
+        private storesRepository: Repository<Store>,
+        private usersService: UsersService
     ) { }
 
     // CREATE
     // 새로운 가게 생성하기
     async createStore(createStoreDTO: CreateStoreDTO): Promise<number> {
-        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
-        const temp_user_id = 1
+        const { store_name, category, address, latitude, longitude, contact_number, description, user_id } = createStoreDTO
+
+        // 유저 조회
+        const user = await this.usersService.readUserById(user_id)
+        if (!user) {
+            throw new NotFoundException("User Not Found")
+        }
 
         const newStore: Store = this.storesRepository.create({
-            user_id: temp_user_id,
+            user,
             store_name,
             category,
             address,
@@ -66,8 +73,17 @@ export class StoresService {
     // 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
         const foundStore = await this.readStoreById(store_id)
+        if (!foundStore) {
+            throw new NotFoundException("Store Not Found")
+        }
 
-        await this.storesRepository.update(store_id, { user_id })
+        const foundUser = await this.usersService.readUserById(user_id)
+        if (!foundUser) {
+            throw new NotFoundException("User Not Found")
+        }
+
+        foundStore.user = foundUser
+        await this.storesRepository.save(foundStore)
     }
 
     // 가게 정보 수정 (매니저 전용)
