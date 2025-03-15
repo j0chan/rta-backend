@@ -1,19 +1,20 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
 import { Event } from "src/events/entities/event.entity"
 import { StoreRequest } from "../../store-requests/entities/store-request.entity"
 import { Menu } from "src/menus/entities/menu.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
+import { User } from "src/users/entities/user.entity"
 
 @Entity()
 export class Store {
     @PrimaryGeneratedColumn()
     store_id: number
 
-    // @ManyToOne(() => User, (user) => user.user_id)
-    @Column()
-    user_id: number
+    @ManyToOne(() => User, (user) => user.stores)
+    @JoinColumn({ name: "manager_id" })
+    manager: User
 
     @OneToMany(() => Review, (review) => review.store)
     reviews: Review[]
