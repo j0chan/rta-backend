@@ -6,7 +6,6 @@ import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
-import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class StoresService {

@@ -1,10 +1,9 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
 import { Store } from "src/stores/entities/store.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
 import { Review } from "src/reviews/entites/review.entity"
-import { Store } from "src/stores/entities/store.entity"
 
 
 @Entity()
@@ -29,6 +28,9 @@ export class User {
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
+
+    @ManyToOne(()=> Store, (store) => store.manager)
+    stores: Store[]
 
     @OneToMany(()=> Review, (review) => review.user)
     reviews: Review[]
