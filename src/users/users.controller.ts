@@ -4,7 +4,6 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@ne
 import { User } from './entities/user.entity'
 import { ReadUserDTO } from './DTO/read-user.dto'
 import { UpdateUserDTO } from './DTO/update-user.dto'
-import { ReadAllUsersDTO } from './DTO/read-all-users.dto'
 import { ReadManagerRequestDTO } from 'src/manager-requests/DTO/read-manager-request.dto'
 import { ManagerRequestsService } from 'src/manager-requests/manager-requests.service'
 import { StoreRequestsService } from 'src/store-requests/store-requests.service'
@@ -25,11 +24,11 @@ export class UsersController {
     // READ[1] - 모든 유저 정보 조회
     // 미구현: logger
     @Get('/')
-    async readAllUsers(): Promise<ApiResponseDTO<ReadAllUsersDTO[]>> {
+    async readAllUsers(): Promise<ApiResponseDTO<ReadUserDTO[]>> {
         const users: User[] = await this.usersService.readAllUsers()
-        const readAllUsersDTO: ReadAllUsersDTO[] = users.map(user => new ReadAllUsersDTO(user))
+        const readUserDTOs: ReadUserDTO[] = users.map(user => new ReadUserDTO(user))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Users Retrieved Successfully', readAllUsersDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Users Retrieved Successfully', readUserDTOs)
     }
 
     // READ[2] - 내 정보 조회
@@ -56,9 +55,9 @@ export class UsersController {
     @Get('/:user_id/store-requests')
     async readMyStoreRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
         const foundRequests = await this.storeRequestsService.readStoreRequestByUser(user_id)
-        const readStoreRequestDTO = foundRequests.map((request) => new ReadStoreRequestDTO(request))
+        const readStoreRequestDTOs = foundRequests.map((request) => new ReadStoreRequestDTO(request))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTOs)
     }
 
     // 나의 리뷰 조회
