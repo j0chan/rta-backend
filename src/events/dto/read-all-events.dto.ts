@@ -8,11 +8,15 @@ export class ReadAllEventsDTO {
     start_date: Date
     end_date: Date
     event_status: EventStatus
+    description: string
+    created_at: Date
 
     constructor(event: Event) {
         this.title = event.title
         this.start_date = event.start_date
         this.end_date = event.end_date
         this.event_status = event.event_status
+        this.description = event.description
+        this.created_at = event.created_at
     }
 }
