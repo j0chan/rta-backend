@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator"
+import { IsBoolean, IsDate, IsNotEmpty, IsString } from "class-validator"
 
 export class UpdateEventDTO {
     @IsNotEmpty()
@@ -16,4 +16,8 @@ export class UpdateEventDTO {
     @IsNotEmpty()
     @IsDate()
     end_date: Date
+
+    @IsNotEmpty()
+    @IsBoolean()
+    is_canceled: boolean
 }
