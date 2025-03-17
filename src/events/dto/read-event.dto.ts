@@ -14,6 +14,6 @@ export class ReadEventDTO {
         this.description = event.description
         this.start_date = event.start_date
         this.end_date = event.end_date
-        this.event_status = event.event_status
+        this.event_status = event.eventStatus
     }
 }

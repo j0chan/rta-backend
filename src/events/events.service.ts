@@ -93,14 +93,22 @@ export class EventsService {
     async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
         const foundEvent = await this.readEventById(event_id)
 
-        const { title, description, start_date, end_date, event_status } = updateEventDTO
+        const { title, description, start_date, end_date } = updateEventDTO
 
         foundEvent.title = title
         foundEvent.description = description
         foundEvent.start_date = start_date
         foundEvent.end_date = end_date
-        foundEvent.event_status = event_status
 
+        await this.eventRepository.save(foundEvent)
+    }
+
+    // UPDATE - 이벤트 상태 취소로 변경
+    async cancelEvent(event_id: number) {
+        const foundEvent = await this.readEventById(event_id)
+
+        foundEvent.is_canceled = true
+        
         await this.eventRepository.save(foundEvent)
     }
 

@@ -64,6 +64,14 @@ export class EventsController {
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
     }
 
+    // UPDATE - 이벤트 상태 취소로 변경
+    @Put('/:event_id/cancel')
+    async cancelEvent(@Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
+        await this.eventsService.cancelEvent(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Canceled Successfully')
+    }
+
     // DELETE - by event_id
     // 미구현: logger
     @Delete('/:event_id')

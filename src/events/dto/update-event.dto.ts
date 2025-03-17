@@ -1,5 +1,4 @@
 import { IsDate, IsNotEmpty, IsString } from "class-validator"
-import { EventStatus } from "../entities/event-status.enum"
 
 export class UpdateEventDTO {
     @IsNotEmpty()
@@ -17,7 +16,4 @@ export class UpdateEventDTO {
     @IsNotEmpty()
     @IsDate()
     end_date: Date
-
-    @IsNotEmpty()
-    event_status: EventStatus
 }
