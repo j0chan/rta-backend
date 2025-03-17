@@ -2,7 +2,7 @@ import { UpdateEventDTO } from './DTO/update-event.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
-import { Repository } from 'typeorm'
+import { LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository } from 'typeorm'
 import { CreateEventDTO } from './DTO/create-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
@@ -47,11 +47,33 @@ export class EventsService {
         return createdEvent
     }
 
-    // READ[1] - 모든 이벤트 조회
+    // READ[3] - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
+    // 미구현: logger, 에러 처리
+    async readRecentEventByStore(store_id: number): Promise<Event> {
+        const now = new Date
+
+        const foundEvent = await this.eventRepository.findOne({
+            where: {
+                store: { store_id },
+                start_date: LessThanOrEqual(now),
+                end_date: MoreThanOrEqual(now)
+            },
+            order: { created_at: 'DESC' },
+            relations: ['store']
+        })
+        if (!foundEvent) {
+            throw new NotFoundException(`Cannot Find Event In This Store`)
+        }
+
+        return foundEvent
+    }
+
+    // READ[1] - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
     // 미구현: logger, 에러 처리
     async readAllEventsByStore(store_id: number): Promise<Event[]> {
         const foundEvents = await this.eventRepository.find({
-            where: { store: { store_id } }
+            where: { store: { store_id } },
+            order: { created_at: 'DESC'},
         })
         if (!foundEvents) {
             throw new NotFoundException(`Cannot Find Events`)
@@ -68,21 +90,6 @@ export class EventsService {
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
-        }
-
-        return foundEvent
-    }
-
-    // READ[3] - 최근 등록 이벤트 조회
-    // 미구현: logger, 에러 처리
-    async readRecentEventByStore(store_id: number): Promise<Event> {
-        const foundEvent = await this.eventRepository.findOne({
-            where: { store: { store_id } },
-            order: { created_at: 'DESC' },
-            relations: ['store']
-        })
-        if (!foundEvent) {
-            throw new NotFoundException(`Cannot Find Event In This Store`)
         }
 
         return foundEvent
