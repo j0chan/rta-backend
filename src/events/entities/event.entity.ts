@@ -23,9 +23,24 @@ export class Event {
     @Column()
     end_date: Date
 
-    @Column()
-    event_status: EventStatus = EventStatus.ONGOING
+    @Column({ default: false })
+    is_canceled: boolean
 
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date
+
+    get eventStatus(): EventStatus {
+        if (this.is_canceled) {
+            return EventStatus.CANCELED
+        }
+
+        const now = new Date()
+        if (now < this.start_date) {
+            return EventStatus.UPCOMING
+        } else if (now >= this.start_date && now <= this.end_date) {
+            return EventStatus.ONGOING
+        } else {
+            return EventStatus.COMPLETED
+        }
+    }
 }

@@ -22,7 +22,7 @@ export class EventsController {
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
     }
 
-    // READ[3] - 최근 등록 이벤트 조회
+    // READ[3] - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
     // 미구현: logger
     // 비고: Get요청들 중 최상단에 배치해야 정확히 라우팅함.
     @Get('/latest')
@@ -32,7 +32,7 @@ export class EventsController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
     }
 
-    // READ[1] - 해당 가게의 모든 이벤트 조회
+    // READ[1] - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
     // 미구현: logger
     @Get('/')
     async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
@@ -62,6 +62,14 @@ export class EventsController {
         await this.eventsService.updateEventById(event_id, updateEventDTO)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
+    }
+
+    // UPDATE - 이벤트 상태 취소로 변경
+    @Put('/:event_id/cancel')
+    async cancelEvent(@Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
+        await this.eventsService.cancelEvent(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Canceled Successfully')
     }
 
     // DELETE - by event_id
