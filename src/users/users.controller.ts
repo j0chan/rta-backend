@@ -1,6 +1,6 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { UsersService } from './users.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query } from '@nestjs/common'
 import { User } from './entities/user.entity'
 import { ReadUserDTO } from './DTO/read-user.dto'
 import { UpdateUserDTO } from './DTO/update-user.dto'
@@ -21,7 +21,7 @@ export class UsersController {
         private reviewsService: ReviewsService,
     ) { }
 
-    // READ[1] - 모든 유저 정보 조회
+    // READ - 모든 유저 정보 조회
     // 미구현: logger
     @Get('/')
     async readAllUsers(): Promise<ApiResponseDTO<ReadUserDTO[]>> {
@@ -31,7 +31,15 @@ export class UsersController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Users Retrieved Successfully', readUserDTOs)
     }
 
-    // READ[2] - 내 정보 조회
+    // READ - 이메일 중복 검사
+    // readUserById 메서드보다 위에 있어야 함.
+    @Get('/check-email')
+    async checkEmail(@Query('email') email: string): Promise<ApiResponseDTO<boolean>> {
+        const exists = await this.usersService.readEmailExists(email)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Email Check Completed', exists)
+    }
+
+    // READ - 내 정보 조회
     // 미구현: logger
     @Get('/:user_id')
     async readUserById(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadUserDTO>> {
@@ -42,7 +50,7 @@ export class UsersController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'User Retrieved Successfully', readUserDTO)
     }
 
-    // 나의 점주 신청서 조회
+    // READ - 나의 점주 신청서 조회
     @Get('/:user_id/manager-requests')
     async readMyManagerRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadManagerRequestDTO[]>> {
         const foundRequests = await this.managerRequestsService.readManagerRequestByUser(user_id)
@@ -51,7 +59,7 @@ export class UsersController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'My ManagerRequests Retrieved Successfully', readManagerRequestDTO)
     }
 
-    // 나의 가게 신청서 조회
+    // READ - 나의 가게 신청서 조회
     @Get('/:user_id/store-requests')
     async readMyStoreRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
         const foundRequests = await this.storeRequestsService.readStoreRequestByUser(user_id)
@@ -60,7 +68,7 @@ export class UsersController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTOs)
     }
 
-    // 나의 리뷰 조회
+    // READ - 나의 리뷰 조회
     @Get('/:user_id/reviews')
     async readMyReviews(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
         const foundReviews = await this.reviewsService.readReviewsByUser(user_id)

@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { UpdateUserDTO } from './DTO/update-user.dto'
 import { CreateUserDTO } from './DTO/create-user.dto'
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
@@ -60,10 +61,17 @@ export class UsersService {
     // 미구현: logger, 에러 처리
     async findUserByEmail(email: string): Promise<User> {
         const existingUser = await this.usersRepository.findOne({ where: { email } })
-        if(!existingUser){
+        if (!existingUser) {
             throw new NotFoundException('User Not Found!')
         }
         return existingUser
+    }
+
+    // 이메일 중복검사
+    async readEmailExists(email: string): Promise<boolean> {
+        return this.findUserByEmail(email)
+            .then(() => true) // 유저가 존재하면 true
+            .catch(() => false) // 예외 발생 시(유저 없음) false
     }
 
     // UPDATE - 내 정보 수정
