@@ -34,7 +34,7 @@ export class UsersController {
     // READ - 이메일 중복 검사
     // readUserById 메서드보다 위에 있어야 함.
     @Get('/check-email')
-    async checkEmail(@Query('email') email: string): Promise<ApiResponseDTO<boolean>> {
+    async readEmailExists(@Query('email') email: string): Promise<ApiResponseDTO<boolean>> {
         const exists = await this.usersService.readEmailExists(email)
         return new ApiResponseDTO(true, HttpStatus.OK, 'Email Check Completed', exists)
     }
