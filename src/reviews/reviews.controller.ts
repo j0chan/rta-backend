@@ -14,11 +14,11 @@ export class ReviewsController {
 
     // CREATE - 리뷰 작성
     // 미구현: logger
-    @Post('/')
-    async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDTO<Review>> {
-        await this.reviewsService.createReview(createReviewDTO)
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
-    }
+    // @Post('/')
+    // async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDTO<Review>> {
+    //     await this.reviewsService.createReview(createReviewDTO)
+    //     return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
+    // }
 
     // READ[1] - 모든 리뷰 조회
     // 미구현: logger
