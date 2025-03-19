@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common'
 import { MapsService } from './maps.service'
 
 @Controller('api/maps')
@@ -12,22 +12,32 @@ export class MapsController {
     }
 
     // 장소 검색
-    @Get('/search')
-    async searchPlaces(@Query('query') query: string) {
-        return this.mapsService.searchPlaces(query)
+    @Get('/:lat/:lng/:query')
+    async readStoreByName(
+        @Param('lat') lat: string,  
+        @Param('lng') lng: string,
+        @Param('query') query: string
+    ) {
+        if (!query) {
+            throw new BadRequestException('검색어를 입력하세요.')
+        }
+        if (!lat || !lng) {
+            throw new BadRequestException('위도와 경도를 입력하세요.')
+        }
+
+        return this.mapsService.getStoreByName(parseFloat(lat), parseFloat(lng), query)
     }
 
-    // 주변 장소 검색
-    @Get('/nearby')
-    async getNearbyPlaces(
-        @Query('lat') lat: string, // 위도
-        @Query('lng') lng: string  // 경도
-      ) {
-            if (!lat || !lng) {
-                return { message: '위도와 경도를 입력하세요.' }
-            }
-        
-            const places = await this.mapsService.getNearbyPlaces(parseFloat(lat), parseFloat(lng))
-            return places
+    // 주변 음식점 조회
+    @Get('/:lat/:lng')
+    async readNearbyStores(
+        @Param('lat') lat: string, 
+        @Param('lng') lng: string  
+    ) {
+        if (!lat || !lng) {
+            throw new BadRequestException('위도와 경도를 입력하세요.')
         }
+
+        return await this.mapsService.getNearbyStores(parseFloat(lat), parseFloat(lng))
+    }
 }
