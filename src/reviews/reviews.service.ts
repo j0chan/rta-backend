@@ -23,8 +23,8 @@ export class ReviewsService {
     // CREATE [1]
     // 미구현: logger, 에러 처리
     // 비고: store_id, user_id, keywords는 원래 DTO로 전달해야 한다. 지금은 안되므로 임시값 사용.
-    async createReview(CreateReviewDTO: CreateReviewDTO): Promise<void> {
-        const { store_id, user_id, content } = CreateReviewDTO
+    async createReview(store_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
+        const { user_id, content } = CreateReviewDTO
 
         // user_id로 User 객체 가져오기
         const user = await this.usersService.readUserById(user_id)

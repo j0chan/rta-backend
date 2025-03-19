@@ -8,6 +8,8 @@ import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadReviewDTO } from 'src/reviews/DTO/read-review.dto'
 import { ReviewsService } from 'src/reviews/reviews.service'
+import { CreateReviewDTO } from 'src/reviews/DTO/create-review.dto'
+import { Review } from 'src/reviews/entites/review.entity'
 
 @Controller('api/stores')
 export class StoresController {
@@ -60,15 +62,6 @@ export class StoresController {
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)
     }
 
-    // 가게 리뷰 조회
-    @Get('/:store_id/reviews')
-    async readStoreReviews(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
-        const foundReviews = await this.reviewsService.readReviewsByStore(id)
-        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
-
-        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
-    }
-
     // UPDATE
     // 가게 매니저 수정 (관리자 전용)
     @Patch('/:store_id')
@@ -92,6 +85,27 @@ export class StoresController {
         await this.storesService.deleteStore(store_id)
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Deleted Successfully")
+    }
+
+    // review
+
+    // CREATE
+    // 새로운 리뷰 생성
+    @Post('/:store_id/reviews')
+    async createReview(@Param('store_id') store_id: number, @Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDTO<void>> {
+        await this.reviewsService.createReview(store_id, createReviewDTO)
+
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
+    }
+
+    // READ
+    // 가게 리뷰 조회
+    @Get('/:store_id/reviews')
+    async readStoreReviews(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        const foundReviews = await this.reviewsService.readReviewsByStore(id)
+        const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
 
 }
