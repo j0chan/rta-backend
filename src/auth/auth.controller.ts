@@ -1,12 +1,9 @@
-import { Body, Controller, HttpStatus, Post, Res, UseGuards } from '@nestjs/common'
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateUserDTO } from 'src/users/DTO/create-user.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { SignInDTO } from './DTO/sign-in.dto'
-import { Request, Response } from 'express'
-import { AuthGuard } from '@nestjs/passport'
-import { GetUser } from './custom-guards-decorators/get-user.decorator'
-import { User } from 'src/users/entities/user.entity'
+import { Response } from 'express'
 
 @Controller('api/auth')
 export class AuthController {
@@ -32,13 +29,4 @@ export class AuthController {
 
         res.send(response)
     }
-
-    // 커스텀 데코레이터, JWT토큰 사용 테스크 코드
-    // @Post('/test')
-    // @UseGuards(AuthGuard())
-    // testForAuth(@GetUser() loggindedUser: User) {
-    //     console.log(loggindedUser)
-    //     console.log(loggindedUser.email)
-    //     return { message: 'goooooood', loggindedUser }
-    // }
 }

@@ -1,19 +1,25 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { CreateMenuDTO } from './DTO/create-menu.dto'
 import { MenusService } from './menus.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common'
 import { Menu } from './entities/menu.entity'
 import { ReadAllMenusDTO } from './DTO/read-all-menus.dto'
 import { ReadMenuDTO } from './DTO/read-menu.dto'
 import { UpdateMenuDTO } from './DTO/update-menu.dto'
+import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
+import { AuthGuard } from '@nestjs/passport'
+import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { UserRole } from 'src/users/entities/user-role.enum'
 
 @Controller('api/stores/:store_id/menus')
+@UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
 export class MenusController {
     constructor(private menusService: MenusService) { }
 
     // CREATE - 새로운 메뉴 등록
     // 미구현: logger
     @Post('/')
+    @Roles(UserRole.MANAGER)
     async createMenu(
         @Param('store_id') store_id: number,
         @Body() createMenuDTO: CreateMenuDTO): Promise<ApiResponseDTO<Menu>> {
@@ -45,6 +51,7 @@ export class MenusController {
     // UPDATE - by menu_id
     // 미구현: logger
     @Put('/:menu_id')
+    @Roles(UserRole.MANAGER)
     async updateMenuById(
         @Param('menu_id') menu_id: number,
         @Body() updateMenuDTO: UpdateMenuDTO): Promise<ApiResponseDTO<void>> {
@@ -56,6 +63,7 @@ export class MenusController {
     // DELETE - by menu_id
     // 미구현: logger
     @Delete('/:menu_id')
+    @Roles(UserRole.MANAGER)
     async deleteMenuById(
         @Param('menu_id') menu_id: number): Promise<ApiResponseDTO<void>> {
         await this.menusService.deleteMenuById(menu_id)

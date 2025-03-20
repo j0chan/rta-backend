@@ -1,12 +1,17 @@
 import { EventsService } from './events.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common'
 import { CreateEventDTO } from './DTO/create-event.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
 import { ReadEventDTO } from './DTO/read-event.dto'
 import { UpdateEventDTO } from './DTO/update-event.dto'
+import { AuthGuard } from '@nestjs/passport'
+import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
+import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { UserRole } from 'src/users/entities/user-role.enum'
 
 @Controller('api/stores/:store_id/events')
+@UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
 export class EventsController {
 
     // 생성자 정의
@@ -15,6 +20,7 @@ export class EventsController {
     // CREATE
     // 미구현: logger
     @Post('/')
+    @Roles(UserRole.MANAGER)
     async createEvent(
         @Param('store_id') store_id: number,
         @Body() createEventDTO: CreateEventDTO): Promise<ApiResponseDTO<void>> {
@@ -56,6 +62,7 @@ export class EventsController {
     // UPDATE - by event_id
     // 미구현: logger
     @Put('/:event_id')
+    @Roles(UserRole.MANAGER)
     async updateEventById(
         @Param('event_id') event_id: number,
         @Body() updateEventDTO: UpdateEventDTO): Promise<ApiResponseDTO<void>> {
@@ -67,6 +74,7 @@ export class EventsController {
     // DELETE - by event_id
     // 미구현: logger
     @Delete('/:event_id')
+    @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async deleteEventById(
         @Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
         await this.eventsService.deleteEventById(event_id)

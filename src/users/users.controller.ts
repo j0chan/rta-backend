@@ -1,6 +1,6 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { UsersService } from './users.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { User } from './entities/user.entity'
 import { ReadUserDTO } from './DTO/read-user.dto'
 import { UpdateUserDTO } from './DTO/update-user.dto'
@@ -10,6 +10,10 @@ import { StoreRequestsService } from 'src/store-requests/store-requests.service'
 import { ReadStoreRequestDTO } from 'src/store-requests/DTO/read-store-request.dto'
 import { ReadReviewDTO } from 'src/reviews/DTO/read-review.dto'
 import { ReviewsService } from 'src/reviews/reviews.service'
+import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
+import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { UserRole } from './entities/user-role.enum'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('api/users')
 export class UsersController {
@@ -24,6 +28,8 @@ export class UsersController {
     // READ - 모든 유저 정보 조회
     // 미구현: logger
     @Get('/')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.ADMIN)
     async readAllUsers(): Promise<ApiResponseDTO<ReadUserDTO[]>> {
         const users: User[] = await this.usersService.readAllUsers()
         const readUserDTOs: ReadUserDTO[] = users.map(user => new ReadUserDTO(user))
@@ -42,6 +48,8 @@ export class UsersController {
     // READ - 내 정보 조회
     // 미구현: logger
     @Get('/:user_id')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.ADMIN)
     async readUserById(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadUserDTO>> {
         const foundUser: User = await this.usersService.readUserById(user_id)
 
@@ -52,6 +60,8 @@ export class UsersController {
 
     // READ - 나의 점주 신청서 조회
     @Get('/:user_id/manager-requests')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.MANAGER)
     async readMyManagerRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadManagerRequestDTO[]>> {
         const foundRequests = await this.managerRequestsService.readManagerRequestByUser(user_id)
         const readManagerRequestDTO = foundRequests.map((request) => new ReadManagerRequestDTO(request))
@@ -61,6 +71,8 @@ export class UsersController {
 
     // READ - 나의 가게 신청서 조회
     @Get('/:user_id/store-requests')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.USER)
     async readMyStoreRequests(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
         const foundRequests = await this.storeRequestsService.readStoreRequestByUser(user_id)
         const readStoreRequestDTOs = foundRequests.map((request) => new ReadStoreRequestDTO(request))
@@ -70,6 +82,8 @@ export class UsersController {
 
     // READ - 나의 리뷰 조회
     @Get('/:user_id/reviews')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.USER)
     async readMyReviews(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
         const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
         const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
@@ -80,6 +94,8 @@ export class UsersController {
     // UPDATE - by user_id
     // 미구현: logger
     @Put('/:user_id')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.USER, UserRole.MANAGER)
     async updateUserById(
         @Param('user_id') user_id: number,
         @Body() updateUserDto: UpdateUserDTO): Promise<ApiResponseDTO<void>> {
@@ -91,6 +107,8 @@ export class UsersController {
     // DELETE - 탈퇴
     // 미구현: logger
     @Delete('/:user_id')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.USER, UserRole.MANAGER)
     async deleteUserById(@Param('user_id') user_id: number): Promise<ApiResponseDTO<void>> {
         await this.usersService.deleteUserById(user_id)
 
