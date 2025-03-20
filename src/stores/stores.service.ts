@@ -38,6 +38,18 @@ export class StoresService {
     }
 
     // READ
+    // 특정 유저의 모든 가게 조회
+    async readAllStoresByUser(user_id: number): Promise<Store[]> {
+        const foundStores = await this.storesRepository.find({
+            where: { user_id: { user_id } }
+        })
+        if (!foundStores) {
+            throw new NotFoundException(`Cannot Find Store With user_id: ${user_id}`)
+        }
+        return foundStores
+    }
+
+    // READ
     // 모든 가게 조회
     async readAllStores(): Promise<Store[]> {
         const foundStores = await this.storesRepository.find()
@@ -67,7 +79,7 @@ export class StoresService {
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
         const foundUser = await this.usersService.readUserById(user_id)
 
-        await this.storesRepository.update(store_id, { manager: foundUser })
+        await this.storesRepository.update(store_id, { user_id: foundUser })
     }
 
     // 가게 정보 수정 (매니저 전용)

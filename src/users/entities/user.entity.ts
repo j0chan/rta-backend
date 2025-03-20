@@ -29,7 +29,7 @@ export class User {
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
 
-    @ManyToOne(()=> Store, (store) => store.manager)
+    @ManyToOne(()=> Store, (store) => store.user_id)
     stores: Store[]
 
     @OneToMany(()=> Review, (review) => review.user)

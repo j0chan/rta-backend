@@ -9,7 +9,6 @@ import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReadReviewDTO } from 'src/reviews/DTO/read-review.dto'
 import { ReviewsService } from 'src/reviews/reviews.service'
 import { CreateReviewDTO } from 'src/reviews/DTO/create-review.dto'
-import { Review } from 'src/reviews/entites/review.entity'
 
 @Controller('api/stores')
 export class StoresController {
@@ -26,6 +25,17 @@ export class StoresController {
 
         return new ApiResponseDTO(true, HttpStatus.CREATED, "Store Created Successfully")
     }
+
+    // READ
+    // 특정 유저의 모든 가게 조회
+    @Get('/user/:user_id')
+    async readAllStoresByUser(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+        const stores = await this.storesService.readAllStoresByUser(user_id)
+        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, `Stores with user_id ${user_id} Retrieved Successfully`, readStoreDTOs)
+    }
+    
 
     // READ
     // 모든 가게 조회

@@ -13,8 +13,8 @@ export class Store {
     store_id: number
 
     @ManyToOne(() => User, (user) => user.stores)
-    @JoinColumn({ name: "manager_id" })
-    manager: User
+    @JoinColumn({ name: "user_id" })
+    user_id: User
 
     @OneToMany(() => Review, (review) => review.store)
     reviews: Review[]
