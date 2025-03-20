@@ -1,7 +1,10 @@
-import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common'
+import { BadRequestException, Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 import { MapsService } from './maps.service'
+import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('api/maps')
+@UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
 export class MapsController {
     constructor(private readonly mapsService: MapsService) {}
 
