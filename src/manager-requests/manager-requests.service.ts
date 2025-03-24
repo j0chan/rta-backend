@@ -22,8 +22,8 @@ export class ManagerRequestsService {
 
     // CREATE
     // 점주 신청서 생성 (store가 존재하는 경우)
-    async createManagerRequest(createManagerRequestDTO: CreateManagerRequestDTO): Promise<void> {
-        const { user_id, store_id } = createManagerRequestDTO
+    async createManagerRequest(user_id: number, createManagerRequestDTO: CreateManagerRequestDTO): Promise<void> {
+        const { store_id } = createManagerRequestDTO
 
         // user_id를 이용해 user 가져오기
         const user = await this.usersService.readUserById(user_id)
@@ -74,8 +74,8 @@ export class ManagerRequestsService {
 
     // 특정 사용자의 점주 신청서 조회
     async readManagerRequestByUser(user_id: number): Promise<ManagerRequest[]> {
-        const managerRequests = await this.managerRequestRepository.find({ 
-            where: { user: { user_id: user_id }},
+        const managerRequests = await this.managerRequestRepository.find({
+            where: { user: { user_id: user_id } },
             relations: this.managerRequestRelations,
         })
 
