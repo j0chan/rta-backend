@@ -56,7 +56,7 @@ export class ReviewsService {
     }
 
     // READ[2] - 특정 리뷰 조회
-    async readReviewById(review_id: number): Promise<Review> {
+    async readReviewByReviewId(review_id: number): Promise<Review> {
         const foundReview = await this.reviewRepository.findOne({
             where: { review_id },
             // reply 관계를 포함하여 조회
@@ -93,7 +93,7 @@ export class ReviewsService {
     // UPDATE[1] - 리뷰 수정
     // 미구현: logger, 에러 처리
     async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         const currentDate: Date = new Date()
 
@@ -115,7 +115,7 @@ export class ReviewsService {
      *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
      */
     async markHelpful(review_id: number): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         foundReview.helpful_count += 1
         await this.reviewRepository.save(foundReview)
@@ -123,7 +123,7 @@ export class ReviewsService {
 
     // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
     async updateReplyId(review_id: number, reply: Reply): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
         foundReview.reply = reply
 
         await this.reviewRepository.save(foundReview)
@@ -131,8 +131,8 @@ export class ReviewsService {
 
     // DELETE - 리뷰 삭제
     // 미구현: logger, 에러 처리
-    async deleteReveiwById(review_id: number): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+    async deleteReviewById(review_id: number): Promise<void> {
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         await this.reviewRepository.remove(foundReview)
     }
