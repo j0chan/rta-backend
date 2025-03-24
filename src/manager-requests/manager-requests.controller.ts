@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common'
 import { ManagerRequestsService } from './manager-requests.service'
 import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
 import { ReadManagerRequestDTO } from './DTO/read-manager-request.dto'
@@ -71,9 +71,23 @@ export class ManagerRequestsController {
     // 가게 신청서 삭제 
     @Delete('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
-    async deleteManagerRequest(@Param('request_id') request_id: number): Promise<ApiResponseDTO<void>> {
-        await this.managerRequestsService.deleteManagerRequest(request_id)
+    async deleteManagerRequest(
+        @Req() req: AuthenticatedRequest,
+        @Param('request_id') request_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundRequest = await this.managerRequestsService.readManagerRequestById(request_id)
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Request Deleted Successfully")
+        if (req.user.role === UserRole.ADMIN) {
+            await this.managerRequestsService.deleteManagerRequest(request_id)
+            return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
+        }
+
+        if (foundRequest.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
+
+        }
+
+        await this.managerRequestsService.deleteManagerRequest(request_id)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
     }
 }

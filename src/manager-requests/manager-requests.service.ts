@@ -25,11 +25,10 @@ export class ManagerRequestsService {
     async createManagerRequest(user_id: number, createManagerRequestDTO: CreateManagerRequestDTO): Promise<void> {
         const { store_id } = createManagerRequestDTO
 
-        // user_id를 이용해 user 가져오기
+        // user_id, store_id를 이용해 user, store 객체 가져오기
         const user = await this.usersService.readUserById(user_id)
-
-        // store_id를 이용해 store 가져오기
         const store = await this.storesService.readStoreById(store_id)
+        
         if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
         }
