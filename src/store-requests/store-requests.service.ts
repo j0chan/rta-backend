@@ -23,8 +23,8 @@ export class StoreRequestsService {
 
     // CREATE
     // 가게 신청서 생성
-    async createStoreRequest(createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
-        const { user_id, store_id } = createStoreRequestDTO
+    async createStoreRequest(user_id: number, createStoreRequestDTO: CreateStoreRequestDTO): Promise<void> {
+        const { store_id } = createStoreRequestDTO
 
         // user_id, store_id를 이용해 user, store 객체 가져오기
         const user = await this.usersService.readUserById(user_id)
