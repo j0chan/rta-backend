@@ -4,6 +4,7 @@ import { Store } from "src/stores/entities/store.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
 import { Review } from "src/reviews/entites/review.entity"
+import { Favorite } from "src/favorites/entites/favorite.entity"
 
 
 @Entity()
@@ -41,4 +42,6 @@ export class User {
     @OneToMany(() => StoreRequest, (storeRequest) => storeRequest.user)
     store_requests: StoreRequest[]
 
+    @OneToMany(() => Favorite, (favorite) => favorite.user)
+    favorites: Favorite[]
 }

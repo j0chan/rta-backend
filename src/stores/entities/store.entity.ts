@@ -6,6 +6,7 @@ import { StoreRequest } from "../../store-requests/entities/store-request.entity
 import { Menu } from "src/menus/entities/menu.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { User } from "src/users/entities/user.entity"
+import { Favorite } from "src/favorites/entites/favorite.entity"
 
 @Entity()
 export class Store {
@@ -60,4 +61,8 @@ export class Store {
 
     @OneToMany(() => Menu, (menu) => menu.store)
     menus: Menu[]
+
+    @OneToMany(() => Favorite, (favorite) => favorite.store)
+    favorites: Favorite[]
+
 }
