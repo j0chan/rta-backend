@@ -32,11 +32,11 @@ export class Store {
     @Column()
     address: string
 
-    @Column()
-    latitude: number
+    @Column({ type: 'bigint' })
+    latitude: string
 
-    @Column()
-    longitude: number
+    @Column({ type: 'bigint'})
+    longitude: string
 
     @Column()
     contact_number: string
@@ -64,5 +64,8 @@ export class Store {
 
     @OneToMany(() => Favorite, (favorite) => favorite.store)
     favorites: Favorite[]
+
+    @Column({ nullable: true })
+    area: string
 
 }
