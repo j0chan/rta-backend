@@ -94,7 +94,8 @@ export class StoresService {
     // 미구현: logger, 에러 처리
     async readEventById(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
-            where: { event_id }
+            where: { event_id },
+            relations: ['store.user_id']
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)

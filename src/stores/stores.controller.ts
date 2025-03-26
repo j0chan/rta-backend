@@ -91,6 +91,11 @@ export class StoresController {
             throw new ForbiddenException('You Can Only Update Your Own Store Event.')
         }
 
+        const foundEvent = await this.storesService.readEventById(event_id)
+        if (foundEvent.store.user_id.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
+        }
+
         await this.storesService.updateEventById(event_id, updateEventDTO)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
@@ -109,6 +114,11 @@ export class StoresController {
         const foundStore = await this.storesService.readStoreById(store_id)
         if (foundStore.user_id.user_id !== req.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Store Event.')
+        }
+
+        const foundEvent = await this.storesService.readEventById(event_id)
+        if (foundEvent.store.user_id.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
         }
 
         await this.storesService.deleteEventById(event_id)
