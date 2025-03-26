@@ -6,8 +6,8 @@ import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
-import { CreateEventDTO } from 'src/stores/DTO/create-event.dto';
-import { Event } from './entities/event.entity';
+import { CreateEventDTO } from 'src/stores/DTO/create-event.dto'
+import { Event } from './entities/event.entity'
 import { UpdateEventDTO } from './DTO/update-event.dto'
 
 @Injectable()

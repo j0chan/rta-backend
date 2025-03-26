@@ -60,7 +60,7 @@ export class ReviewsService {
         const foundReview = await this.reviewRepository.findOne({
             where: { review_id },
             // reply 관계를 포함하여 조회
-            relations: this.reviewRelations, 
+            relations: this.reviewRelations,
         })
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find Review with Id ${review_id}`)
@@ -68,12 +68,12 @@ export class ReviewsService {
 
         return foundReview
     }
-    
+
     // READ[3] - 사용자로 리뷰 필터링
     async readReviewsByUser(user_id: number): Promise<Review[]> {
         // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
         const foundReviews = await this.reviewRepository.find({
-            where: { user: { user_id: user_id }},
+            where: { user: { user_id: user_id } },
             relations: this.reviewRelations,
         })
 
@@ -82,8 +82,8 @@ export class ReviewsService {
 
     // READ[4] - 가게로 리뷰 필터링
     async readReviewsByStore(store_id: number): Promise<Review[]> {
-        const foundReviews = await this.reviewRepository.find({ 
-            where: { store: { store_id: store_id }},
+        const foundReviews = await this.reviewRepository.find({
+            where: { store: { store_id: store_id } },
             relations: this.reviewRelations,
         })
 
