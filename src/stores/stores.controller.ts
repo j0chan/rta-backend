@@ -137,9 +137,7 @@ export class StoresController {
         return new ApiResponseDTO(true, HttpStatus.CREATED, "Store Created Successfully")
     }
 
-    // READ
-    // 특정 유저의 모든 가게 조회
-    // 매니저가 자신의 가게 조회할 때 사용
+    // READ - 매니저가 자신의 가게 조회할 때 사용
     @Get('/user/:user_id')
     @Roles(UserRole.MANAGER)
     async readAllStoresByUser(@Param('user_id') user_id: number): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
@@ -231,6 +229,4 @@ export class StoresController {
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
-
-
 }

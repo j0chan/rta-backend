@@ -17,15 +17,6 @@ export class ReviewsController {
     // 생성자 정의
     constructor(private reviewsService: ReviewsService) { }
 
-    // CREATE - 리뷰 작성
-    // 미구현: logger
-    // @Post('/')
-    // @Roles(UserRole.USER)
-    // async createReview(@Body() createReviewDTO: CreateReviewDTO): Promise<ApiResponseDTO<Review>> {
-    //     await this.reviewsService.createReview(createReviewDTO)
-    //     return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
-    // }
-
     // READ[1] - 모든 리뷰 조회 -> 안쓸듯
     // 미구현: logger
     @Get('/')
@@ -90,12 +81,6 @@ export class ReviewsController {
     ): Promise<ApiResponseDTO<void>> {
         const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
 
-        // ADMIN은 모든 리뷰 삭제 가능
-        if (req.user.role === UserRole.ADMIN) {
-            await this.reviewsService.deleteReviewById(review_id)
-            return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully')
-        }
-        
         // USER는 본인 리뷰만 삭제 가능
         if (req.user.user_id !== foundReview.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Review.')

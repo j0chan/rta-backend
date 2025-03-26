@@ -1,6 +1,6 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { UsersService } from './users.service'
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Param, Put, Query, UseGuards } from '@nestjs/common'
 import { User } from './entities/user.entity'
 import { ReadUserDTO } from './DTO/read-user.dto'
 import { UpdateUserDTO } from './DTO/update-user.dto'

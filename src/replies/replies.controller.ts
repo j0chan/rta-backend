@@ -20,7 +20,6 @@ export class RepliesController {
 
     // CREATE - 리뷰 대댓글 (매니저 전용)
     // 미구현: logger
-    // 비고: 매니저 여부를 판단하는 guard 必
     @Post('/:review_id')
     @Roles(UserRole.MANAGER)
     async createReply(
