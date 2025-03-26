@@ -13,6 +13,10 @@ import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
 import { AuthGuard } from '@nestjs/passport'
 import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { CreateEventDTO } from 'src/stores/DTO/create-event.dto';
+import { ReadEventDTO } from './DTO/read-event.dto'
+import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
+import { UpdateEventDTO } from './DTO/update-event.dto'
 
 @Controller('api/stores')
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -21,6 +25,76 @@ export class StoresController {
         private storesService: StoresService,
         private reviewsService: ReviewsService,
     ) { }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ이벤트 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    // CREATE - 이벤트 생성
+    // jwt를 통한 user_id추출 기능 추가 필요
+    @Post('/:store_id/events')
+    @Roles(UserRole.MANAGER)
+    async createEvent(
+        @Param('store_id') store_id: number,
+        @Body() createEventDTO: CreateEventDTO): Promise<ApiResponseDTO<void>> {
+        await this.storesService.createEvent(store_id, createEventDTO)
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
+    }
+
+    // READ - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
+    // 미구현: logger
+    @Get('/:store_id/events/latest')
+    async readRecentEventByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent = await this.storesService.readRecentEventByStore(store_id)
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
+    }
+
+    // READ - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
+    // 미구현: logger
+    @Get('/:store_id/events')
+    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
+        const events = await this.storesService.readAllEventsByStore(store_id)
+        const readAllEventsDTO = events.map(event => new ReadAllEventsDTO(event))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDTO)
+    }
+
+    // READ - 특정 이벤트 상세 조회
+    // 미구현: logger
+    // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
+    @Get('/:store_id/events/:event_id')
+    async readEventById(
+        @Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent = await this.storesService.readEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
+    }
+
+    // UPDATE - by event_id
+    // 미구현: logger
+    // jwt를 통해 user_id추출 필요
+    @Put('/:store_id/events/:event_id')
+    @Roles(UserRole.MANAGER)
+    async updateEventById(
+        @Param('event_id') event_id: number,
+        @Body() updateEventDTO: UpdateEventDTO): Promise<ApiResponseDTO<void>> {
+        await this.storesService.updateEventById(event_id, updateEventDTO)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
+    }
+
+    // DELETE - by event_id
+    // 미구현: logger
+    // jwt를 통해 user_id추출 필요
+    @Delete('/:store_id/events/:event_id')
+    @Roles(UserRole.MANAGER, UserRole.ADMIN)
+    async deleteEventById(
+        @Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
+        await this.storesService.deleteEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
+    }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ스토어 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     // CREATE
     // 새로운 가게 생성하기
@@ -125,5 +199,6 @@ export class StoresController {
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
+
 
 }

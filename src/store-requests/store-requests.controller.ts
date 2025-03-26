@@ -16,8 +16,8 @@ export class StoreRequestsController {
     constructor(private storeRequestsService: StoreRequestsService) { }
     // Store Request 가게 신청서
 
-    // CREATE
-    // 가게 신청서 생성
+    // CREATE - 가게 신청서 생성
+    // jwt토큰에서 user_id추출해서 전달하는 구조
     @Post('/')
     @Roles(UserRole.MANAGER)
     async createStoreRequest(
@@ -46,6 +46,8 @@ export class StoreRequestsController {
     }
 
     // 특정 가게 신청서 조회
+    // 비고: 내 가게 신청서 조회하는 기능 구현 할 것인지?
+    //       만약 한다면 본인 신청서만 조회하는 기능 추가 필요.
     @Get('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async readStoreRequestById(@Param('request_id') request_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO>> {
@@ -79,14 +81,8 @@ export class StoreRequestsController {
     ): Promise<ApiResponseDTO<void>> {
         const foundRequest = await this.storeRequestsService.readStoreRequestById(request_id)
 
-        if (req.user.role === UserRole.ADMIN) {
-            await this.storeRequestsService.deleteStoreRequest(request_id)
-            return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
-        }
-
         if (foundRequest.user.user_id !== req.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
-
         }
 
         await this.storeRequestsService.deleteStoreRequest(request_id)
