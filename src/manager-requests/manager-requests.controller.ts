@@ -77,14 +77,8 @@ export class ManagerRequestsController {
     ): Promise<ApiResponseDTO<void>> {
         const foundRequest = await this.managerRequestsService.readManagerRequestById(request_id)
 
-        if (req.user.role === UserRole.ADMIN) {
-            await this.managerRequestsService.deleteManagerRequest(request_id)
-            return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
-        }
-
         if (foundRequest.user.user_id !== req.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
-
         }
 
         await this.managerRequestsService.deleteManagerRequest(request_id)
