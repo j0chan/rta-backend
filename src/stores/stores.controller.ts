@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common'
 import { StoresService } from './stores.service'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { ReadStoreDTO } from './DTO/read-store.dto'
@@ -13,10 +13,11 @@ import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
 import { AuthGuard } from '@nestjs/passport'
 import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
-import { CreateEventDTO } from 'src/stores/DTO/create-event.dto';
+import { CreateEventDTO } from 'src/stores/DTO/create-event.dto'
 import { ReadEventDTO } from './DTO/read-event.dto'
 import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
 import { UpdateEventDTO } from './DTO/update-event.dto'
+import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
 
 @Controller('api/stores')
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -29,12 +30,18 @@ export class StoresController {
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ이벤트 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     // CREATE - 이벤트 생성
-    // jwt를 통한 user_id추출 기능 추가 필요
     @Post('/:store_id/events')
     @Roles(UserRole.MANAGER)
     async createEvent(
+        @Req() req: AuthenticatedRequest,
         @Param('store_id') store_id: number,
-        @Body() createEventDTO: CreateEventDTO): Promise<ApiResponseDTO<void>> {
+        @Body() createEventDTO: CreateEventDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user_id.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Create Event Your Own Store.')
+        }
+
         await this.storesService.createEvent(store_id, createEventDTO)
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
     }
@@ -69,26 +76,41 @@ export class StoresController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
     }
 
-    // UPDATE - by event_id
+    // UPDATE - 자신의 가게 이벤트 수정
     // 미구현: logger
-    // jwt를 통해 user_id추출 필요
     @Put('/:store_id/events/:event_id')
     @Roles(UserRole.MANAGER)
     async updateEventById(
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
         @Param('event_id') event_id: number,
-        @Body() updateEventDTO: UpdateEventDTO): Promise<ApiResponseDTO<void>> {
+        @Body() updateEventDTO: UpdateEventDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user_id.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Update Your Own Store Event.')
+        }
+
         await this.storesService.updateEventById(event_id, updateEventDTO)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
     }
 
-    // DELETE - by event_id
+    // DELETE - 자신의 가게 이벤트 삭제
     // 미구현: logger
     // jwt를 통해 user_id추출 필요
     @Delete('/:store_id/events/:event_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async deleteEventById(
-        @Param('event_id') event_id: number): Promise<ApiResponseDTO<void>> {
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
+        @Param('event_id') event_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user_id.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Delete Your Own Store Event.')
+        }
+
         await this.storesService.deleteEventById(event_id)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
@@ -136,7 +158,7 @@ export class StoresController {
     }
 
     // 특정 가게 주소 조회
-    @Get('/:store_id')
+    @Get('/:store_id/address')
     async readStoreAddressById(@Param('store_id') id: number): Promise<ApiResponseDTO<ReadStoreAddressDTO>> {
         const store = await this.storesService.readStoreById(id)
 

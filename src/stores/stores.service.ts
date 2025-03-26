@@ -171,7 +171,11 @@ export class StoresService {
 
     // 특정 가게 조회
     async readStoreById(store_id: number): Promise<Store> {
-        const foundStore = await this.storesRepository.findOneBy({ store_id: store_id })
+        const foundStore = await this.storesRepository.findOne({
+            where: { store_id },
+            relations: ['user_id'],
+        })
+
         if (!foundStore) {
             throw new NotFoundException(`Cannot Find Store with ID ${store_id}`)
         }
