@@ -32,105 +32,6 @@ export class StoresController {
         private reviewsService: ReviewsService,
     ) { }
 
-    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ이벤트 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-    // CREATE - 이벤트 생성
-    @Post('/:store_id/events')
-    @Roles(UserRole.MANAGER)
-    async createEvent(
-        @Req() req: AuthenticatedRequest,
-        @Param('store_id') store_id: number,
-        @Body() createEventDTO: CreateEventDTO
-    ): Promise<ApiResponseDTO<void>> {
-        const foundStore = await this.storesService.readStoreById(store_id)
-        if (foundStore.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('You Can Create Event Your Own Store.')
-        }
-
-        await this.storesService.createEvent(store_id, createEventDTO)
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
-    }
-
-    // READ - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
-    // 미구현: logger
-    @Get('/:store_id/events/latest')
-    async readRecentEventByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
-        const foundEvent = await this.storesService.readRecentEventByStore(store_id)
-
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
-    }
-
-    // READ - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
-    // 미구현: logger
-    @Get('/:store_id/events')
-    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
-        const events = await this.storesService.readAllEventsByStore(store_id)
-        const readAllEventsDTO = events.map(event => new ReadAllEventsDTO(event))
-
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDTO)
-    }
-
-    // READ - 특정 이벤트 상세 조회
-    // 미구현: logger
-    // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
-    @Get('/:store_id/events/:event_id')
-    async readEventById(
-        @Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
-        const foundEvent = await this.storesService.readEventById(event_id)
-
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
-    }
-
-    // UPDATE - 자신의 가게 이벤트 수정
-    // 미구현: logger
-    @Put('/:store_id/events/:event_id')
-    @Roles(UserRole.MANAGER)
-    async updateEventById(
-        @Req() req: AuthenticatedRequest,
-        @Param('store_id') store_id: number,
-        @Param('event_id') event_id: number,
-        @Body() updateEventDTO: UpdateEventDTO
-    ): Promise<ApiResponseDTO<void>> {
-        const foundStore = await this.storesService.readStoreById(store_id)
-        if (foundStore.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('You Can Only Update Your Own Store Event.')
-        }
-
-        const foundEvent = await this.storesService.readEventById(event_id)
-        if (foundEvent.store.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
-        }
-
-        await this.storesService.updateEventById(event_id, updateEventDTO)
-
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
-    }
-
-    // DELETE - 자신의 가게 이벤트 삭제
-    // 미구현: logger
-    // jwt를 통해 user_id추출 필요
-    @Delete('/:store_id/events/:event_id')
-    @Roles(UserRole.MANAGER, UserRole.ADMIN)
-    async deleteEventById(
-        @Req() req: AuthenticatedRequest,
-        @Param('store_id') store_id: number,
-        @Param('event_id') event_id: number
-    ): Promise<ApiResponseDTO<void>> {
-        const foundStore = await this.storesService.readStoreById(store_id)
-        if (foundStore.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('You Can Only Delete Your Own Store Event.')
-        }
-
-        const foundEvent = await this.storesService.readEventById(event_id)
-        if (foundEvent.store.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
-        }
-
-        await this.storesService.deleteEventById(event_id)
-
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
-    }
-
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ스토어 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     // CREATE
@@ -266,23 +167,129 @@ export class StoresController {
     }
 
 
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ이벤트 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    // CREATE - 이벤트 생성
+    @Post('/:store_id/events')
+    @Roles(UserRole.MANAGER)
+    async createEvent(
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
+        @Body() createEventDTO: CreateEventDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Create Event Your Own Store.')
+        }
+
+        await this.storesService.createEvent(store_id, createEventDTO)
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Event Created Successfully')
+    }
+
+    // READ - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
+    // 미구현: logger
+    @Get('/:store_id/events/latest')
+    async readRecentEventByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent = await this.storesService.readRecentEventByStore(store_id)
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
+    }
+
+    // READ - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
+    // 미구현: logger
+    @Get('/:store_id/events')
+    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
+        const events = await this.storesService.readAllEventsByStore(store_id)
+        const readAllEventsDTO = events.map(event => new ReadAllEventsDTO(event))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDTO)
+    }
+
+    // READ - 특정 이벤트 상세 조회
+    // 미구현: logger
+    // 비고: 이벤트 목록 중 특정 이벤트 클릭 시, 해당 event_id로 이벤트 상세 조회
+    @Get('/:store_id/events/:event_id')
+    async readEventById(
+        @Param('event_id') event_id: number): Promise<ApiResponseDTO<ReadEventDTO>> {
+        const foundEvent = await this.storesService.readEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Event Retrieved Successfully', new ReadEventDTO(foundEvent))
+    }
+
+    // UPDATE - 자신의 가게 이벤트 수정
+    // 미구현: logger
+    @Put('/:store_id/events/:event_id')
+    @Roles(UserRole.MANAGER)
+    async updateEventById(
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
+        @Param('event_id') event_id: number,
+        @Body() updateEventDTO: UpdateEventDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Update Your Own Store Event.')
+        }
+
+        const foundEvent = await this.storesService.readEventById(event_id)
+        if (foundEvent.store.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
+        }
+
+        await this.storesService.updateEventById(event_id, updateEventDTO)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Updated Successfully')
+    }
+
+    // DELETE - 자신의 가게 이벤트 삭제
+    // 미구현: logger
+    @Delete('/:store_id/events/:event_id')
+    @Roles(UserRole.MANAGER, UserRole.ADMIN)
+    async deleteEventById(
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
+        @Param('event_id') event_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Delete Your Own Store Event.')
+        }
+
+        const foundEvent = await this.storesService.readEventById(event_id)
+        if (foundEvent.store.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
+        }
+
+        await this.storesService.deleteEventById(event_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
+    }
+
+
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ메뉴 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     // CREATE - 새로운 메뉴 등록
     // 미구현: logger
-    @Post('/')
+    @Post('/:store_id/menus')
     @Roles(UserRole.MANAGER)
     async createMenu(
+        @Req() req: AuthenticatedRequest,
         @Param('store_id') store_id: number,
-        @Body() createMenuDTO: CreateMenuDTO): Promise<ApiResponseDTO<Menu>> {
+        @Body() createMenuDTO: CreateMenuDTO
+    ): Promise<ApiResponseDTO<Menu>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Create Menu Your Own Store.')
+        }
+
         await this.storesService.createMenu(store_id, createMenuDTO)
 
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Menu Registered Successfully!')
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Menu Created Successfully!')
     }
 
     // READ[1] - 해당 가게 모든 메뉴 조회
     // 미구현: logger
-    @Get('/')
+    @Get('/:store_id/menus')
     async readMenusByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllMenusDTO[]>> {
         const menus: Menu[] = await this.storesService.readMenusByStore(store_id)
         const readAllMenusDTO = menus.map(menu => new ReadAllMenusDTO(menu))
@@ -292,7 +299,7 @@ export class StoresController {
 
     // READ[2] - 해당 가게 특정 메뉴 조회
     // 미구현: logger
-    @Get('/:menu_id')
+    @Get('/:store_id/menus/:menu_id')
     async readMenuById(
         @Param('menu_id') menu_id: number): Promise<ApiResponseDTO<ReadMenuDTO>> {
         const foundMenu: Menu = await this.storesService.readMenuById(menu_id)
@@ -302,11 +309,24 @@ export class StoresController {
 
     // UPDATE - by menu_id
     // 미구현: logger
-    @Put('/:menu_id')
+    @Put('/:store_id/menus/:menu_id')
     @Roles(UserRole.MANAGER)
     async updateMenuById(
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
         @Param('menu_id') menu_id: number,
-        @Body() updateMenuDTO: UpdateMenuDTO): Promise<ApiResponseDTO<void>> {
+        @Body() updateMenuDTO: UpdateMenuDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Update Menu Your Own Store.')
+        }
+
+        const foundMenu = await this.storesService.readMenuById(menu_id)
+        if (foundMenu.store.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Menu Does Not Belong to the Provided Store.')
+        }
+
         await this.storesService.updateMenuById(menu_id, updateMenuDTO)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Menu Updated Successfully!')
@@ -314,10 +334,23 @@ export class StoresController {
 
     // DELETE - by menu_id
     // 미구현: logger
-    @Delete('/:menu_id')
+    @Delete('/:store_id/menus/:menu_id')
     @Roles(UserRole.MANAGER)
     async deleteMenuById(
-        @Param('menu_id') menu_id: number): Promise<ApiResponseDTO<void>> {
+        @Req() req: AuthenticatedRequest,
+        @Param('store_id') store_id: number,
+        @Param('menu_id') menu_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundStore = await this.storesService.readStoreById(store_id)
+        if (foundStore.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Delete Menu Your Own Store.')
+        }
+
+        const foundMenu = await this.storesService.readMenuById(menu_id)
+        if (foundMenu.store.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('This Menu Does Not Belong to the Provided Store.')
+        }
+
         await this.storesService.deleteMenuById(menu_id)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Menu Deleted Successfully!')
