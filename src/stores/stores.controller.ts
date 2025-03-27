@@ -131,7 +131,7 @@ export class StoresController {
     // CREATE
     // 새로운 가게 생성하기
     @Post('/')
-    @Roles(UserRole.MANAGER)
+    @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async createStore(
         @Req() req: AuthenticatedRequest,
         @Body() createStoreDTO: CreateStoreDTO
