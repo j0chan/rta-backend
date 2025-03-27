@@ -9,7 +9,6 @@ import { OpenaiModule } from './openai/openai.module'
 import { StoreRequestsModule } from './store-requests/store-requests.module'
 import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { RepliesModule } from './replies/replies.module'
-import { MenusModule } from './menus/menus.module'
 import { AuthModule } from './auth/auth.module'
 
 @Module({
@@ -23,7 +22,6 @@ import { AuthModule } from './auth/auth.module'
     StoreRequestsModule,
     ManagerRequestsModule,
     RepliesModule,
-    MenusModule,
     UsersModule,
     AuthModule
   ],

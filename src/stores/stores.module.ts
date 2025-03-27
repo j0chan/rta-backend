@@ -6,11 +6,13 @@ import { Store } from './entities/store.entity'
 import { ReviewsModule } from 'src/reviews/reviews.module'
 import { UsersModule } from 'src/users/users.module'
 import { Event } from './entities/event.entity'
+import { Menu } from './entities/menu.entity'
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Store]),
         TypeOrmModule.forFeature([Event]),
+        TypeOrmModule.forFeature([Menu]),
         forwardRef(() => ReviewsModule),
         forwardRef(() => UsersModule),
     ],

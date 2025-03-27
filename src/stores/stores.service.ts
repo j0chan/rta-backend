@@ -9,6 +9,9 @@ import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { CreateEventDTO } from 'src/stores/DTO/create-event.dto'
 import { Event } from './entities/event.entity'
 import { UpdateEventDTO } from './DTO/update-event.dto'
+import { Menu } from './entities/menu.entity'
+import { CreateMenuDTO } from './DTO/create-menu.dto'
+import { UpdateMenuDTO } from './DTO/update-menu.dto'
 
 @Injectable()
 export class StoresService {
@@ -19,6 +22,8 @@ export class StoresService {
         private storesRepository: Repository<Store>,
         @InjectRepository(Event)
         private eventRepository: Repository<Event>,
+        @InjectRepository(Menu)
+        private menusRepository: Repository<Menu>,
         private usersService: UsersService,
     ) { }
 
@@ -229,5 +234,80 @@ export class StoresService {
         const foundStore = await this.readStoreById(store_id)
 
         await this.storesRepository.remove(foundStore)
+    }
+
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ메뉴 관련 기능 시작ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    // CREATE - 새로운 메뉴 등록
+    // 미구현: logger, 에러 처리
+    async createMenu(store_id: number, createMenuDTO: CreateMenuDTO): Promise<Menu> {
+        const { menu_name, price, description, manager_container } = createMenuDTO
+
+        // 가게 객체 가져오기
+        const store = await this.readStoreById(store_id)
+        if (!store) {
+            throw new NotFoundException(`Store with ID ${store_id} not found`)
+        }
+
+        const newMenu: Menu = this.menusRepository.create({
+            store,
+            menu_name,
+            price,
+            description,
+            manager_container,
+        })
+
+        const createdMenu = await this.menusRepository.save(newMenu)
+
+        return createdMenu
+    }
+
+    // READ[1] - 해당 가게 모든 메뉴 조회
+    // 미구현: logger, 에러 처리
+    async readMenusByStore(store_id: number): Promise<Menu[]> {
+        const foundMenus = await this.menusRepository.find({
+            where: { store: { store_id } }
+        })
+        if (!foundMenus) {
+            throw new NotFoundException(`Cannot Find Menus`)
+        }
+
+        return foundMenus
+    }
+
+    // READ[2] - 특정 메뉴 상세 조회
+    // 미구현: logger, 에러 처리
+    async readMenuById(menu_id: number): Promise<Menu> {
+        const foundMenu = await this.menusRepository.findOne({
+            where: { menu_id }
+        })
+        if (!foundMenu) {
+            throw new NotFoundException(`Cannot Find Menu By Id ${menu_id}`)
+        }
+        return foundMenu
+    }
+
+    // UPDATE - by menu_id
+    // 미구현: logger, 에러 처리
+    async updateMenuById(menu_id: number, updateMenuDTO: UpdateMenuDTO) {
+        const foundMenu = await this.readMenuById(menu_id)
+
+        const { menu_name, description, price, manager_container } = updateMenuDTO
+        foundMenu.menu_name = menu_name
+        foundMenu.description = description
+        foundMenu.price = price
+        foundMenu.manager_container = manager_container
+
+        await this.menusRepository.save(foundMenu)
+    }
+
+    // DELETE
+    // 미구현: logger, 에러 처리
+    async deleteMenuById(menu_id: number) {
+        const foundMenu = await this.readMenuById(menu_id)
+        if (foundMenu) {
+            await this.menusRepository.remove(foundMenu)
+        }
     }
 }
