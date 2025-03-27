@@ -153,8 +153,7 @@ export class StoresService {
         return newStore
     }
 
-    // READ
-    // 특정 유저의 모든 가게 조회
+    // READ - 매니저가 자신의 가게 조회할 때 사용
     async readAllStoresByUser(user_id: number): Promise<Store[]> {
         const foundStores = await this.storesRepository.find({
             where: { user: { user_id } }

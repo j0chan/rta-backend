@@ -3,10 +3,6 @@ import { StoreCategory } from "../entities/store-category.enum"
 
 export class CreateStoreDTO {
     @IsNotEmpty()
-    @IsNumber()
-    user_id: number
-
-    @IsNotEmpty()
     @IsString()
     store_name: string
 
