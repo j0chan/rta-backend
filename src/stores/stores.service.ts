@@ -95,7 +95,7 @@ export class StoresService {
     async readEventById(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
             where: { event_id },
-            relations: ['store.user_id']
+            relations: ['store.user']
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)
@@ -132,12 +132,15 @@ export class StoresService {
 
     // CREATE
     // 새로운 가게 생성하기
-    async createStore(createStoreDTO: CreateStoreDTO): Promise<number> {
+    async createStore(user_id: number, createStoreDTO: CreateStoreDTO): Promise<Store> {
         const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
+
+        const foundUser = await this.usersService.readUserById(user_id)
 
         const newStore: Store = this.storesRepository.create({
             store_name,
             category,
+            user: foundUser,
             address,
             latitude,
             longitude,
@@ -147,14 +150,14 @@ export class StoresService {
 
         await this.storesRepository.save(newStore)
 
-        return newStore.store_id
+        return newStore
     }
 
     // READ
     // 특정 유저의 모든 가게 조회
     async readAllStoresByUser(user_id: number): Promise<Store[]> {
         const foundStores = await this.storesRepository.find({
-            where: { user_id: { user_id } }
+            where: { user: { user_id } }
         })
         if (!foundStores) {
             throw new NotFoundException(`Cannot Find Store With user_id: ${user_id}`)
@@ -174,7 +177,7 @@ export class StoresService {
     async readStoreById(store_id: number): Promise<Store> {
         const foundStore = await this.storesRepository.findOne({
             where: { store_id },
-            relations: ['user_id'],
+            relations: ['user'],
         })
 
         if (!foundStore) {
@@ -196,7 +199,7 @@ export class StoresService {
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
         const foundUser = await this.usersService.readUserById(user_id)
 
-        await this.storesRepository.update(store_id, { user_id: foundUser })
+        await this.storesRepository.update(store_id, { user: foundUser })
     }
 
     // 가게 정보 수정 (매니저 전용)

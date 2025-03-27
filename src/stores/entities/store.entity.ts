@@ -14,7 +14,7 @@ export class Store {
 
     @ManyToOne(() => User, (user) => user.stores)
     @JoinColumn({ name: "user_id" })
-    user_id: User
+    user: User
 
     @OneToMany(() => Review, (review) => review.store)
     reviews: Review[]
@@ -25,7 +25,7 @@ export class Store {
     @Column({ nullable: true })
     owner_name: string
 
-    @Column()
+    @Column({type: 'enum', enum: StoreCategory})
     category: StoreCategory
 
     @Column()
