@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common'
 import { ManagerRequestsService } from './manager-requests.service'
 import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
 import { ReadManagerRequestDTO } from './DTO/read-manager-request.dto'
@@ -8,6 +8,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
 import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
 
 @Controller('api/manager-requests')
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -18,8 +19,12 @@ export class ManagerRequestsController {
     // 점주 신청서 생성
     @Post('/')
     @Roles(UserRole.USER)
-    async createManagerRequest(@Body() createManagerRequestDTO: CreateManagerRequestDTO): Promise<ApiResponseDTO<void>> {
-        await this.managerRequestsService.createManagerRequest(createManagerRequestDTO)
+    async createManagerRequest(
+        @Req() req: AuthenticatedRequest,
+        @Body() createManagerRequestDTO: CreateManagerRequestDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const user_id = req.user.user_id
+        await this.managerRequestsService.createManagerRequest(user_id, createManagerRequestDTO)
 
         return new ApiResponseDTO(true, HttpStatus.CREATED, "Request Created Successfully")
     }
@@ -66,9 +71,17 @@ export class ManagerRequestsController {
     // 가게 신청서 삭제 
     @Delete('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
-    async deleteManagerRequest(@Param('request_id') request_id: number): Promise<ApiResponseDTO<void>> {
-        await this.managerRequestsService.deleteManagerRequest(request_id)
+    async deleteManagerRequest(
+        @Req() req: AuthenticatedRequest,
+        @Param('request_id') request_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundRequest = await this.managerRequestsService.readManagerRequestById(request_id)
 
-        return new ApiResponseDTO(true, HttpStatus.OK, "Request Deleted Successfully")
+        if (foundRequest.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
+        }
+
+        await this.managerRequestsService.deleteManagerRequest(request_id)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
     }
 }

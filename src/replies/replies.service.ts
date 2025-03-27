@@ -19,7 +19,7 @@ export class RepliesService {
     // CREATE
     // 미구현: logger, 에러 처리
     async createReply(review_id: number, createReplyDTO: CreateReplyDTO): Promise<void> {
-        const foundReview = await this.reviewsService.readReviewById(review_id)
+        const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
         if (foundReview.reply) {
             throw new ForbiddenException('Reply already exists for this review.')
         }

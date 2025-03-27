@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Put, UseGuards } from "@nestjs/common"
+import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, NotFoundException, Param, Post, Put, Req, UseGuards } from "@nestjs/common"
 import { CreateStoreRequestDTO } from "./DTO/create-store-request.dto"
 import { ReadStoreRequestDTO } from "./DTO/read-store-request.dto"
 import { StoreRequestsService } from "./store-requests.service"
@@ -8,6 +8,7 @@ import { RolesGuard } from "src/common/custom-decorators/custom-role.guard"
 import { AuthGuard } from "@nestjs/passport"
 import { UserRole } from "src/users/entities/user-role.enum"
 import { Roles } from "src/common/custom-decorators/roles.decorator"
+import { AuthenticatedRequest } from "src/auth/interfaces/authenticated-request.interface"
 
 @Controller('api/store-requests')
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -15,12 +16,16 @@ export class StoreRequestsController {
     constructor(private storeRequestsService: StoreRequestsService) { }
     // Store Request 가게 신청서
 
-    // CREATE
-    // 가게 신청서 생성
+    // CREATE - 가게 신청서 생성
+    // jwt토큰에서 user_id추출해서 전달하는 구조
     @Post('/')
     @Roles(UserRole.MANAGER)
-    async createStoreRequest(@Body() createStoreRequestDTO: CreateStoreRequestDTO): Promise<ApiResponseDTO<void>> {
-        await this.storeRequestsService.createStoreRequest(createStoreRequestDTO)
+    async createStoreRequest(
+        @Req() req: AuthenticatedRequest,
+        @Body() createStoreRequestDTO: CreateStoreRequestDTO
+    ): Promise<ApiResponseDTO<void>> {
+        const user_id = req.user.user_id
+        await this.storeRequestsService.createStoreRequest(user_id, createStoreRequestDTO)
 
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Request Created Successfully')
     }
@@ -31,7 +36,7 @@ export class StoreRequestsController {
     @Roles(UserRole.ADMIN)
     async readAllStoreRequest(): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
         const storeRequests = await this.storeRequestsService.readAllStoreRequest()
-        if (!storeRequests) { 
+        if (!storeRequests) {
             throw new NotFoundException(`Cannot Find Requests`)
         }
 
@@ -41,11 +46,13 @@ export class StoreRequestsController {
     }
 
     // 특정 가게 신청서 조회
+    // 비고: 내 가게 신청서 조회하는 기능 구현 할 것인지?
+    //       만약 한다면 본인 신청서만 조회하는 기능 추가 필요.
     @Get('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async readStoreRequestById(@Param('request_id') request_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO>> {
         const storeRequest = await this.storeRequestsService.readStoreRequestById(request_id)
-        if (!storeRequest) { 
+        if (!storeRequest) {
             throw new NotFoundException(`Cannot Find Request by Id ${request_id}`)
         }
 
@@ -68,9 +75,17 @@ export class StoreRequestsController {
     // 가게 신청서 삭제
     @Delete('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
-    async deleteStoreRequest(@Param('request_id') request_id: number) {
-        await this.storeRequestsService.deleteStoreRequest(request_id)
+    async deleteStoreRequest(
+        @Req() req: AuthenticatedRequest,
+        @Param('request_id') request_id: number
+    ): Promise<ApiResponseDTO<void>> {
+        const foundRequest = await this.storeRequestsService.readStoreRequestById(request_id)
 
+        if (foundRequest.user.user_id !== req.user.user_id) {
+            throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
+        }
+
+        await this.storeRequestsService.deleteStoreRequest(request_id)
         return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
     }
 

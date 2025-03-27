@@ -15,12 +15,18 @@ import { Roles } from 'src/common/custom-decorators/roles.decorator'
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
 export class RepliesController {
 
+    /*
+        ####참조####
+        Reply는 Store->Review->Reply 3중 참조 구조로 되어 있어서
+        JWT에서 정보를 파싱한 뒤 적절한 권한을 제한하는 것을 구현하기가 복잡함.
+        차라리 프론트엔드에서 가게의 매니저가 아니면 대댓글 작성 버튼을 숨기는 것이 더 편할듯. 
+    */
+
     // 생성자 정의
     constructor(private repliesService: RepliesService) { }
 
-    // CREATE - 리뷰 대댓글 (매니저 전용)
+    // CREATE - 본인 가게 리뷰 대댓글 (매니저 전용)
     // 미구현: logger
-    // 비고: 매니저 여부를 판단하는 guard 必
     @Post('/:review_id')
     @Roles(UserRole.MANAGER)
     async createReply(
@@ -31,7 +37,7 @@ export class RepliesController {
         return new ApiResponseDTO(true, HttpStatus.CREATED, 'Reply Created Successfully')
     }
 
-    // READ[1] - 모든 대댓글 조회 (매니저 전용)
+    // READ[1] - 나의 모든 대댓글 조회 (매니저 전용)
     // 미구현: logger
     @Get('/')
     @Roles(UserRole.MANAGER)

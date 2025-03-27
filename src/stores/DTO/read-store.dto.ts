@@ -17,7 +17,7 @@ export class ReadStoreDTO {
 
     constructor(store: Store) {
         this.store_id = store.store_id
-        this.user_id = store.user_id
+        this.user_id = store.user
         this.store_name = store.store_name
         this.owner_name = store.owner_name
         this.category = store.category
