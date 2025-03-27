@@ -10,6 +10,7 @@ import { StoreRequestsModule } from './store-requests/store-requests.module'
 import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
+import { FavoriteModule } from './favorites/favorites.module'
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AuthModule } from './auth/auth.module'
     ManagerRequestsModule,
     RepliesModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    FavoriteModule
   ],
 })
 export class AppModule { }

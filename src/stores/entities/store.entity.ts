@@ -6,6 +6,7 @@ import { Menu } from "src/stores/entities/menu.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { User } from "src/users/entities/user.entity"
 import { Event } from "./event.entity"
+import { Favorite } from "src/favorites/entites/favorite.entity"
 
 @Entity()
 export class Store {
@@ -31,11 +32,11 @@ export class Store {
     @Column()
     address: string
 
-    @Column()
-    latitude: number
+    @Column({ type: 'bigint' })
+    latitude: string
 
-    @Column()
-    longitude: number
+    @Column({ type: 'bigint'})
+    longitude: string
 
     @Column()
     contact_number: string
@@ -60,4 +61,11 @@ export class Store {
 
     @OneToMany(() => Menu, (menu) => menu.store)
     menus: Menu[]
+
+    @OneToMany(() => Favorite, (favorite) => favorite.store)
+    favorites: Favorite[]
+
+    @Column({ nullable: true })
+    area: string
+
 }

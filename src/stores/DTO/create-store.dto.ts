@@ -16,11 +16,11 @@ export class CreateStoreDTO {
 
     @IsNotEmpty()
     @IsNumber()
-    latitude: number
+    latitude: string
 
     @IsNotEmpty()
     @IsNumber()
-    longitude: number
+    longitude: string
 
     @IsNotEmpty()
     @IsString()
@@ -28,4 +28,7 @@ export class CreateStoreDTO {
 
     @IsString()
     description: string
+
+    @IsString()
+    area: string
 }
