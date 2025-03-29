@@ -2,7 +2,6 @@ import { EventsService } from './events.service'
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common'
 import { CreateEventDTO } from './DTO/create-event.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
-import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
 import { ReadEventDTO } from './DTO/read-event.dto'
 import { UpdateEventDTO } from './DTO/update-event.dto'
 import { AuthGuard } from '@nestjs/passport'
@@ -41,11 +40,11 @@ export class EventsController {
     // READ[1] - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
     // 미구현: logger
     @Get('/')
-    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
+    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadEventDTO[]>> {
         const events = await this.eventsService.readAllEventsByStore(store_id)
-        const readAllEventsDTO = events.map(event => new ReadAllEventsDTO(event))
+        const readEventsDTO = events.map(event => new ReadEventDTO(event))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readEventsDTO)
     }
 
     // READ[2] - 특정 이벤트 상세 조회
@@ -64,6 +63,7 @@ export class EventsController {
     @Put('/:event_id')
     @Roles(UserRole.MANAGER)
     async updateEventById(
+        @Param('store_id') store_id: number,
         @Param('event_id') event_id: number,
         @Body() updateEventDTO: UpdateEventDTO): Promise<ApiResponseDTO<void>> {
         await this.eventsService.updateEventById(event_id, updateEventDTO)
@@ -81,5 +81,4 @@ export class EventsController {
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Event Deleted Successfully')
     }
-
 }
