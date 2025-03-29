@@ -1,4 +1,3 @@
-import { error } from 'console';
 import { UpdateUserDTO } from './DTO/update-user.dto'
 import { CreateUserDTO } from './DTO/create-user.dto'
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
@@ -15,7 +14,6 @@ export class UsersService {
     ) { }
 
     // CREATE - 회원가입
-    // 미구현: logger, 에러 처리
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
         const { email, password, nickname, phone_number, role } = createUserDTO
 
@@ -34,7 +32,6 @@ export class UsersService {
     }
 
     // READ[1] - 모든 유저 조회
-    // 미구현: logger, 에러 처리
     async readAllUsers(): Promise<User[]> {
         const foundUsers: User[] = await this.usersRepository.find()
         if (!foundUsers) {
@@ -45,7 +42,6 @@ export class UsersService {
     }
 
     // READ[2] - 내 정보 조회
-    // 미구현: logger, 에러 처리
     async readUserById(user_id: number): Promise<User> {
         const foundUser = await this.usersRepository.findOne({
             where: { user_id }
@@ -58,7 +54,6 @@ export class UsersService {
     }
 
     // READ[3] - 이메일로 유저 찾기
-    // 미구현: logger, 에러 처리
     async findUserByEmail(email: string): Promise<User> {
         const existingUser = await this.usersRepository.findOne({ where: { email } })
         if (!existingUser) {
@@ -75,7 +70,6 @@ export class UsersService {
     }
 
     // UPDATE - 내 정보 수정
-    // 미구현: logger, 에러 처리
     async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO) {
         const foundUser = await this.readUserById(user_id)
 
@@ -88,7 +82,6 @@ export class UsersService {
     }
 
     // DELETE
-    // 미구현: logger, 에러 처리
     async deleteUserById(user_id: number) {
         const foundUser = await this.readUserById(user_id)
 

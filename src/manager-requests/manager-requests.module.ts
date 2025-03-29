@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { ManagerRequestsService } from './manager-requests.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ManagerRequestsController } from './manager-requests.controller'
@@ -10,7 +10,7 @@ import { UsersModule } from 'src/users/users.module'
   imports: [
     TypeOrmModule.forFeature([ManagerRequest]),
     StoresModule,
-    forwardRef(()=> UsersModule),
+    UsersModule,
   ],
   providers: [ManagerRequestsService],
   controllers: [ManagerRequestsController],

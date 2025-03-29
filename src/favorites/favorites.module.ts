@@ -9,8 +9,8 @@ import { FavoritesController } from './favorites.controller'
 @Module({
   imports: [
     TypeOrmModule.forFeature([Favorite]),
-    forwardRef(() => UsersModule),
-    forwardRef(() => StoresModule),
+    UsersModule,
+    StoresModule,
   ],
   providers: [FavoritesService],
   controllers: [FavoritesController],

@@ -11,13 +11,11 @@ import { Roles } from "src/common/custom-decorators/roles.decorator"
 import { AuthenticatedRequest } from "src/auth/interfaces/authenticated-request.interface"
 
 @Controller('api/store-requests')
-@UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class StoreRequestsController {
     constructor(private storeRequestsService: StoreRequestsService) { }
-    // Store Request 가게 신청서
 
     // CREATE - 가게 신청서 생성
-    // jwt토큰에서 user_id추출해서 전달하는 구조
     @Post('/')
     @Roles(UserRole.MANAGER)
     async createStoreRequest(
@@ -31,7 +29,6 @@ export class StoreRequestsController {
     }
 
     // READ
-    // 모든 가게 신청서 조회 (관리자 전용)
     @Get('/')
     @Roles(UserRole.ADMIN)
     async readAllStoreRequest(): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
@@ -46,11 +43,11 @@ export class StoreRequestsController {
     }
 
     // 특정 가게 신청서 조회
-    // 비고: 내 가게 신청서 조회하는 기능 구현 할 것인지?
-    //       만약 한다면 본인 신청서만 조회하는 기능 추가 필요.
     @Get('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
-    async readStoreRequestById(@Param('request_id') request_id: number): Promise<ApiResponseDTO<ReadStoreRequestDTO>> {
+    async readStoreRequestById(
+        @Param('request_id') request_id: number
+    ): Promise<ApiResponseDTO<ReadStoreRequestDTO>> {
         const storeRequest = await this.storeRequestsService.readStoreRequestById(request_id)
         if (!storeRequest) {
             throw new NotFoundException(`Cannot Find Request by Id ${request_id}`)
@@ -61,18 +58,34 @@ export class StoreRequestsController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Request Retrieved Successfully', readStoreRequestDTO)
     }
 
-    // UPDATE
-    // 가게 신청서 처리 (관리자 전용)
+    // READ - 나의 가게 신청서 조회
+    @Get('/my-store-requests')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.USER)
+    async readMyStoreRequests(
+        @Req() req: AuthenticatedRequest
+    ): Promise<ApiResponseDTO<ReadStoreRequestDTO[]>> {
+        const user_id = req.user.user_id
+
+        const foundRequests = await this.storeRequestsService.readStoreRequestByUser(user_id)
+        const readStoreRequestDTOs = foundRequests.map((request) => new ReadStoreRequestDTO(request))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, 'My StoreRequests Retrieved Successfully', readStoreRequestDTOs)
+    }
+
+    // UPDATE - 가게 신청서 처리 (관리자 전용)
     @Put('/:request_id')
     @Roles(UserRole.ADMIN)
-    async updateStoreRequest(@Param('request_id') request_id: number, @Body() updateStoreRequestDTO: UpdateStoreRequestDTO): Promise<ApiResponseDTO<void>> {
+    async updateStoreRequest(
+        @Param('request_id') request_id: number,
+        @Body() updateStoreRequestDTO: UpdateStoreRequestDTO
+    ): Promise<ApiResponseDTO<void>> {
         await this.storeRequestsService.updateStoreRequest(request_id, updateStoreRequestDTO)
 
         return new ApiResponseDTO(true, HttpStatus.OK, 'Request Updated Successfully')
     }
 
-    // DELETE
-    // 가게 신청서 삭제
+    // DELETE - 가게 신청서 삭제
     @Delete('/:request_id')
     @Roles(UserRole.MANAGER, UserRole.ADMIN)
     async deleteStoreRequest(
@@ -88,5 +101,4 @@ export class StoreRequestsController {
         await this.storeRequestsService.deleteStoreRequest(request_id)
         return new ApiResponseDTO(true, HttpStatus.OK, 'Request Deleted Successfully')
     }
-
 }
