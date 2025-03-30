@@ -11,4 +11,8 @@ export class CreateMenuDTO {
 
     @IsString()
     description: string
+
+    @IsNotEmpty()
+    @IsString()
+    manager_container: string
 }
