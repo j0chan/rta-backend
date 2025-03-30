@@ -2,6 +2,8 @@ import { BadRequestException, Controller, Get, Param, Query, UseGuards } from '@
 import { MapsService } from './maps.service'
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
 import { AuthGuard } from '@nestjs/passport'
+import { Roles } from 'src/common/custom-decorators/roles.decorator'
+import { UserRole } from 'src/users/entities/user-role.enum'
 
 @Controller('api/maps')
 @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -10,12 +12,14 @@ export class MapsController {
 
     // 클라이언트 ID
     @Get('/client-id')
+    @Roles(UserRole.USER, UserRole.ADMIN)
     getClientId() {
         return this.mapsService.getClientId()
     }
 
     // 장소 검색
     @Get('/:lat/:lng/:query')
+    @Roles(UserRole.USER, UserRole.ADMIN)
     async readStoreByName(
         @Param('lat') lat: string,  
         @Param('lng') lng: string,
