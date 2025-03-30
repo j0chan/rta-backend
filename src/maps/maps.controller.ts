@@ -14,7 +14,7 @@ export class MapsController {
         return this.mapsService.getClientId()
     }
 
-    // 장소 검색
+    // 현위치 기준 검색 목록 조회 (map api)
     @Get('/:lat/:lng/:query')
     async readStoreByName(
         @Param('lat') lat: string,  
@@ -31,16 +31,30 @@ export class MapsController {
         return this.mapsService.getStoreByName(parseFloat(lat), parseFloat(lng), query)
     }
 
-    // 주변 음식점 조회
-    @Get('/:lat/:lng')
-    async readNearbyStores(
-        @Param('lat') lat: string, 
-        @Param('lng') lng: string  
+    // 현위치 기준 주변 가게 조회
+    @Get('/')
+    async readStoreByCurrentLocation(
+        @Query('lat') lat: string,
+        @Query('lng') lng: string
     ) {
         if (!lat || !lng) {
             throw new BadRequestException('위도와 경도를 입력하세요.')
         }
 
-        return await this.mapsService.getNearbyStores(parseFloat(lat), parseFloat(lng))
+        return await this.mapsService.readStoreByCurrentLocation(parseFloat(lat), parseFloat(lng))
     }
+
+    // map api 주변 음식점 조회
+    // @Get('/:lat/:lng')
+    // @Roles(UserRole.USER, UserRole.ADMIN)
+    // async readNearbyStores(
+    //     @Param('lat') lat: string, 
+    //     @Param('lng') lng: string  
+    // ) {
+    //     if (!lat || !lng) {
+    //         throw new BadRequestException('위도와 경도를 입력하세요.')
+    //     }
+
+    //     return await this.mapsService.getNearbyStores(parseFloat(lat), parseFloat(lng))
+    // }
 }

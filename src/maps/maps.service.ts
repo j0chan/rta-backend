@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException, HttpException } from '@nestjs/common'
-import { HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
 import axios from 'axios'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Store } from 'src/stores/entities/store.entity'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class MapsService {
@@ -10,14 +11,17 @@ export class MapsService {
     private readonly MAP_SERVICE_ID = process.env.MAP_SERVICE_ID
     private readonly MAP_SERVICE_SECRET = process.env.MAP_SERVICE_SECRET
 
-    constructor(private readonly httpService: HttpService) {}
+    constructor(
+        @InjectRepository(Store)
+        private readonly storeRepository: Repository<Store>,
+    ) {}
 
     // 클라이언트 ID 반환
     getClientId() {
         return { clientId: this.MAP_CLIENT_ID }
     }
 
-    // 현위치 기준 음식점 조회
+    // 현위치 기준 검색 목록 조회 (map api)
     async getStoreByName(lat: number, lng: number, query: string) {
         if (!query) {
             throw new BadRequestException('검색어를 입력하세요.')
@@ -90,62 +94,129 @@ export class MapsService {
         }
     }
 
-    // 주변 음식점 조회
-    async getNearbyStores(lat: number, lng: number) {
+    // 현위치 기준 주변 가게 조회
+    async readStoreByCurrentLocation(lat: number, lng: number): Promise<any[]> {
+        const radius = 3 // km
+      
         try {
-            // 현재 좌표를 기반으로 주소 얻기
-            const reverseResponse = await axios.get('https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc', {
-                headers: {
-                    'X-NCP-APIGW-API-KEY-ID': this.MAP_CLIENT_ID,
-                    'X-NCP-APIGW-API-KEY': this.MAP_CLIENT_SECRET,
-                },
-                params: {
-                    coords: `${lng},${lat}`,
-                    orders: 'addr',  // 주소 정보 반환 (기본값: legalcode)
-                    output: 'json'   // JSON 형식 응답
-                },
-            })
-
-            // 주소 추출
-            // const address = reverseResponse.data.results[0].region.area1.name + ' ' +
-            //                 reverseResponse.data.results[0].region.area2.name + ' ' +
-            //                 reverseResponse.data.results[0].region.area3.name + ' ' +
-            //                 reverseResponse.data.results[0].region.area4.name
-
-            const region = reverseResponse.data.results[0].region
-
-            const address = [region.area1?.name, region.area2?.name, region.area3?.name, region.area4?.name]
-                            .filter(Boolean)
-                            .join(' ')
-
-            // 현재 주소 근처 음식점 검색
-            const placesResponse = await axios.get('https://openapi.naver.com/v1/search/local.json', {
-                headers: {
-                    'X-Naver-Client-Id': this.MAP_SERVICE_ID,
-                    'X-Naver-Client-Secret': this.MAP_SERVICE_SECRET,
-                },
-                params: {
-                    query: `음식점 ${address}`,  // 현재 주소를 포함한 음식점 검색
-                    display: 5,
-                    start: 1,
-                    // sort: 'random',
-                    radius: 1000,  // 반경 1km 내에서 음식점 검색
-                },
-            })
-    
-            return placesResponse.data.items.map((item: any) => ({
-                name: item.title.replace(/<[^>]+>/g, ''),
-                address: item.address,
-                lat: parseFloat(item.mapy),
-                lng: parseFloat(item.mapx),
-            }))
-        } catch (error) {
-            if (error.response) {
-                console.error('API 요청 실패:', error.response.status, error.response.data)
-            } else {
-                console.error('네트워크 오류 또는 API 요청 중 알 수 없는 오류 발생:', error)
-            }
-            throw new Error('음식점 정보를 가져오는 데 실패했습니다.')
+            const stores = await this.storeRepository.query(
+                `
+                WITH converted_store AS (
+                    SELECT 
+                        store_id,
+                        store_name,
+                        address,
+                        latitude,
+                        longitude,
+                        CASE
+                        WHEN latitude BETWEEN 10000000 AND 99999999 THEN latitude / 1000000
+                        WHEN latitude BETWEEN 100000000 AND 999999999 THEN latitude / 10000000
+                        WHEN latitude BETWEEN 1000000000 AND 9999999999 THEN latitude / 100000000
+                        ELSE NULL
+                        END AS lat,
+                        CASE
+                        WHEN longitude BETWEEN 10000000 AND 99999999 THEN longitude / 100000
+                        WHEN longitude BETWEEN 100000000 AND 999999999 THEN longitude / 1000000
+                        WHEN longitude BETWEEN 1000000000 AND 9999999999 THEN longitude / 10000000
+                        ELSE NULL
+                        END AS lon
+                    FROM store
+                    WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+                    )
+                    SELECT 
+                    store_id,
+                    store_name,
+                    address,
+                    latitude,
+                    longitude,
+                    lat,
+                    lon,
+                    ROUND(
+                        6371 * acos(
+                        cos(radians(?)) * cos(radians(lat)) *
+                        cos(radians(lon) - radians(?)) +
+                        sin(radians(?)) * sin(radians(lat))
+                        ), 2
+                    ) AS distance_km
+                    FROM converted_store
+                    HAVING distance_km < ?
+                    ORDER BY distance_km ASC
+                    LIMIT 10
+                `,
+                [lat, lng, lat, radius]
+            )
+      
+          return stores.map(store => ({
+            store_id: store.store_id,
+            store_name: store.store_name,
+            address: store.address,
+            lat: parseFloat(store.lat),
+            lng: parseFloat(store.lon),
+            distance: Math.round(store.distance),
+          }))
+      
+        } catch (err) {
+          console.error('위치 기반 쿼리 오류:', err) // ← 여기 로그 꼭 확인 필요
+          throw new InternalServerErrorException('DB 쿼리 실패')
         }
     }
+
+    // map api 주변 음식점 조회
+    // async getNearbyStores(lat: number, lng: number) {
+    //     try {
+    //         // 현재 좌표를 기반으로 주소 얻기
+    //         const reverseResponse = await axios.get('https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc', {
+    //             headers: {
+    //                 'X-NCP-APIGW-API-KEY-ID': this.MAP_CLIENT_ID,
+    //                 'X-NCP-APIGW-API-KEY': this.MAP_CLIENT_SECRET,
+    //             },
+    //             params: {
+    //                 coords: `${lng},${lat}`,
+    //                 orders: 'addr',  // 주소 정보 반환 (기본값: legalcode)
+    //                 output: 'json'   // JSON 형식 응답
+    //             },
+    //         })
+
+    //         // 주소 추출
+    //         // const address = reverseResponse.data.results[0].region.area1.name + ' ' +
+    //         //                 reverseResponse.data.results[0].region.area2.name + ' ' +
+    //         //                 reverseResponse.data.results[0].region.area3.name + ' ' +
+    //         //                 reverseResponse.data.results[0].region.area4.name
+
+    //         const region = reverseResponse.data.results[0].region
+
+    //         const address = [region.area1?.name, region.area2?.name, region.area3?.name, region.area4?.name]
+    //                         .filter(Boolean)
+    //                         .join(' ')
+
+    //         // 현재 주소 근처 음식점 검색
+    //         const placesResponse = await axios.get('https://openapi.naver.com/v1/search/local.json', {
+    //             headers: {
+    //                 'X-Naver-Client-Id': this.MAP_SERVICE_ID,
+    //                 'X-Naver-Client-Secret': this.MAP_SERVICE_SECRET,
+    //             },
+    //             params: {
+    //                 query: `음식점 ${address}`,  // 현재 주소를 포함한 음식점 검색
+    //                 display: 5,
+    //                 start: 1,
+    //                 // sort: 'random',
+    //                 radius: 1000,  // 반경 1km 내에서 음식점 검색
+    //             },
+    //         })
+    
+    //         return placesResponse.data.items.map((item: any) => ({
+    //             name: item.title.replace(/<[^>]+>/g, ''),
+    //             address: item.address,
+    //             lat: parseFloat(item.mapy),
+    //             lng: parseFloat(item.mapx),
+    //         }))
+    //     } catch (error) {
+    //         if (error.response) {
+    //             console.error('API 요청 실패:', error.response.status, error.response.data)
+    //         } else {
+    //             console.error('네트워크 오류 또는 API 요청 중 알 수 없는 오류 발생:', error)
+    //         }
+    //         throw new Error('음식점 정보를 가져오는 데 실패했습니다.')
+    //     }
+    // }
 }
