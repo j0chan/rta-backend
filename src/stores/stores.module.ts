@@ -7,12 +7,14 @@ import { ReviewsModule } from 'src/reviews/reviews.module'
 import { UsersModule } from 'src/users/users.module'
 import { Event } from './entities/event.entity'
 import { Menu } from './entities/menu.entity'
+import { Category } from './entities/category.entity'
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Store]),
         TypeOrmModule.forFeature([Event]),
         TypeOrmModule.forFeature([Menu]),
+        TypeOrmModule.forFeature([Category]),
         forwardRef(() => ReviewsModule),
         forwardRef(() => UsersModule),
     ],

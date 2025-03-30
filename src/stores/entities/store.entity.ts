@@ -7,6 +7,7 @@ import { ManagerRequest } from "src/manager-requests/entities/manager-requests.e
 import { User } from "src/users/entities/user.entity"
 import { Event } from "./event.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
+import { Category } from "./category.entity"
 
 @Entity()
 export class Store {
@@ -26,8 +27,9 @@ export class Store {
     @Column({ nullable: true })
     owner_name: string
 
-    @Column({type: 'enum', enum: StoreCategory})
-    category: StoreCategory
+    @ManyToOne(() => Category)
+    @JoinColumn({ name: "category_id" })
+    category: Category
 
     @Column()
     address: string

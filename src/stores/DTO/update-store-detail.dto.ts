@@ -11,8 +11,8 @@ export class UpdateStoreDetailDTO {
     owner_name: string
 
     @IsNotEmpty()
-    @IsEnum(StoreCategory)
-    category: StoreCategory
+    @IsString()
+    category: string
 
     @IsNotEmpty()
     @IsString()
