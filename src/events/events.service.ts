@@ -71,6 +71,7 @@ export class EventsService {
         const foundEvents = await this.eventRepository.find({
             where: { store: { store_id } },
             order: { created_at: 'DESC'},
+            relations: ['store']
         })
         if (!foundEvents) {
             throw new NotFoundException(`Cannot Find Events`)
@@ -82,7 +83,8 @@ export class EventsService {
     // READ[2] - 특정 이벤트 상세 조회
     async readEventById(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
-            where: { event_id }
+            where: { event_id },
+            relations: ['store']
         })
         if (!foundEvent) {
             throw new NotFoundException(`Cannot Find Event by Id ${event_id}`)

@@ -8,7 +8,6 @@ import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.
 import { EventsService } from './events.service'
 import { CreateEventDTO } from './DTO/create-event.dto'
 import { UpdateEventDTO } from './DTO/update-event.dto'
-import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
 import { ReadEventDTO } from './DTO/read-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
@@ -47,13 +46,11 @@ export class EventsController {
 
     // READ - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
     @Get('/')
-    async readAllEventsByStore(
-        @Param('store_id') store_id: number
-    ): Promise<ApiResponseDTO<ReadAllEventsDTO[]>> {
+    async readAllEventsByStore(@Param('store_id') store_id: number): Promise<ApiResponseDTO<ReadEventDTO[]>> {
         const events = await this.eventsService.readAllEventsByStore(store_id)
-        const readAllEventsDTO = events.map(event => new ReadAllEventsDTO(event))
+        const readEventsDTO = events.map(event => new ReadEventDTO(event))
 
-        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readAllEventsDTO)
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Events Retrieved Successfully', readEventsDTO)
     }
 
     // READ - 특정 이벤트 상세 조회
