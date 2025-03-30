@@ -33,5 +33,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             role: user.role
         }
     }
-
 }

@@ -13,7 +13,6 @@ export class ReviewsService {
     private reviewRelations = ["user", "reply", "store"]
 
     constructor(
-        // Review 엔터티 주입
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
         private storesService: StoresService,
@@ -21,10 +20,8 @@ export class ReviewsService {
     ) { }
 
     // CREATE [1]
-    // 미구현: logger, 에러 처리
-    // 비고: store_id, user_id, keywords는 원래 DTO로 전달해야 한다. 지금은 안되므로 임시값 사용.
-    async createReview(store_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
-        const { user_id, content } = CreateReviewDTO
+    async createReview(store_id: number, user_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
+        const { content } = CreateReviewDTO
 
         // user_id로 User 객체 가져오기
         const user = await this.usersService.readUserById(user_id)
@@ -46,7 +43,6 @@ export class ReviewsService {
     }
 
     // READ[1] - 모든 리뷰 조회
-    // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
         const foundReviews = await this.reviewRepository.find({
             relations: this.reviewRelations,
@@ -91,7 +87,6 @@ export class ReviewsService {
     }
 
     // UPDATE[1] - 리뷰 수정
-    // 미구현: logger, 에러 처리
     async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO): Promise<void> {
         const foundReview = await this.readReviewByReviewId(review_id)
 
@@ -104,16 +99,6 @@ export class ReviewsService {
     }
 
     // UPDATE[2] - 리뷰 도움됐어요 반응
-    // 미구현: logger, 에러 처리
-    /**
-     * 비고
-     * 1. 한번만 누를 수 있게, 취소는 불가능
-     *    취소 되게하려면 복잡해지기 때문에 일단 이렇게
-     * 
-     * 2. 버튼을 이미 눌렀는지 확인하는 로직은 프론트에서 구현하기
-     *    백엔드에서도 2차적으로 필터링하면 좋겠지만
-     *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
-     */
     async markHelpful(review_id: number): Promise<void> {
         const foundReview = await this.readReviewByReviewId(review_id)
 
@@ -130,7 +115,6 @@ export class ReviewsService {
     }
 
     // DELETE - 리뷰 삭제
-    // 미구현: logger, 에러 처리
     async deleteReviewById(review_id: number): Promise<void> {
         const foundReview = await this.readReviewByReviewId(review_id)
 

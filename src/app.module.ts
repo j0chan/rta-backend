@@ -23,7 +23,6 @@ import { FavoriteModule } from './favorites/favorites.module'
     StoreRequestsModule,
     ManagerRequestsModule,
     RepliesModule,
-    UsersModule,
     AuthModule,
     FavoriteModule
   ],

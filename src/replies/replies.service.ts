@@ -8,16 +8,13 @@ import { UpdateReplyDTO } from './DTO/upate-reply.dto'
 
 @Injectable()
 export class RepliesService {
-
     constructor(
-        // Reply 엔터티 주입
         @InjectRepository(Reply)
         private replyRepository: Repository<Reply>,
         private reviewsService: ReviewsService,
     ) { }
 
     // CREATE
-    // 미구현: logger, 에러 처리
     async createReply(review_id: number, createReplyDTO: CreateReplyDTO): Promise<void> {
         const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
         if (foundReview.reply) {
@@ -38,7 +35,6 @@ export class RepliesService {
     }
 
     // READ[1] - 모든 대댓글 조회 (매니저 전용)
-    // 미구현: logger, 에러 처리
     async readAllReplies(): Promise<Reply[]> {
         const foundReplies = await this.replyRepository.find()
 
@@ -46,7 +42,6 @@ export class RepliesService {
     }
 
     // READ[2] - 특정 리뷰 조회
-    // 미구현: logger, 에러 처리
     async readReplyById(reply_id: number): Promise<Reply> {
         const foundReply = await this.replyRepository.findOneBy({ reply_id: reply_id })
 
@@ -58,7 +53,6 @@ export class RepliesService {
     }
 
     // UPDATE[1] - 리뷰 수정
-    // 미구현: logger, 에러 처리
     async updateReplyByReplyId(reply_id: number, updateReviewDTO: UpdateReplyDTO) {
         const foundReply = await this.readReplyById(reply_id)
         const currentDate = new Date()
@@ -70,7 +64,6 @@ export class RepliesService {
     }
 
     // DELETE - 대댓글 삭제
-    // 미구현: logger, 에러 처리
     async deleteReplyByReplyId(reply_id: number) {
         const foundReply = await this.readReplyById(reply_id)
 

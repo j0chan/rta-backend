@@ -6,7 +6,6 @@ import { CreateStoreRequestDTO } from './DTO/create-store-request.dto'
 import { UpdateStoreRequestDTO } from './DTO/update-store-request.dto'
 import { RequestStatus } from 'src/common/request-status.enum'
 import { StoresService } from 'src/stores/stores.service'
-import { CreateStoreDTO } from 'src/stores/DTO/create-store.dto'
 import { UsersService } from 'src/users/users.service'
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Store } from "src/stores/entities/store.entity"
 import { EventStatus } from "./event-status.enum"
+import { Store } from "src/stores/entities/store.entity"
 
 @Entity()
 export class Event {

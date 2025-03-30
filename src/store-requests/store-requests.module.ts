@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { StoreRequest } from './entities/store-request.entity'
 import { StoreRequestsService } from './store-requests.service'
@@ -10,8 +10,7 @@ import { UsersModule } from 'src/users/users.module'
     imports: [
         TypeOrmModule.forFeature([StoreRequest]),
         StoresModule,
-        forwardRef(()=> UsersModule),
-
+        UsersModule,
     ],
     providers: [StoreRequestsService],
     controllers: [StoreRequestsController],
