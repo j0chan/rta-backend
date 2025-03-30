@@ -14,7 +14,7 @@ export class S3Controller {
     }
 
     @Get('/download/:file_name')
-    async getImage(@Param('fileName') file_name: string): Promise<{ url: string }> {
+    async getImage(@Param('file_name') file_name: string): Promise<{ url: string }> {
         const foundImageUrl = await this.s3Service.getImage(file_name)
         return { url: foundImageUrl }
     }
