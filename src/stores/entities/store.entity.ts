@@ -7,6 +7,7 @@ import { User } from "src/users/entities/user.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
 import { Menu } from "src/menus/entities/menu.entity"
 import { Event } from "src/events/entities/event.entity"
+import { Image } from "openai/resources"
 
 @Entity()
 export class Store {
@@ -68,4 +69,6 @@ export class Store {
     @Column({ nullable: true })
     area: string
 
+    @OneToOne(() => Image, { nullable: true })
+    review_image: Image
 }
