@@ -36,7 +36,7 @@ export class S3Service {
     }
 
     // 파일 업로드
-    async uploadFile(fileBuffer: Buffer, file_name: string, content_type: string): Promise<Image> {
+    async uploadImage(fileBuffer: Buffer, file_name: string, content_type: string): Promise<Image> {
         const uploadParamas = {
             Bucket: this.bucketName,
             Key: file_name,
@@ -59,29 +59,18 @@ export class S3Service {
     }
 
     // 파일 다운로드
-    async getFile(file_name: string): Promise<Buffer> {
-        const getParams = {
-            Bucket: this.bucketName,
-            Key: file_name,
+    async getImage(file_name: string): Promise<string> {
+        const image = await this.imageRepository.findOne({ where: { file_name } })
+
+        if(!image) {
+            throw new Error('File Not Found.')
         }
 
-        const { Body } = await this.s3Client.send(new GetObjectCommand(getParams))
-
-        // Body가 ReadableStream일 경우 Buffer로 변환
-        if (Body instanceof Readable) {
-            return new Promise((resolve, reject) => {
-                const chunks: any[] = []
-                Body.on('data', (chunk) => chunks.push(chunk))
-                Body.on('end', () => resolve(Buffer.concat(chunks)))
-                Body.on('error', reject)
-            })
-        }
-
-        throw new Error('File not found')
+        return image.url
     }
 
     // 파일 삭제
-    async deleteFile(file_name: string): Promise<string> {
+    async deleteImage(file_name: string): Promise<string> {
         const deleteParams = {
             Bucket: this.bucketName,
             Key: file_name,

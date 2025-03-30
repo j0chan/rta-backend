@@ -8,20 +8,20 @@ export class S3Controller {
 
     @Post('/upload')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@UploadedFile() file: Express.Multer.File) {
-        const url = await this.s3Service.uploadFile(file.buffer, file.originalname, file.mimetype)
+    async uploadImage(@UploadedFile() file: Express.Multer.File) {
+        const url = await this.s3Service.uploadImage(file.buffer, file.originalname, file.mimetype)
         return { message: 'File uploaded successfully', url }
     }
 
     @Get('/download/:file_name')
-    async getFile(@Param('fileName') file_name: string) {
-        const fileBuffer = await this.s3Service.getFile(file_name)
-        return fileBuffer
+    async getImage(@Param('fileName') file_name: string): Promise<string> {
+        const foundImageUrl = await this.s3Service.getImage(file_name)
+        return foundImageUrl
     }
 
     @Delete('/delete/:file_name')
-    async deleteFile(@Param('file_name') file_name: string) {
-        const message = await this.s3Service.deleteFile(file_name)
+    async deleteImage(@Param('file_name') file_name: string) {
+        const message = await this.s3Service.deleteImage(file_name)
         return { message }
     }
 }
