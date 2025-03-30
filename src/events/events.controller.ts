@@ -8,7 +8,6 @@ import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.
 import { EventsService } from './events.service'
 import { CreateEventDTO } from './DTO/create-event.dto'
 import { UpdateEventDTO } from './DTO/update-event.dto'
-import { ReadAllEventsDTO } from './DTO/read-all-events.dto'
 import { ReadEventDTO } from './DTO/read-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
@@ -71,6 +70,7 @@ export class EventsController {
     @Put(':event_id')
     @Roles(UserRole.MANAGER)
     async updateEventById(
+        @Req() req: AuthenticatedRequest,
         @Param('store_id') store_id: number,
         @Param('event_id') event_id: number,
         @Body() updateEventDTO: UpdateEventDTO
