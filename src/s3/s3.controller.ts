@@ -1,6 +1,7 @@
 import { Controller, Post, UploadedFile, UseInterceptors, Param, Get, Delete } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { S3Service } from './s3.service'
+import { ImageType } from './entities/image-type.enum'
 
 @Controller('api/s3')
 export class S3Controller {
@@ -9,7 +10,10 @@ export class S3Controller {
     @Post('/upload')
     @UseInterceptors(FileInterceptor('file'))
     async uploadImage(@UploadedFile() file: Express.Multer.File) {
-        const url = await this.s3Service.uploadImage(file.buffer, file.originalname, file.mimetype)
+        // 임시 이미지 타입. 추후 body를 통해 정확한 이미지 타입 전송
+        const image_type = ImageType.USER_PROFILE
+
+        const url = await this.s3Service.uploadImage(file.buffer, file.originalname,file.mimetype, image_type)
         return { message: 'File uploaded successfully', url }
     }
 

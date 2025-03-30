@@ -1,10 +1,10 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { Injectable } from '@nestjs/common'
 import * as dotenv from 'dotenv'
-import { Readable } from 'typeorm/platform/PlatformTools'
 import { Image } from './entities/images.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { ImageType } from './entities/image-type.enum'
 
 dotenv.config()
 @Injectable()
@@ -36,7 +36,7 @@ export class S3Service {
     }
 
     // 파일 업로드
-    async uploadImage(fileBuffer: Buffer, file_name: string, content_type: string): Promise<Image> {
+    async uploadImage(fileBuffer: Buffer, file_name: string, content_type: string, image_type: ImageType): Promise<Image> {
         const uploadParamas = {
             Bucket: this.bucketName,
             Key: file_name,
@@ -53,6 +53,7 @@ export class S3Service {
             file_name,
             url,
             content_type,
+            image_type,
         })
 
         return await this.imageRepository.save(image)
@@ -62,7 +63,7 @@ export class S3Service {
     async getImage(file_name: string): Promise<string> {
         const image = await this.imageRepository.findOne({ where: { file_name } })
 
-        if(!image) {
+        if (!image) {
             throw new Error('File Not Found.')
         }
 
