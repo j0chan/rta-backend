@@ -1,4 +1,3 @@
-import { Image } from "openai/resources"
 import { Reply } from "src/replies/entities/reply.entity"
 import { Store } from "src/stores/entities/store.entity"
 import { User } from "src/users/entities/user.entity"
@@ -31,9 +30,6 @@ export class Review {
 
     @OneToOne(() => Reply, (reply) => reply.review, { cascade: true, nullable: true })
     reply: Reply
-
-    @OneToOne(() => Image, { nullable: true })
-    review_image: Image
 
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()

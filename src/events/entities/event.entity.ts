@@ -1,7 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { EventStatus } from "./event-status.enum"
 import { Store } from "src/stores/entities/store.entity"
-import { Image } from "openai/resources"
 
 @Entity()
 export class Event {
@@ -29,9 +28,6 @@ export class Event {
 
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date
-
-    @OneToOne(() => Image, { nullable: true })
-    event_image: Image
 
     get eventStatus(): EventStatus {
         if (this.is_canceled) {

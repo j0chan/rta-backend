@@ -1,11 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { UserRole } from "./user-role.enum"
 import { Store } from "src/stores/entities/store.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
 import { Review } from "src/reviews/entites/review.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
-import { Image } from "src/s3/entities/images.entity"
 
 
 @Entity()
@@ -31,13 +30,13 @@ export class User {
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date
 
-    @ManyToOne(() => Store, (store) => store.user)
+    @ManyToOne(()=> Store, (store) => store.user)
     stores: Store[]
 
-    @OneToMany(() => Review, (review) => review.user)
+    @OneToMany(()=> Review, (review) => review.user)
     reviews: Review[]
 
-    @OneToMany(() => ManagerRequest, (managerRequest) => managerRequest.user)
+    @OneToMany(()=> ManagerRequest, (managerRequest) => managerRequest.user)
     manager_requests: ManagerRequest[]
 
     @OneToMany(() => StoreRequest, (storeRequest) => storeRequest.user)
@@ -45,7 +44,4 @@ export class User {
 
     @OneToMany(() => Favorite, (favorite) => favorite.user)
     favorites: Favorite[]
-
-    @OneToOne(() => Image, { nullable: true })
-    profile_image: Image
 }
