@@ -3,10 +3,6 @@ import { StoreCategory } from "../entities/store-category.enum"
 
 export class CreateStoreDTO {
     @IsNotEmpty()
-    @IsNumber()
-    user_id: number
-
-    @IsNotEmpty()
     @IsString()
     store_name: string
 
@@ -20,11 +16,11 @@ export class CreateStoreDTO {
 
     @IsNotEmpty()
     @IsNumber()
-    latitude: number
+    latitude: string
 
     @IsNotEmpty()
     @IsNumber()
-    longitude: number
+    longitude: string
 
     @IsNotEmpty()
     @IsString()
@@ -32,4 +28,7 @@ export class CreateStoreDTO {
 
     @IsString()
     description: string
+
+    @IsString()
+    area: string
 }

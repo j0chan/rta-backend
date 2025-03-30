@@ -6,7 +6,9 @@ export class OpenaiController {
     constructor(private readonly openAiService: OpenaiService) {}
     
     @Post('/')
-    async test(@Body('text') text: string): Promise<string> {
+    async test(
+        @Body('text') text: string
+    ): Promise<string> {
         return await this.openAiService.summarizeText(text)
     }
 }

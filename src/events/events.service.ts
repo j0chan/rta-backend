@@ -1,10 +1,10 @@
-import { UpdateEventDTO } from './DTO/update-event.dto'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Event } from './entities/event.entity'
-import { LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository } from 'typeorm'
-import { CreateEventDTO } from './DTO/create-event.dto'
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm'
 import { StoresService } from 'src/stores/stores.service'
+import { CreateEventDTO } from './DTO/create-event.dto'
+import { UpdateEventDTO } from './DTO/update-event.dto'
 
 @Injectable()
 export class EventsService {
@@ -17,7 +17,6 @@ export class EventsService {
     ) { }
 
     // CREATE
-    // 미구현: logger, 에러 처리
     // 비고: 임시 시간값, 임시 스토어 id 사용
     async createEvent(store_id: number, createEventDTO: CreateEventDTO): Promise<Event> {
         const { title, description, start_date, end_date } = createEventDTO
@@ -48,7 +47,6 @@ export class EventsService {
     }
 
     // READ[3] - 최근 등록 이벤트 조회 (status: ONGOING 이벤트)
-    // 미구현: logger, 에러 처리
     async readRecentEventByStore(store_id: number): Promise<Event> {
         const now = new Date
 
@@ -69,7 +67,6 @@ export class EventsService {
     }
 
     // READ[1] - 해당 가게의 모든 이벤트 조회 (생성일 기준 정렬)
-    // 미구현: logger, 에러 처리
     async readAllEventsByStore(store_id: number): Promise<Event[]> {
         const foundEvents = await this.eventRepository.find({
             where: { store: { store_id } },
@@ -84,7 +81,6 @@ export class EventsService {
     }
 
     // READ[2] - 특정 이벤트 상세 조회
-    // 미구현: logger, 에러 처리
     async readEventById(event_id: number): Promise<Event> {
         const foundEvent = await this.eventRepository.findOne({
             where: { event_id },
@@ -98,7 +94,6 @@ export class EventsService {
     }
 
     // UPDATE - by event_id
-    // 미구현: logger, 에러 처리
     async updateEventById(event_id: number, updateEventDTO: UpdateEventDTO) {
         const foundEvent = await this.readEventById(event_id)
 
@@ -114,7 +109,6 @@ export class EventsService {
     }
 
     // DELETE
-    // 미구현: logger, 에러 처리
     async deleteEventById(event_id: number) {
         const foundEvent = await this.readEventById(event_id)
 

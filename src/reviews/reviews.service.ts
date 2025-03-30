@@ -13,7 +13,6 @@ export class ReviewsService {
     private reviewRelations = ["user", "reply", "store"]
 
     constructor(
-        // Review 엔터티 주입
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
         private storesService: StoresService,
@@ -21,10 +20,8 @@ export class ReviewsService {
     ) { }
 
     // CREATE [1]
-    // 미구현: logger, 에러 처리
-    // 비고: store_id, user_id, keywords는 원래 DTO로 전달해야 한다. 지금은 안되므로 임시값 사용.
-    async createReview(store_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
-        const { user_id, content } = CreateReviewDTO
+    async createReview(store_id: number, user_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
+        const { content } = CreateReviewDTO
 
         // user_id로 User 객체 가져오기
         const user = await this.usersService.readUserById(user_id)
@@ -46,7 +43,6 @@ export class ReviewsService {
     }
 
     // READ[1] - 모든 리뷰 조회
-    // 미구현: logger, 에러 처리
     async readAllReviews(): Promise<Review[]> {
         const foundReviews = await this.reviewRepository.find({
             relations: this.reviewRelations,
@@ -56,11 +52,11 @@ export class ReviewsService {
     }
 
     // READ[2] - 특정 리뷰 조회
-    async readReviewById(review_id: number): Promise<Review> {
+    async readReviewByReviewId(review_id: number): Promise<Review> {
         const foundReview = await this.reviewRepository.findOne({
             where: { review_id },
             // reply 관계를 포함하여 조회
-            relations: this.reviewRelations, 
+            relations: this.reviewRelations,
         })
         if (!foundReview) {
             throw new NotFoundException(`Cannot Find Review with Id ${review_id}`)
@@ -68,12 +64,12 @@ export class ReviewsService {
 
         return foundReview
     }
-    
+
     // READ[3] - 사용자로 리뷰 필터링
     async readReviewsByUser(user_id: number): Promise<Review[]> {
         // !!!! user 수정되면 검색 방식 교체해야됨 (아래 readReviewsByStore 형식 참고)
         const foundReviews = await this.reviewRepository.find({
-            where: { user: { user_id: user_id }},
+            where: { user: { user_id: user_id } },
             relations: this.reviewRelations,
         })
 
@@ -82,8 +78,8 @@ export class ReviewsService {
 
     // READ[4] - 가게로 리뷰 필터링
     async readReviewsByStore(store_id: number): Promise<Review[]> {
-        const foundReviews = await this.reviewRepository.find({ 
-            where: { store: { store_id: store_id }},
+        const foundReviews = await this.reviewRepository.find({
+            where: { store: { store_id: store_id } },
             relations: this.reviewRelations,
         })
 
@@ -91,9 +87,8 @@ export class ReviewsService {
     }
 
     // UPDATE[1] - 리뷰 수정
-    // 미구현: logger, 에러 처리
     async updateReviewByReviewId(review_id: number, updateReviewDTO: UpdateReviewDTO): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         const currentDate: Date = new Date()
 
@@ -104,18 +99,8 @@ export class ReviewsService {
     }
 
     // UPDATE[2] - 리뷰 도움됐어요 반응
-    // 미구현: logger, 에러 처리
-    /**
-     * 비고
-     * 1. 한번만 누를 수 있게, 취소는 불가능
-     *    취소 되게하려면 복잡해지기 때문에 일단 이렇게
-     * 
-     * 2. 버튼을 이미 눌렀는지 확인하는 로직은 프론트에서 구현하기
-     *    백엔드에서도 2차적으로 필터링하면 좋겠지만
-     *    리뷰 엔터티에 좋아요 누른 사람 배열을 추가해야 함.
-     */
     async markHelpful(review_id: number): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         foundReview.helpful_count += 1
         await this.reviewRepository.save(foundReview)
@@ -123,16 +108,15 @@ export class ReviewsService {
 
     // UPDATE[3] - 리뷰 대댓글 달릴 시 해당 대댓글 id 업데이트
     async updateReplyId(review_id: number, reply: Reply): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+        const foundReview = await this.readReviewByReviewId(review_id)
         foundReview.reply = reply
 
         await this.reviewRepository.save(foundReview)
     }
 
     // DELETE - 리뷰 삭제
-    // 미구현: logger, 에러 처리
-    async deleteReveiwById(review_id: number): Promise<void> {
-        const foundReview = await this.readReviewById(review_id)
+    async deleteReviewById(review_id: number): Promise<void> {
+        const foundReview = await this.readReviewByReviewId(review_id)
 
         await this.reviewRepository.remove(foundReview)
     }

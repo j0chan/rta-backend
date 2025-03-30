@@ -1,30 +1,30 @@
 import { UsersService } from 'src/users/users.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Store } from './entities/store.entity'
 import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
+import { Store } from './entities/store.entity'
 
 @Injectable()
 export class StoresService {
-
-    // init
     constructor(
         @InjectRepository(Store)
         private storesRepository: Repository<Store>,
         private usersService: UsersService,
     ) { }
 
-    // CREATE
-    // 새로운 가게 생성하기
-    async createStore(createStoreDTO: CreateStoreDTO): Promise<number> {
+    // CREATE - 새로운 가게 생성하기
+    async createStore(user_id: number, createStoreDTO: CreateStoreDTO): Promise<Store> {
         const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
+
+        const foundUser = await this.usersService.readUserById(user_id)
 
         const newStore: Store = this.storesRepository.create({
             store_name,
             category,
+            user: foundUser,
             address,
             latitude,
             longitude,
@@ -34,14 +34,13 @@ export class StoresService {
 
         await this.storesRepository.save(newStore)
 
-        return newStore.store_id
+        return newStore
     }
 
-    // READ
-    // 특정 유저의 모든 가게 조회
+    // READ - 매니저가 자신의 가게 조회할 때 사용
     async readAllStoresByUser(user_id: number): Promise<Store[]> {
         const foundStores = await this.storesRepository.find({
-            where: { user_id: { user_id } }
+            where: { user: { user_id } }
         })
         if (!foundStores) {
             throw new NotFoundException(`Cannot Find Store With user_id: ${user_id}`)
@@ -49,8 +48,7 @@ export class StoresService {
         return foundStores
     }
 
-    // READ
-    // 모든 가게 조회
+    // READ - 모든 가게 조회
     async readAllStores(): Promise<Store[]> {
         const foundStores = await this.storesRepository.find()
 
@@ -59,7 +57,11 @@ export class StoresService {
 
     // 특정 가게 조회
     async readStoreById(store_id: number): Promise<Store> {
-        const foundStore = await this.storesRepository.findOneBy({ store_id: store_id })
+        const foundStore = await this.storesRepository.findOne({
+            where: { store_id },
+            relations: ['user'],
+        })
+
         if (!foundStore) {
             throw new NotFoundException(`Cannot Find Store with ID ${store_id}`)
         }
@@ -74,12 +76,11 @@ export class StoresService {
         return foundStores
     }
 
-    // UPDATE
-    // 가게 매니저 속성 수정 (관리자 전용)
+    // UPDATE - 가게 매니저 속성 수정 (관리자 전용)
     async updateStoreManager(store_id: number, user_id: number): Promise<void> {
         const foundUser = await this.usersService.readUserById(user_id)
 
-        await this.storesRepository.update(store_id, { user_id: foundUser })
+        await this.storesRepository.update(store_id, { user: foundUser })
     }
 
     // 가게 정보 수정 (매니저 전용)
@@ -104,8 +105,7 @@ export class StoresService {
         await this.storesRepository.update(store_id, { public: true })
     }
 
-    // DELETE
-    // 가게 삭제하기
+    // DELETE - 가게 삭제하기
     async deleteStore(store_id: number): Promise<void> {
         const foundStore = await this.readStoreById(store_id)
 

@@ -9,7 +9,6 @@ import { Repository } from 'typeorm'
 @Injectable()
 export class MenusService {
 
-    // init
     constructor(
         @InjectRepository(Menu)
         private menusRepository: Repository<Menu>,
@@ -17,11 +16,9 @@ export class MenusService {
     ) { }
 
     // CREATE - 새로운 메뉴 등록
-    // 미구현: logger, 에러 처리
     async createMenu(store_id: number, createMenuDTO: CreateMenuDTO): Promise<Menu> {
         const { menu_name, price, description, manager_container } = createMenuDTO
 
-        // 가게 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
         if (!store) {
             throw new NotFoundException(`Store with ID ${store_id} not found`)
@@ -41,7 +38,6 @@ export class MenusService {
     }
 
     // READ[1] - 해당 가게 모든 메뉴 조회
-    // 미구현: logger, 에러 처리
     async readMenusByStore(store_id: number): Promise<Menu[]> {
         const foundMenus = await this.menusRepository.find({
             where: { store: { store_id } }
@@ -54,7 +50,6 @@ export class MenusService {
     }
 
     // READ[2] - 특정 메뉴 상세 조회
-    // 미구현: logger, 에러 처리
     async readMenuById(menu_id: number): Promise<Menu> {
         const foundMenu = await this.menusRepository.findOne({
             where: { menu_id }
@@ -66,7 +61,6 @@ export class MenusService {
     }
 
     // UPDATE - by menu_id
-    // 미구현: logger, 에러 처리
     async updateMenuById(menu_id: number, updateMenuDTO: UpdateMenuDTO) {
         const foundMenu = await this.readMenuById(menu_id)
 
@@ -80,7 +74,6 @@ export class MenusService {
     }
 
     // DELETE
-    // 미구현: logger, 에러 처리
     async deleteMenuById(menu_id: number) {
         const foundMenu = await this.readMenuById(menu_id)
         if (foundMenu) {

@@ -5,6 +5,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt'
 import { error } from 'console'
+import { JwtPayload } from './interfaces/jwt-payload.interface'
 
 
 @Injectable()
@@ -47,8 +48,8 @@ export class AuthService {
             }
 
             // [1] JWT 토큰 생성
-            const payload = {
-                id: existingUser.user_id,
+            const payload: JwtPayload = {
+                user_id: existingUser.user_id,
                 email: existingUser.email,
                 nickname: existingUser.nickname,
                 role: existingUser.role

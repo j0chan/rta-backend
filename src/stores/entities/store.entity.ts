@@ -1,11 +1,12 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
-import { Event } from "src/events/entities/event.entity"
 import { StoreRequest } from "../../store-requests/entities/store-request.entity"
-import { Menu } from "src/menus/entities/menu.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { User } from "src/users/entities/user.entity"
+import { Favorite } from "src/favorites/entites/favorite.entity"
+import { Menu } from "src/menus/entities/menu.entity"
+import { Event } from "src/events/entities/event.entity"
 
 @Entity()
 export class Store {
@@ -14,7 +15,7 @@ export class Store {
 
     @ManyToOne(() => User, (user) => user.stores)
     @JoinColumn({ name: "user_id" })
-    user_id: User
+    user: User
 
     @OneToMany(() => Review, (review) => review.store)
     reviews: Review[]
@@ -25,17 +26,17 @@ export class Store {
     @Column({ nullable: true })
     owner_name: string
 
-    @Column()
+    @Column({type: 'enum', enum: StoreCategory})
     category: StoreCategory
 
     @Column()
     address: string
 
-    @Column()
-    latitude: number
+    @Column({ type: 'bigint' })
+    latitude: string
 
-    @Column()
-    longitude: number
+    @Column({ type: 'bigint'})
+    longitude: string
 
     @Column()
     contact_number: string
@@ -60,4 +61,11 @@ export class Store {
 
     @OneToMany(() => Menu, (menu) => menu.store)
     menus: Menu[]
+
+    @OneToMany(() => Favorite, (favorite) => favorite.store)
+    favorites: Favorite[]
+
+    @Column({ nullable: true })
+    area: string
+
 }
