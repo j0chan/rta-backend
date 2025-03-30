@@ -5,13 +5,28 @@ import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
+import { CreateEventDTO } from 'src/stores/DTO/create-event.dto'
+import { Event } from './entities/event.entity'
+import { UpdateEventDTO } from './DTO/update-event.dto'
+import { Menu } from './entities/menu.entity'
+import { CreateMenuDTO } from './DTO/create-menu.dto'
+import { UpdateMenuDTO } from './DTO/update-menu.dto'
+import { Category } from './entities/category.entity'
 import { Store } from './entities/store.entity'
+
 
 @Injectable()
 export class StoresService {
     constructor(
         @InjectRepository(Store)
         private storesRepository: Repository<Store>,
+        @InjectRepository(Event)
+        private eventRepository: Repository<Event>,
+        @InjectRepository(Menu)
+        private menusRepository: Repository<Menu>,
+        @InjectRepository(Category)
+        private categoriesRepository: Repository<Category>,
+
         private usersService: UsersService,
     ) { }
 
@@ -20,10 +35,16 @@ export class StoresService {
         const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
 
         const foundUser = await this.usersService.readUserById(user_id)
+        
+        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category })
+
+        if (!categoryEntity) {
+            throw new NotFoundException(`Category ${category} not found`)
+        }
 
         const newStore: Store = this.storesRepository.create({
             store_name,
-            category,
+            category: categoryEntity,
             user: foundUser,
             address,
             latitude,
@@ -71,7 +92,13 @@ export class StoresService {
 
     // 가게 업종(category)으로 검색 조회
     async readStoresByCategory(category: StoreCategory): Promise<Store[]> {
-        const foundStores = await this.storesRepository.findBy({ category: category })
+        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category  })
+        
+        if (!categoryEntity) {
+            throw new NotFoundException(`Category ${category} not found`)
+        }
+
+        const foundStores = await this.storesRepository.findBy({ category: categoryEntity })
 
         return foundStores
     }
@@ -89,9 +116,15 @@ export class StoresService {
 
         const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
 
+        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category })
+
+        if (!categoryEntity) {
+            throw new NotFoundException(`Category ${category} not found`)
+          }
+
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
-        foundStore.category = category
+        foundStore.category = categoryEntity
         foundStore.contact_number = contact_number
         foundStore.description = description
 
