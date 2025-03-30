@@ -13,15 +13,15 @@ export class S3Controller {
         return { message: 'File uploaded successfully', url }
     }
 
-    @Get('/download/:fileName')
-    async getFile(@Param('fileName') fileName: string) {
-        const fileBuffer = await this.s3Service.getFile(fileName)
+    @Get('/download/:file_name')
+    async getFile(@Param('fileName') file_name: string) {
+        const fileBuffer = await this.s3Service.getFile(file_name)
         return fileBuffer
     }
 
-    @Delete('/delete/:fileName')
-    async deleteFile(@Param('fileName') fileName: string) {
-        const message = await this.s3Service.deleteFile(fileName)
+    @Delete('/delete/:file_name')
+    async deleteFile(@Param('file_name') file_name: string) {
+        const message = await this.s3Service.deleteFile(file_name)
         return { message }
     }
 }

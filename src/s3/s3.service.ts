@@ -1,8 +1,10 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import * as dotenv from 'dotenv'
 import { Readable } from 'typeorm/platform/PlatformTools'
+import { Image } from './entities/images.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 dotenv.config()
 @Injectable()
@@ -10,7 +12,10 @@ export class S3Service {
     s3Client: S3Client
     private bucketName: string
 
-    constructor(private configService: ConfigService) {
+    constructor(
+        @InjectRepository(Image)
+        private imageRepository: Repository<Image>,
+    ) {
         const accessKeyId = process.env.AWS_S3_ACCESS_KEY
         const secretAccessKey = process.env.AWS_S3_SECRET_ACCESS_KEY
         const region = process.env.AWS_REGION
@@ -31,29 +36,33 @@ export class S3Service {
     }
 
     // 파일 업로드
-    async uploadFile(fileBuffer: Buffer, fileName: string, contentType: string): Promise<string> {
+    async uploadFile(fileBuffer: Buffer, file_name: string, content_type: string): Promise<Image> {
         const uploadParamas = {
             Bucket: this.bucketName,
-            Key: fileName,
+            Key: file_name,
             Body: fileBuffer,
-            ContentType: contentType,
+            ContentType: content_type,
         }
 
         await this.s3Client.send(new PutObjectCommand(uploadParamas))
 
-        return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`
-    }
+        const url = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${file_name}`
 
-    // 파일 DB에 저장
-    async save() {
+        // DB에 저장
+        const image = this.imageRepository.create({
+            file_name,
+            url,
+            content_type,
+        })
 
+        return await this.imageRepository.save(image)
     }
 
     // 파일 다운로드
-    async getFile(fileName: string): Promise<Buffer> {
+    async getFile(file_name: string): Promise<Buffer> {
         const getParams = {
             Bucket: this.bucketName,
-            Key: fileName,
+            Key: file_name,
         }
 
         const { Body } = await this.s3Client.send(new GetObjectCommand(getParams))
@@ -72,13 +81,17 @@ export class S3Service {
     }
 
     // 파일 삭제
-    async deleteFile(fileName: string): Promise<string> {
+    async deleteFile(file_name: string): Promise<string> {
         const deleteParams = {
             Bucket: this.bucketName,
-            Key: fileName,
+            Key: file_name,
         }
 
         await this.s3Client.send(new DeleteObjectCommand(deleteParams))
-        return `File ${fileName} deleted successfully`
+
+        // DB에서 삭제
+        await this.imageRepository.delete({ file_name })
+
+        return `File ${file_name} deleted successfully`
     }
 }
