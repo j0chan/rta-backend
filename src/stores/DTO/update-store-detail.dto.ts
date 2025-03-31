@@ -1,5 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from "class-validator"
-import { StoreCategory } from "../entities/store-category.enum"
+import { IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class UpdateStoreDetailDTO {
     @IsNotEmpty()
@@ -11,8 +10,8 @@ export class UpdateStoreDetailDTO {
     owner_name: string
 
     @IsNotEmpty()
-    @IsString()
-    category: string
+    @IsNumber()
+    category_id: number
 
     @IsNotEmpty()
     @IsString()

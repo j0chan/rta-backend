@@ -3,7 +3,6 @@ import { StoresService } from './stores.service'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { ReadStoreDTO } from './DTO/read-store.dto'
 import { ReadStoreAddressDTO } from './DTO/read-store-address.dto'
-import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
@@ -77,9 +76,9 @@ export class StoresController {
     // 가게 업종으로 검색(필터링) 조회
     @Get('/')
     async readStoresByCategory(
-        @Query('category') category: StoreCategory
+        @Query('category_id') category_id: number
     ): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
-        const stores = await this.storesService.readStoresByCategory(category)
+        const stores = await this.storesService.readStoresByCategory(category_id)
         const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
 
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)

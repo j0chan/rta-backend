@@ -3,43 +3,29 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
-import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
-import { CreateEventDTO } from 'src/stores/DTO/create-event.dto'
-import { Event } from './entities/event.entity'
-import { UpdateEventDTO } from './DTO/update-event.dto'
-import { Menu } from './entities/menu.entity'
-import { CreateMenuDTO } from './DTO/create-menu.dto'
-import { UpdateMenuDTO } from './DTO/update-menu.dto'
-import { Category } from './entities/category.entity'
 import { Store } from './entities/store.entity'
-
+import { CategoriesService } from 'src/categories/categories.service'
 
 @Injectable()
 export class StoresService {
     constructor(
         @InjectRepository(Store)
         private storesRepository: Repository<Store>,
-        @InjectRepository(Event)
-        private eventRepository: Repository<Event>,
-        @InjectRepository(Menu)
-        private menusRepository: Repository<Menu>,
-        @InjectRepository(Category)
-        private categoriesRepository: Repository<Category>,
-
         private usersService: UsersService,
+        private categoriesService: CategoriesService
     ) { }
 
     // CREATE - 새로운 가게 생성하기
     async createStore(user_id: number, createStoreDTO: CreateStoreDTO): Promise<Store> {
-        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
+        const { store_name, category_id, address, latitude, longitude, contact_number, description } = createStoreDTO
 
         const foundUser = await this.usersService.readUserById(user_id)
-        
-        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category })
 
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
+        
         if (!categoryEntity) {
-            throw new NotFoundException(`Category ${category} not found`)
+            throw new NotFoundException(`Category ${category_id} not found`)
         }
 
         const newStore: Store = this.storesRepository.create({
@@ -80,7 +66,7 @@ export class StoresService {
     async readStoreById(store_id: number): Promise<Store> {
         const foundStore = await this.storesRepository.findOne({
             where: { store_id },
-            relations: ['user'],
+            relations: ['user', 'category']
         })
 
         if (!foundStore) {
@@ -91,15 +77,13 @@ export class StoresService {
     }
 
     // 가게 업종(category)으로 검색 조회
-    async readStoresByCategory(category: StoreCategory): Promise<Store[]> {
-        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category  })
-        
-        if (!categoryEntity) {
-            throw new NotFoundException(`Category ${category} not found`)
-        }
+    async readStoresByCategory(category_id: number): Promise<Store[]> {
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
 
-        const foundStores = await this.storesRepository.findBy({ category: categoryEntity })
-
+        const foundStores = await this.storesRepository.find({
+            where: { category: categoryEntity },
+            relations: ['category'], // join
+        })
         return foundStores
     }
 
@@ -114,13 +98,13 @@ export class StoresService {
     async updateStoreDetail(store_id: number, updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<void> {
         const foundStore = await this.readStoreById(store_id)
 
-        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
+        const { store_name, owner_name, category_id, contact_number, description } = updateStoreDetailDTO
 
-        const categoryEntity = await this.categoriesRepository.findOneBy({ name: category })
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
 
         if (!categoryEntity) {
-            throw new NotFoundException(`Category ${category} not found`)
-          }
+            throw new NotFoundException(`Category ${category_id} not found`)
+        }
 
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
