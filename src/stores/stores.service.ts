@@ -3,9 +3,9 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
-import { StoreCategory } from './entities/store-category.enum'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { Store } from './entities/store.entity'
+import { CategoriesService } from 'src/categories/categories.service'
 
 @Injectable()
 export class StoresService {
@@ -13,17 +13,24 @@ export class StoresService {
         @InjectRepository(Store)
         private storesRepository: Repository<Store>,
         private usersService: UsersService,
+        private categoriesService: CategoriesService
     ) { }
 
     // CREATE - 새로운 가게 생성하기
     async createStore(user_id: number, createStoreDTO: CreateStoreDTO): Promise<Store> {
-        const { store_name, category, address, latitude, longitude, contact_number, description } = createStoreDTO
+        const { store_name, category_id, address, latitude, longitude, contact_number, description } = createStoreDTO
 
         const foundUser = await this.usersService.readUserById(user_id)
 
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
+        
+        if (!categoryEntity) {
+            throw new NotFoundException(`Category ${category_id} not found`)
+        }
+
         const newStore: Store = this.storesRepository.create({
             store_name,
-            category,
+            category: categoryEntity,
             user: foundUser,
             address,
             latitude,
@@ -59,7 +66,7 @@ export class StoresService {
     async readStoreById(store_id: number): Promise<Store> {
         const foundStore = await this.storesRepository.findOne({
             where: { store_id },
-            relations: ['user'],
+            relations: ['user', 'category']
         })
 
         if (!foundStore) {
@@ -70,9 +77,13 @@ export class StoresService {
     }
 
     // 가게 업종(category)으로 검색 조회
-    async readStoresByCategory(category: StoreCategory): Promise<Store[]> {
-        const foundStores = await this.storesRepository.findBy({ category: category })
+    async readStoresByCategory(category_id: number): Promise<Store[]> {
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
 
+        const foundStores = await this.storesRepository.find({
+            where: { category: categoryEntity },
+            relations: ['category'], // join
+        })
         return foundStores
     }
 
@@ -87,11 +98,17 @@ export class StoresService {
     async updateStoreDetail(store_id: number, updateStoreDetailDTO: UpdateStoreDetailDTO): Promise<void> {
         const foundStore = await this.readStoreById(store_id)
 
-        const { store_name, owner_name, category, contact_number, description } = updateStoreDetailDTO
+        const { store_name, owner_name, category_id, contact_number, description } = updateStoreDetailDTO
+
+        const categoryEntity = await this.categoriesService.readCategoryById(category_id)
+
+        if (!categoryEntity) {
+            throw new NotFoundException(`Category ${category_id} not found`)
+        }
 
         foundStore.store_name = store_name
         foundStore.owner_name = owner_name
-        foundStore.category = category
+        foundStore.category = categoryEntity
         foundStore.contact_number = contact_number
         foundStore.description = description
 

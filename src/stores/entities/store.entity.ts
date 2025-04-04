@@ -1,10 +1,10 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
-import { StoreCategory } from "./store-category.enum"
 import { Review } from "src/reviews/entites/review.entity"
 import { StoreRequest } from "../../store-requests/entities/store-request.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { User } from "src/users/entities/user.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
+import { Category } from "../../categories/entities/category.entity"
 import { Menu } from "src/menus/entities/menu.entity"
 import { Event } from "src/events/entities/event.entity"
 import { Image } from "src/s3/entities/images.entity"
@@ -27,8 +27,9 @@ export class Store {
     @Column({ nullable: true })
     owner_name: string
 
-    @Column({type: 'enum', enum: StoreCategory})
-    category: StoreCategory
+    @ManyToOne(() => Category, (category) => category.stores)
+    @JoinColumn({ name: "category_id" })
+    category: Category
 
     @Column()
     address: string
