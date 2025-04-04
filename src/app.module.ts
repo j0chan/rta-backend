@@ -11,6 +11,7 @@ import { ManagerRequestsModule } from './manager-requests/manager-requests.modul
 import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
 import { FavoriteModule } from './favorites/favorites.module'
+import { EventsModule } from './events/events.module'
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { FavoriteModule } from './favorites/favorites.module'
     ManagerRequestsModule,
     RepliesModule,
     AuthModule,
-    FavoriteModule
+    FavoriteModule,
+    EventsModule,
   ],
 })
 export class AppModule { }
