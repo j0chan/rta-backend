@@ -84,6 +84,15 @@ export class StoresController {
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)
     }
 
+    // READ - 키워드 기반 가게 검색
+    @Get('/')
+    async searchStoresByKeword(@Query('keyword') keyword: string): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+        const stores = await this.storesService.readStoresByKeyword(keyword)
+        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
+
+        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTOs)
+    }
+
     // UPDATE - 가게 매니저 수정 (관리자 전용)
     @Patch('/:store_id')
     @Roles(UserRole.ADMIN)
