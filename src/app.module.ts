@@ -11,6 +11,7 @@ import { ManagerRequestsModule } from './manager-requests/manager-requests.modul
 import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
 import { FavoriteModule } from './favorites/favorites.module'
+import { S3Module } from './s3/s3.module'
 import { EventsModule } from './events/events.module'
 
 @Module({
@@ -26,6 +27,7 @@ import { EventsModule } from './events/events.module'
     RepliesModule,
     AuthModule,
     FavoriteModule,
+    S3Module,
     EventsModule,
   ],
 })

@@ -5,10 +5,12 @@ import { ReviewsController } from './reviews.controller'
 import { Review } from './entites/review.entity'
 import { StoresModule } from 'src/stores/stores.module'
 import { UsersModule } from 'src/users/users.module'
+import { Image } from 'src/s3/entities/images.entity'
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Review]),
+        TypeOrmModule.forFeature([Image]),
         StoresModule,
         UsersModule,
     ],
