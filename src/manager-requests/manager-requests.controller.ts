@@ -1,4 +1,3 @@
-import { GetUser } from './../common/custom-decorators/get-user.decorator';
 import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, NotFoundException, Param, Post, Put, Req, UseGuards } from '@nestjs/common'
 import { ManagerRequestsService } from './manager-requests.service'
 import { CreateManagerRequestDTO } from './DTO/create-manager-request.dto'
@@ -18,7 +17,7 @@ export class ManagerRequestsController {
 
     // CREATE
     @Post('/')
-    @Roles(UserRole.USER)
+    @Roles(UserRole.USER, UserRole.MANAGER)
     async createManagerRequest(
         @Req() req: AuthenticatedRequest,
         @Body() createManagerRequestDTO: CreateManagerRequestDTO
@@ -29,6 +28,22 @@ export class ManagerRequestsController {
         return new ApiResponseDTO(true, HttpStatus.CREATED, "Request Created Successfully")
     }
 
+    // 로그인된 회원의(나의) 점주신청서 조회
+    @Get('/my')
+    @Roles(UserRole.USER, UserRole.MANAGER)
+    async readMyManagerRequest(
+        @Req() req: AuthenticatedRequest
+    ): Promise<ApiResponseDTO<ReadManagerRequestDTO[]>> {
+        const logginedUser = req.user.user_id
+        const managerRequest = await this.managerRequestsService.readManagerRequestByUser(logginedUser)
+        if (!managerRequest) {
+            throw new NotFoundException(`Cannot Find Request by Id ${logginedUser}`)
+        }
+
+        const readManagerRequestDTOs = managerRequest.map(request => new ReadManagerRequestDTO(request))
+        return new ApiResponseDTO(true, HttpStatus.OK, "Request Retrieved Successfully", readManagerRequestDTOs)
+    }
+    
     // READ
     @Get('/')
     @Roles(UserRole.ADMIN)
@@ -58,21 +73,6 @@ export class ManagerRequestsController {
         return new ApiResponseDTO(true, HttpStatus.OK, "Request Retrieved Successfully", readManagerRequestDTO)
     }
 
-    // 로그인된 회원의(나의) 점주신청서 조회
-    @Get('/my')
-    @Roles(UserRole.USER)
-    async readMyManagerRequest(
-        @Req() req: AuthenticatedRequest
-    ): Promise<ApiResponseDTO<ReadManagerRequestDTO[]>> {
-        const logginedUser = req.user.user_id
-        const managerRequest = await this.managerRequestsService.readManagerRequestByUser(logginedUser)
-        if (!managerRequest) {
-            throw new NotFoundException(`Cannot Find Request by Id ${logginedUser}`)
-        }
-
-        const readManagerRequestDTOs = managerRequest.map(request => new ReadManagerRequestDTO(request));
-        return new ApiResponseDTO(true, HttpStatus.OK, "Request Retrieved Successfully", readManagerRequestDTOs)
-    }
     
     // READ - 특정아이디() 점주 신청서 조회 - ///// 바로 위랑 중복되는거인듯? /////
     // @Get('/my-manager-requests')

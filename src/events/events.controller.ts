@@ -75,14 +75,11 @@ export class EventsController {
         @Param('event_id') event_id: number,
         @Body() updateEventDTO: UpdateEventDTO
     ): Promise<ApiResponseDTO<void>> {
+        console.log('req.user:', req.user)
+
         const foundStore = await this.storesService.readStoreById(store_id)
         if (foundStore.user.user_id !== req.user.user_id) {
             throw new ForbiddenException('You Can Only Update Your Own Store Event.')
-        }
-
-        const foundEvent = await this.eventsService.readEventById(event_id)
-        if (foundEvent.store.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
         }
 
         await this.eventsService.updateEventById(event_id, updateEventDTO)
@@ -101,11 +98,6 @@ export class EventsController {
         const foundStore = await this.storesService.readStoreById(store_id)
         if (foundStore.user.user_id !== req.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Store Event.')
-        }
-
-        const foundEvent = await this.eventsService.readEventById(event_id)
-        if (foundEvent.store.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('This Event Does Not Belong to the Provided Store.')
         }
 
         await this.eventsService.deleteEventById(event_id)

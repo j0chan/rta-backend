@@ -10,6 +10,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
+import { Store } from './entities/store.entity'
 
 @Controller('api/stores')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -33,7 +34,7 @@ export class StoresController {
     // READ - 매니저가 자신의 가게 조회할 때 사용
     @Get('/my')
     @Roles(UserRole.MANAGER)
-    async readAllStoresByUser(
+    async readMyStores(
         @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         const user_id = req.user.user_id
@@ -46,10 +47,21 @@ export class StoresController {
 
     // READ - 모든 가게 조회
     @Get('/')
-    async readAllStores(): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
-        const stores = await this.storesService.readAllStores()
-        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
+    async readAllStores(@Query('category_id') category_id: number, @Query('keyword') keyword: string): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+        var stores: Store[] = []
+        
+        if (category_id) {
+            // 가게 업종으로 검색(필터링) 조회
+            stores = await this.storesService.readStoresByCategory(category_id)
+        } else if (keyword) {
+            // 키워드 기반 가게 검색(필터링) 조회
+            stores = await this.storesService.readStoresByKeyword(keyword)
+        } else {
+            // 전체 가게 목록 조회
+            stores = await this.storesService.readAllStores()
+        }
 
+        const readStoreDTOs = stores.map(store => new ReadStoreDTO(store))
         return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved Successfully", readStoreDTOs)
     }
 
@@ -73,16 +85,7 @@ export class StoresController {
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Address Retrieved by Id Successfully", new ReadStoreAddressDTO(store))
     }
 
-    // 가게 업종으로 검색(필터링) 조회
-    @Get('/')
-    async readStoresByCategory(
-        @Query('category_id') category_id: number
-    ): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
-        const stores = await this.storesService.readStoresByCategory(category_id)
-        const readStoreDTO = stores.map(store => new ReadStoreDTO(store))
-
-        return new ApiResponseDTO(true, HttpStatus.OK, "Stores Retrieved by Category Successfully", readStoreDTO)
-    }
+    
 
     // UPDATE - 가게 매니저 수정 (관리자 전용)
     @Patch('/:store_id')

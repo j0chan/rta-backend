@@ -59,7 +59,7 @@ export class StoreRequestsController {
     }
 
     // READ - 나의 가게 신청서 조회
-    @Get('/my-store-requests')
+    @Get('/my')
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.USER)
     async readMyStoreRequests(

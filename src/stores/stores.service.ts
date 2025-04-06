@@ -1,7 +1,7 @@
 import { UsersService } from 'src/users/users.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { ILike, Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { Store } from './entities/store.entity'
@@ -83,6 +83,14 @@ export class StoresService {
         const foundStores = await this.storesRepository.find({
             where: { category: categoryEntity },
             relations: ['category'], // join
+        })
+        return foundStores
+    }
+
+    // 가게 이름(keyword)으로 검색 조회
+    async readStoresByKeyword(keyword: string): Promise<Store[]> {
+        const foundStores = await this.storesRepository.find({
+            where: { store_name: ILike(`%${keyword}%`) },
         })
         return foundStores
     }
