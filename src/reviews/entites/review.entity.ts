@@ -1,8 +1,8 @@
 import { Reply } from "src/replies/entities/reply.entity"
-import { Image } from "src/s3/entities/images.entity"
+import { ReviewImage } from "src/s3/entities/review-image.entity"
 import { Store } from "src/stores/entities/store.entity"
 import { User } from "src/users/entities/user.entity"
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class Review {
@@ -10,7 +10,7 @@ export class Review {
     review_id: number
 
     @ManyToOne(() => Store, (store) => store.reviews)
-    @JoinColumn({name: "store_id"})
+    @JoinColumn({ name: "store_id" })
     store: Store
 
     @ManyToOne(() => User, (user) => user.reviews)
@@ -32,8 +32,8 @@ export class Review {
     @OneToOne(() => Reply, (reply) => reply.review, { cascade: true, nullable: true })
     reply: Reply
 
-    @OneToOne(() => Image, { nullable: true })
-    review_image: Image
+    @OneToMany(() => ReviewImage, ri => ri.review, { cascade: true })
+    images: ReviewImage[]
 
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()
