@@ -12,6 +12,7 @@ import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
 import { FavoriteModule } from './favorites/favorites.module'
 import { S3Module } from './s3/s3.module'
+import { EventsModule } from './events/events.module'
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { S3Module } from './s3/s3.module'
     AuthModule,
     FavoriteModule,
     S3Module,
+    EventsModule,
   ],
 })
 export class AppModule { }
