@@ -5,6 +5,8 @@ import { Image } from './entities/images.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { ImageType } from './entities/image-type.enum'
+import { ReviewImage } from './entities/review-image.entity'
+import { Review } from 'src/reviews/entites/review.entity'
 
 dotenv.config()
 @Injectable()
@@ -15,6 +17,10 @@ export class S3Service {
     constructor(
         @InjectRepository(Image)
         private imageRepository: Repository<Image>,
+        @InjectRepository(ReviewImage)
+        private reviewImageRepository: Repository<ReviewImage>,
+        @InjectRepository(Review)
+        private reviewRepository: Repository<Review>,
     ) {
         const accessKeyId = process.env.AWS_S3_ACCESS_KEY
         const secretAccessKey = process.env.AWS_S3_SECRET_ACCESS_KEY
@@ -33,6 +39,40 @@ export class S3Service {
                 secretAccessKey: secretAccessKey, // Secret Key
             },
         })
+    }
+
+    // 리뷰 이미지 업로드
+    async uploadReviewImages(file: Express.Multer.File, review_id: number): Promise<ReviewImage> {
+        const review = await this.reviewRepository.findOne({ where: { review_id: review_id } })
+        if (!review) throw new Error('Review not found')
+
+        const uploadParamas = {
+            Bucket: this.bucketName,
+            Key: file.originalname,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        }
+
+        await this.s3Client.send(new PutObjectCommand(uploadParamas))
+
+        const url = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${file.originalname}`
+
+        // image 저장
+        const image = this.imageRepository.create({
+            file_name: file.originalname,
+            url,
+            content_type: file.mimetype,
+            image_type: ImageType.REVIEW_IMAGE
+        })
+        const savedImage = await this.imageRepository.save(image)
+
+        // reviewImage에 매핑 저장
+        const reviewImage = this.reviewImageRepository.create({
+            review,
+            image: savedImage,
+        })
+
+        return await this.reviewImageRepository.save(reviewImage)
     }
 
     // 파일 업로드
