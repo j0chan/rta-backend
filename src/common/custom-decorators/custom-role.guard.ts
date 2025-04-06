@@ -23,6 +23,11 @@ export class RolesGuard implements CanActivate {
         // 요청 객체에서 사용자 정보 가져오기
         const { user }: { user: User } = context.switchToHttp().getRequest()
 
+        console.log('[RolesGuard] user:', user)
+        console.log('[RolesGuard] user.role:', user.role)
+        console.log('[RolesGuard] requiredRoles:', requiredRoles)
+
+
         // 사용자의 역할이 필요한 역할 목록에 포함되는지 권한 확인
         return requiredRoles.some((role) => user.role === role)
     }
