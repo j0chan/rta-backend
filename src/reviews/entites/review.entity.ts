@@ -33,7 +33,7 @@ export class Review {
     reply: Reply
 
     @OneToMany(() => ReviewImage, ri => ri.review, { cascade: true })
-    images: ReviewImage[]
+    review_images: ReviewImage[]
 
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()

@@ -10,7 +10,7 @@ import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class ReviewsService {
-    private reviewRelations = ["user", "reply", "store"]
+    private reviewRelations = ["user", "reply", "store", "review_images", "review_images.image"]
 
     constructor(
         @InjectRepository(Review)

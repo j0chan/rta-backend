@@ -7,7 +7,7 @@ export class ReviewImage {
     @PrimaryGeneratedColumn()
     id: number
 
-    @ManyToOne(() => Review, review => review.images, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Review, review => review.review_images, { onDelete: 'CASCADE' })
     review: Review
 
     @OneToOne(() => Image, { cascade: true, eager: true })

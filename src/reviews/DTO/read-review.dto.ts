@@ -10,6 +10,7 @@ export class ReadReviewDTO {
     reply?: ReadReplyDTO
     date: Date
     isModified: Boolean
+    image_urls?: string[]
 
     constructor(review: Review) {
         this.review_id = review.review_id
@@ -20,5 +21,6 @@ export class ReadReviewDTO {
         this.reply = review.reply ? new ReadReplyDTO(review.reply) : undefined
         this.date = review.isModified ? review.updated_at : review.created_at
         this.isModified = review.isModified
+        this.image_urls = review.review_images?.map(rImg => rImg.image?.url).filter(url => !!url) || []
     }
 }
