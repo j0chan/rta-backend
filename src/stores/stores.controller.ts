@@ -34,7 +34,7 @@ export class StoresController {
     // READ - 매니저가 자신의 가게 조회할 때 사용
     @Get('/my')
     @Roles(UserRole.MANAGER)
-    async readAllStoresByUser(
+    async readMyStores(
         @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         const user_id = req.user.user_id
@@ -47,7 +47,7 @@ export class StoresController {
 
     // READ - 모든 가게 조회
     @Get('/')
-    async readStores(@Query('category_id') category_id: number, @Query('keyword') keyword: string): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
+    async readAllStores(@Query('category_id') category_id: number, @Query('keyword') keyword: string): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         var stores: Store[] = []
         
         if (category_id) {
