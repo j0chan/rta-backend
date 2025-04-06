@@ -23,12 +23,17 @@ export class ReviewsController {
         @Param('store_id') store_id: number,
         @Req() req: AuthenticatedRequest,
         @Body() createReviewDTO: CreateReviewDTO
-    ): Promise<ApiResponseDTO<void>> {
+    ): Promise<ApiResponseDTO<{ review_id: number }>> {
         const user_id = req.user.user_id
 
-        await this.reviewsService.createReview(store_id, user_id, createReviewDTO)
+        const newReview = await this.reviewsService.createReview(store_id, user_id, createReviewDTO)
 
-        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Review Created Successfully!')
+        return new ApiResponseDTO(
+            true,
+            HttpStatus.CREATED,
+            'Review Created Successfully!',
+            { review_id: newReview.review_id }
+        )
     }
 
     // READ[1] 가게 리뷰 조회
@@ -48,7 +53,7 @@ export class ReviewsController {
         @Param('review_id') review_id: number
     ): Promise<ApiResponseDTO<Review>> {
         const foundReview: Review = await this.reviewsService.readReviewByReviewId(review_id)
-        
+
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
@@ -78,7 +83,7 @@ export class ReviewsController {
         const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
 
         // 수정하려는 리뷰가 본인의 리뷰인지 검증
-        if(req.user.user_id !== foundReview.user.user_id) {
+        if (req.user.user_id !== foundReview.user.user_id) {
             throw new ForbiddenException('You Can Only Update Your Own Review.')
         }
 

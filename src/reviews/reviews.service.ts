@@ -20,7 +20,7 @@ export class ReviewsService {
     ) { }
 
     // CREATE [1]
-    async createReview(store_id: number, user_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
+    async createReview(store_id: number, user_id: number, CreateReviewDTO: CreateReviewDTO): Promise<Review> {
         const { content } = CreateReviewDTO
 
         // user_id로 User 객체 가져오기
@@ -39,7 +39,7 @@ export class ReviewsService {
             updated_at: currentDate,
         })
 
-        await this.reviewRepository.save(newReview)
+        return await this.reviewRepository.save(newReview)
     }
 
     // READ[1] - 모든 리뷰 조회
