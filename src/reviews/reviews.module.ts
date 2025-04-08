@@ -5,14 +5,16 @@ import { ReviewsController } from './reviews.controller'
 import { Review } from './entites/review.entity'
 import { StoresModule } from 'src/stores/stores.module'
 import { UsersModule } from 'src/users/users.module'
-import { Image } from 'src/s3/entities/images.entity'
+import { File } from 'src/file/entities/file.entity'
+import { FileModule } from 'src/file/file.module'
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Review]),
-        TypeOrmModule.forFeature([Image]),
+        TypeOrmModule.forFeature([File]),
         StoresModule,
         UsersModule,
+        FileModule
     ],
     providers: [ReviewsService],
     controllers: [ReviewsController],
