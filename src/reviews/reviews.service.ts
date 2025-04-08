@@ -1,5 +1,5 @@
 import { UpdateReviewDTO } from './DTO/update-review.dto'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Review } from './entites/review.entity'
 import { Repository } from 'typeorm'
@@ -7,26 +7,32 @@ import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { Reply } from 'src/replies/entities/reply.entity'
 import { UsersService } from 'src/users/users.service'
+import { File } from 'src/file/entities/file.entity'
+import { FileService } from 'src/file/file.service'
 
 @Injectable()
 export class ReviewsService {
-    private reviewRelations = ["user", "reply", "store"]
+    private readonly logger = new Logger(FileService.name); // Logger 추가
+
+    private reviewRelations = ["user", "reply", "store", "files"]
 
     constructor(
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
         private storesService: StoresService,
         private usersService: UsersService,
+        private fileService: FileService,
     ) { }
 
     // CREATE [1]
-    async createReview(store_id: number, user_id: number, CreateReviewDTO: CreateReviewDTO): Promise<void> {
-        const { content } = CreateReviewDTO
+    async createReview(
+        store_id: number,
+        user_id: number,
+        createReviewDTO: CreateReviewDTO, files: Express.Multer.File[]): Promise<Review> {
+        const { content } = createReviewDTO
 
-        // user_id로 User 객체 가져오기
         const user = await this.usersService.readUserById(user_id)
 
-        // store_id로 Store 객체 가져오기
         const store = await this.storesService.readStoreById(store_id)
 
         const currentDate: Date = new Date()
@@ -39,7 +45,12 @@ export class ReviewsService {
             updated_at: currentDate,
         })
 
-        await this.reviewRepository.save(newReview)
+        const createdReview: Review = await this.reviewRepository.save(newReview);
+
+
+        const uploadedFiles = await this.fileService.uploadImage(files, createdReview);
+
+        return createdReview
     }
 
     // READ[1] - 모든 리뷰 조회

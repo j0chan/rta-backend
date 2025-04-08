@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { EventStatus } from "./event-status.enum"
 import { Store } from "src/stores/entities/store.entity"
-import { Image } from "src/s3/entities/images.entity"
+import { File } from "src/file/entities/file.entity"
 
 @Entity()
 export class Event {
@@ -30,8 +30,8 @@ export class Event {
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date
 
-    @OneToOne(() => Image, { nullable: true })
-    event_image: Image
+    @OneToOne(() => File, { nullable: true })
+    event_image: File
 
     get eventStatus(): EventStatus {
         if (this.is_canceled) {

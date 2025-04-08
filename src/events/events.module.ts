@@ -4,12 +4,12 @@ import { EventsService } from './events.service'
 import { Event } from './entities/event.entity'
 import { EventsController } from './events.controller'
 import { StoresModule } from 'src/stores/stores.module'
-import { Image } from 'src/s3/entities/images.entity'
+import { File } from 'src/file/entities/file.entity'
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Event]),
-        TypeOrmModule.forFeature([Image]),
+        TypeOrmModule.forFeature([File]),
         StoresModule,
     ],
     providers: [EventsService],

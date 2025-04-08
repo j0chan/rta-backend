@@ -7,7 +7,7 @@ import { Favorite } from "src/favorites/entites/favorite.entity"
 import { Category } from "../../categories/entities/category.entity"
 import { Menu } from "src/menus/entities/menu.entity"
 import { Event } from "src/events/entities/event.entity"
-import { Image } from "src/s3/entities/images.entity"
+import { File } from "src/file/entities/file.entity"
 
 @Entity()
 export class Store {
@@ -70,6 +70,6 @@ export class Store {
     @Column({ nullable: true })
     area: string
 
-    @OneToOne(() => Image, { nullable: true })
-    review_image: Image
+    @OneToOne(() => File, { nullable: true })
+    review_image: File
 }

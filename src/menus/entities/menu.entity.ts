@@ -1,4 +1,4 @@
-import { Image } from "src/s3/entities/images.entity"
+import { File } from "src/file/entities/file.entity"
 import { Store } from "src/stores/entities/store.entity"
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
@@ -30,6 +30,6 @@ export class Menu {
     @JoinColumn({ name: "store_id" })
     store: Store
 
-    @OneToOne(() => Image, { nullable: true })
-    review_image: Image
+    @OneToOne(() => File, { nullable: true })
+    review_image: File
 }

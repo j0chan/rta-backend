@@ -5,7 +5,7 @@ import { ManagerRequest } from "src/manager-requests/entities/manager-requests.e
 import { StoreRequest } from "src/store-requests/entities/store-request.entity"
 import { Review } from "src/reviews/entites/review.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
-import { Image } from "src/s3/entities/images.entity"
+import { File } from "src/file/entities/file.entity"
 
 
 @Entity()
@@ -46,6 +46,6 @@ export class User {
     @OneToMany(() => Favorite, (favorite) => favorite.user)
     favorites: Favorite[]
 
-    @OneToOne(() => Image, { nullable: true })
-    profile_image: Image
+    @OneToOne(() => File, { nullable: true })
+    profile_image: File
 }
