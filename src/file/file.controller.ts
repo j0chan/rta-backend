@@ -1,7 +1,5 @@
 import { Controller, Post, UploadedFile, UseInterceptors, Param, Get, Delete } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
 import { FileService } from './file.service'
-import { UploadType } from './entities/upload-type.enum'
 
 @Controller('api/s3')
 export class FileController {
@@ -27,16 +25,4 @@ export class FileController {
     //     const url = await this.s3Service.uploadImage(file.buffer, file.originalname, file.mimetype, image_type)
     //     return { message: 'File uploaded successfully', url }
     // }
-
-    @Get('/download/:file_name')
-    async getImage(@Param('file_name') file_name: string): Promise<{ url: string }> {
-        const foundImageUrl = await this.fileService.getImage(file_name)
-        return { url: foundImageUrl }
-    }
-
-    @Delete('/delete/:file_name')
-    async deleteImage(@Param('file_name') file_name: string) {
-        const message = await this.fileService.deleteImage(file_name)
-        return { message }
-    }
 }

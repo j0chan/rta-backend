@@ -18,7 +18,8 @@ export class File {
     @Column({type: 'enum', enum: UploadType, default: UploadType.UNCATEGORIZED})
     upload_type: UploadType
 
-    @Column() //mime type
+    // 확장자(mime)
+    @Column() 
     content_type: string
 
     @CreateDateColumn()

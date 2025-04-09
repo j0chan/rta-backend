@@ -15,8 +15,8 @@ import { FilesInterceptor } from '@nestjs/platform-express'
 @Controller('api/stores/:store_id/reviews')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ReviewsController {
-    private readonly logger = new Logger(ReviewsController.name); // Logger 추가
-    
+    private readonly logger = new Logger(ReviewsController.name)
+
     constructor(private reviewsService: ReviewsService) { }
 
     // CREATE - 새로운 리뷰 생성
@@ -29,12 +29,13 @@ export class ReviewsController {
         @Body() createReviewDTO: CreateReviewDTO,
         @UploadedFiles() files: Express.Multer.File[]
     ): Promise<ApiResponseDTO<{ review_id: number }>> {
-        this.logger.error('Logs :',store_id,createReviewDTO,files );
+        this.logger.log(`createReview START`)
 
         const user_id = req.user.user_id
 
         const newReview = await this.reviewsService.createReview(store_id, user_id, createReviewDTO, files)
 
+        this.logger.log(`createReview END`)
         return new ApiResponseDTO(
             true,
             HttpStatus.CREATED,
@@ -48,9 +49,12 @@ export class ReviewsController {
     async readStoreReviews(
         @Param('store_id') id: number
     ): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        this.logger.log(`readStoreReviews START`)
+
         const foundReviews = await this.reviewsService.readReviewsByStore(id)
         const readReviewDTOs = foundReviews.map(review => new ReadReviewDTO(review))
 
+        this.logger.log(`readStoreReviews END`)
         return new ApiResponseDTO(true, HttpStatus.OK, "Store Reviews Retrieved Successfully", readReviewDTOs)
     }
 
@@ -59,8 +63,11 @@ export class ReviewsController {
     async readReviewById(
         @Param('review_id') review_id: number
     ): Promise<ApiResponseDTO<Review>> {
+        this.logger.log(`readReviewById START`)
+
         const foundReview: Review = await this.reviewsService.readReviewByReviewId(review_id)
 
+        this.logger.log(`readReviewById END`)
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
@@ -71,8 +78,11 @@ export class ReviewsController {
     async readMyReviews(
         @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+        this.logger.log(`readMyReviews START`)
+
         const user_id = req.user.user_id
 
+        this.logger.log(`readMyReviews END`)
         const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
         const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
 
@@ -87,6 +97,8 @@ export class ReviewsController {
         @Param('review_id') review_id: number,
         @Body() updateReviewDTO: UpdateReviewDTO
     ): Promise<ApiResponseDTO<void>> {
+        this.logger.log(`updateReviewByReviewId START`)
+
         const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
 
         // 수정하려는 리뷰가 본인의 리뷰인지 검증
@@ -95,6 +107,8 @@ export class ReviewsController {
         }
 
         await this.reviewsService.updateReviewByReviewId(review_id, updateReviewDTO)
+        
+        this.logger.log(`updateReviewByReviewId END`)
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
 
@@ -115,13 +129,16 @@ export class ReviewsController {
         @Req() req: AuthenticatedRequest,
         @Param('review_id') review_id: number
     ): Promise<ApiResponseDTO<void>> {
-        const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
+        this.logger.log(`deleteReviewByReviewId START`)
 
+        const foundReview = await this.reviewsService.readReviewByReviewId(review_id)
         if (req.user.user_id !== foundReview.user.user_id) {
             throw new ForbiddenException('You Can Only Delete Your Own Review.')
         }
 
         await this.reviewsService.deleteReviewById(review_id)
+        
+        this.logger.log(`deleteReviewByReviewId END`)
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully')
     }
 }
