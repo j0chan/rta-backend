@@ -50,6 +50,8 @@ export class FileService {
         targetEntity: Review | Store | User | Event,
         uploadType: UploadType
     ): Promise<File[]> {
+        this.logger.log(`uploadImage START`)
+
         const uploadedFiles: File[] = []
 
         try {
@@ -113,11 +115,14 @@ export class FileService {
             throw new Error('Failed to upload images')
         }
 
+        this.logger.log(`uploadImage END`)
         return uploadedFiles
     }
 
     // 파일 삭제
     async deleteImage(file_name: string): Promise<string> {
+        this.logger.log(`deleteImage START`)
+
         const deleteParams = {
             Bucket: this.bucketName,
             Key: file_name,
@@ -128,6 +133,7 @@ export class FileService {
         // DB에서 삭제
         await this.fileRepository.delete({ file_name })
 
+        this.logger.log(`deleteImage END`)
         return `File ${file_name} deleted successfully`
     }
 
