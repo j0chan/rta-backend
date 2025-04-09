@@ -1,6 +1,7 @@
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { Injectable, Logger } from '@nestjs/common'
 import * as dotenv from 'dotenv'
+import * as path from 'path'
 import { File } from './entities/file.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
@@ -53,33 +54,34 @@ export class FileService {
 
         try {
             for (const file of files) {
-                // uuid를 통해 파일명 중복을 방지
+                // uuid를 통해 파일명 중복 방지
                 const uuid = uuidv4()
-                const originalName = file.originalname
-                    .replace(/[^a-zA-Z0-9._-]/g, '_')  // 허용되지 않는 문자를 '_'로
-                    .replace(/_+/g, '_')               // 연속된 '_'를 하나로 압축
 
-                // s3에 저장될 최종 파일 이름
+                // 파일 확장자 추출
+                const ext = path.extname(file.originalname)
+
+                // S3에 저장될 최종 파일 이름
                 const folderPrefix = this.getFolderByUploadType(uploadType)
-                const filename = `${folderPrefix}/${uuid}_${originalName}`
+                const s3FileName = `${folderPrefix}/${uuid}${ext}`
 
+                // S3에 업로드 할 객체
                 const uploadParams = {
                     Bucket: this.bucketName,
-                    Key: filename,
+                    Key: s3FileName,
                     Body: file.buffer,
                     ContentType: file.mimetype,
                 }
-
                 await this.s3Client.send(new PutObjectCommand(uploadParams))
 
                 const region = process.env.AWS_REGION
 
-                // DB에 저장할 url 생성
-                const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${filename}`
+                // DB에 저장할 url / 파일명(한글깨짐) 생성
+                const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${s3FileName}`
+                const dbFileName = file.originalname
 
                 // DB에 저장
                 const fileData: Partial<File> = {
-                    file_name: filename,
+                    file_name: dbFileName,
                     url: url,
                     content_type: file.mimetype,
                     upload_type: uploadType,
