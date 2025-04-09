@@ -7,6 +7,9 @@ import { Repository } from 'typeorm'
 import { UploadType } from './entities/upload-type.enum'
 import { Review } from 'src/reviews/entites/review.entity'
 import { v4 as uuidv4 } from 'uuid'
+import { Store } from 'src/stores/entities/store.entity'
+import { User } from 'src/users/entities/user.entity'
+import { Event } from 'src/events/entities/event.entity'
 
 dotenv.config()
 
@@ -41,7 +44,11 @@ export class FileService {
     }
 
     // 파일 업로드
-    async uploadImage(files: Express.Multer.File[], createdReview: Review): Promise<File[]> {
+    async uploadImage(
+        files: Express.Multer.File[],
+        targetEntity: Review | Store | User | Event,
+        uploadType: UploadType
+    ): Promise<File[]> {
         const uploadedFiles: File[] = []
 
         try {
@@ -51,8 +58,10 @@ export class FileService {
                 const originalName = file.originalname
                     .replace(/[^a-zA-Z0-9._-]/g, '_')  // 허용되지 않는 문자를 '_'로
                     .replace(/_+/g, '_')               // 연속된 '_'를 하나로 압축
+
                 // s3에 저장될 최종 파일 이름
-                const filename = `${uuid}_${originalName}`
+                const folderPrefix = this.getFolderByUploadType(uploadType)
+                const filename = `${folderPrefix}/${uuid}_${originalName}`
 
                 const uploadParams = {
                     Bucket: this.bucketName,
@@ -67,14 +76,32 @@ export class FileService {
 
                 // DB에 저장할 url 생성
                 const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${filename}`
+
                 // DB에 저장
-                const fileEntity = this.fileRepository.create({
+                const fileData: Partial<File> = {
                     file_name: filename,
                     url: url,
                     content_type: file.mimetype,
-                    upload_type: UploadType.REVIEW_IMAGE,
-                    review: createdReview,
-                })
+                    upload_type: uploadType,
+                }
+                switch (uploadType) {
+                    case UploadType.REVIEW_IMAGE:
+                        fileData.review = targetEntity as Review
+                        break
+                    // 추후 구현 완료 시 주석 해제
+                    // case UploadType.STORE_PROFILE:
+                    //     fileData.store = targetEntity as Store
+                    //     break
+                    // case UploadType.USER_PROFILE:
+                    //     fileData.user = targetEntity as User
+                    //     break
+                    // case UploadType.EVENT_IMAGE:
+                    //     fileData.event = targetEntity as Event
+                    //     break
+                    default:
+                        this.logger.warn(`Unknown upload type: ${uploadType}`)
+                }
+                const fileEntity = this.fileRepository.create(fileData)
 
                 const savedFile = await this.fileRepository.save(fileEntity)
                 uploadedFiles.push(savedFile)
@@ -100,5 +127,20 @@ export class FileService {
         await this.fileRepository.delete({ file_name })
 
         return `File ${file_name} deleted successfully`
+    }
+
+    private getFolderByUploadType(uploadType: UploadType): string {
+        switch (uploadType) {
+            case UploadType.REVIEW_IMAGE:
+                return 'review'
+            case UploadType.USER_PROFILE:
+                return 'user_profile'
+            case UploadType.STORE_PROFILE:
+                return 'store'
+            case UploadType.EVENT_IMAGE:
+                return 'event'
+            default:
+                return 'etc'
+        }
     }
 }

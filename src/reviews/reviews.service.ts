@@ -8,6 +8,7 @@ import { StoresService } from 'src/stores/stores.service'
 import { Reply } from 'src/replies/entities/reply.entity'
 import { UsersService } from 'src/users/users.service'
 import { FileService } from 'src/file/file.service'
+import { UploadType } from 'src/file/entities/upload-type.enum'
 
 @Injectable()
 export class ReviewsService {
@@ -29,6 +30,7 @@ export class ReviewsService {
         user_id: number,
         createReviewDTO: CreateReviewDTO, files: Express.Multer.File[]
     ): Promise<Review> {
+        this.logger.log(`createReview START`)
         const { content } = createReviewDTO
 
         const user = await this.usersService.readUserById(user_id)
@@ -45,8 +47,9 @@ export class ReviewsService {
         })
 
         const createdReview = await this.reviewRepository.save(newReview)
-        await this.fileService.uploadImage(files, createdReview)
+        await this.fileService.uploadImage(files, createdReview, UploadType.REVIEW_IMAGE)
 
+        this.logger.log(`createReview END`)
         return createdReview
     }
 
