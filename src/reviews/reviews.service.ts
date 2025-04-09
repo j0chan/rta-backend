@@ -7,7 +7,6 @@ import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'
 import { Reply } from 'src/replies/entities/reply.entity'
 import { UsersService } from 'src/users/users.service'
-import { File } from 'src/file/entities/file.entity'
 import { FileService } from 'src/file/file.service'
 
 @Injectable()
@@ -130,10 +129,10 @@ export class ReviewsService {
         const foundReview = await this.readReviewByReviewId(review_id)
 
         // S3에서 이미지 삭제하는 메서드 호출
-        for(const file of foundReview.files) {
+        for (const file of foundReview.files) {
             try {
                 await this.fileService.deleteImage(file.file_name)
-            } catch(error){
+            } catch (error) {
                 throw new Error(`Failed to delete file: ${file.file_name}`)
             }
         }

@@ -33,7 +33,7 @@ export class Review {
     reply: Reply
 
     @OneToMany(() => File, (file) => file.review)
-    files: File[];
+    files: File[]
 
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()

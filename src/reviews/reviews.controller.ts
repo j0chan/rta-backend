@@ -82,10 +82,10 @@ export class ReviewsController {
 
         const user_id = req.user.user_id
 
-        this.logger.log(`readMyReviews END`)
         const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
         const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
 
+        this.logger.log(`readMyReviews END`)
         return new ApiResponseDTO(true, HttpStatus.OK, 'My Reviews Retrieved Successfully', readReviewDTOs)
     }
 
@@ -107,7 +107,7 @@ export class ReviewsController {
         }
 
         await this.reviewsService.updateReviewByReviewId(review_id, updateReviewDTO)
-        
+
         this.logger.log(`updateReviewByReviewId END`)
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
@@ -137,7 +137,7 @@ export class ReviewsController {
         }
 
         await this.reviewsService.deleteReviewById(review_id)
-        
+
         this.logger.log(`deleteReviewByReviewId END`)
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully')
     }

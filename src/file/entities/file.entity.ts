@@ -15,11 +15,11 @@ export class File {
     @Column()
     url: string
 
-    @Column({type: 'enum', enum: UploadType, default: UploadType.UNCATEGORIZED})
+    @Column({ type: 'enum', enum: UploadType, default: UploadType.UNCATEGORIZED })
     upload_type: UploadType
 
     // 확장자(mime)
-    @Column() 
+    @Column()
     content_type: string
 
     @CreateDateColumn()
@@ -27,5 +27,5 @@ export class File {
 
     @ManyToOne(() => Review, (review) => review.files)
     @JoinColumn({ name: "review_id" })
-    review: Review;
+    review: Review
 }
