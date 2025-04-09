@@ -48,7 +48,9 @@ export class FileService {
             for (const file of files) {
                 // uuid를 통해 파일명 중복을 방지
                 const uuid = uuidv4()
-                const originalName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')
+                const originalName = file.originalname
+                    .replace(/[^a-zA-Z0-9._-]/g, '_')  // 허용되지 않는 문자를 '_'로
+                    .replace(/_+/g, '_')               // 연속된 '_'를 하나로 압축
                 // s3에 저장될 최종 파일 이름
                 const filename = `${uuid}_${originalName}`
 
@@ -62,7 +64,7 @@ export class FileService {
                 await this.s3Client.send(new PutObjectCommand(uploadParams))
 
                 const region = process.env.AWS_REGION
-                
+
                 // DB에 저장할 url 생성
                 const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${filename}`
                 // DB에 저장
