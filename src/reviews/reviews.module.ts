@@ -10,8 +10,7 @@ import { FileModule } from 'src/file/file.module'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Review]),
-        TypeOrmModule.forFeature([File]),
+        TypeOrmModule.forFeature([Review, File]),
         StoresModule,
         UsersModule,
         FileModule
