@@ -12,7 +12,7 @@ import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
 
 @Controller('api/replies')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class RepliesController {
     constructor(private repliesService: RepliesService) { }
 

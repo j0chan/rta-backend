@@ -14,7 +14,7 @@ import { UpdateMenuDTO } from './DTO/update-menu.dto'
 import { StoresService } from 'src/stores/stores.service'
 
 @Controller('api/stores/:store_id/menus')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class MenusController {
     constructor(
         private menusService: MenusService,
