@@ -11,7 +11,7 @@ import { Roles } from "src/common/custom-decorators/roles.decorator"
 import { AuthenticatedRequest } from "src/auth/interfaces/authenticated-request.interface"
 
 @Controller('api/store-requests')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class StoreRequestsController {
     constructor(private storeRequestsService: StoreRequestsService) { }
 

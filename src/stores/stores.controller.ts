@@ -13,7 +13,7 @@ import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.
 import { Store } from './entities/store.entity'
 
 @Controller('api/stores')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class StoresController {
     constructor(private storesService: StoresService) { }
 

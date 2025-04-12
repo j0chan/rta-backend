@@ -4,12 +4,14 @@ import { CreateUserDTO } from 'src/users/DTO/create-user.dto'
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { SignInDTO } from './DTO/sign-in.dto'
 import { Response } from 'express'
+import { Public } from 'src/common/custom-decorators/public.decorator'
 
 @Controller('api/auth')
 export class AuthController {
     constructor(private authService: AuthService) { }
 
     // Sign-Up
+    @Public()
     @Post('/signup')
     async singUp(
         @Body() createUserDTO: CreateUserDTO
@@ -20,6 +22,7 @@ export class AuthController {
     }
 
     // Sign-In
+    @Public()
     @Post('/signin')
     async singIn(
         @Body() signInDTO: SignInDTO,

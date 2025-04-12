@@ -9,6 +9,7 @@ import { Roles } from 'src/common/custom-decorators/roles.decorator'
 import { UserRole } from './entities/user-role.enum'
 import { AuthGuard } from '@nestjs/passport'
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
+import { Public } from 'src/common/custom-decorators/public.decorator'
 
 @Controller('api/users')
 export class UsersController {
@@ -16,7 +17,7 @@ export class UsersController {
 
     // READ - 모든 유저 정보 조회
     @Get('/')
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.ADMIN)
     async readAllUsers(): Promise<ApiResponseDTO<ReadUserDTO[]>> {
         const users: User[] = await this.usersService.readAllUsers()
@@ -26,6 +27,7 @@ export class UsersController {
     }
 
     // READ - 이메일 중복 검사
+    @Public()
     @Get('/check-email')
     async readEmailExists(
         @Query('email') email: string
@@ -36,7 +38,7 @@ export class UsersController {
 
     // READ - 내 정보 조회
     @Get('/my')
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
     async readUserById(
         @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<ReadUserDTO>> {
@@ -51,7 +53,7 @@ export class UsersController {
 
     // UPDATE - by user_id
     @Put('/')
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.USER, UserRole.MANAGER)
     async updateUserById(
         @Req() req: AuthenticatedRequest,
@@ -66,7 +68,7 @@ export class UsersController {
 
     // DELETE - 탈퇴
     @Delete('/')
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.USER, UserRole.MANAGER)
     async deleteUserById(
         @Req() req: AuthenticatedRequest

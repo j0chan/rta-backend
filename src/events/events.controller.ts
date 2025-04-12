@@ -12,7 +12,7 @@ import { ReadEventDTO } from './DTO/read-event.dto'
 import { StoresService } from 'src/stores/stores.service'
 
 @Controller('api/stores/:store_id/events')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class EventsController {
     constructor(
         private eventsService: EventsService,

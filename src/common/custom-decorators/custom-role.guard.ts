@@ -3,12 +3,23 @@ import { Reflector } from "@nestjs/core";
 import { UserRole } from "src/users/entities/user-role.enum";
 import { User } from "src/users/entities/user.entity";
 import { ROLES_KEY } from "./roles.decorator";
+import { IS_PUBLIC_KEY } from "./public.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private reflector: Reflector) { }
 
     canActivate(context: ExecutionContext): boolean {
+        // public으로 설정된 경우 인증/권한 검사 생략
+        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ])
+
+        if (isPublic) {
+            return true
+        }
+
         // 핸들러 또는 클래스에 설정된 역할 가져오기
         const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [
             context.getHandler(),

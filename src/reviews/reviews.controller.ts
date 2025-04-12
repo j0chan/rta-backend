@@ -13,7 +13,7 @@ import { CreateReviewDTO } from './DTO/create-review.dto'
 import { FilesInterceptor } from '@nestjs/platform-express'
 
 @Controller('api/stores/:store_id/reviews')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ReviewsController {
     private readonly logger = new Logger(ReviewsController.name)
 
