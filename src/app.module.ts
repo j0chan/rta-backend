@@ -6,7 +6,6 @@ import { ReviewsModule } from './reviews/reviews.module'
 import { typeOrmConfig } from './config/typeorm.config'
 import { MapsModule } from './maps/maps.module'
 import { OpenaiModule } from './openai/openai.module'
-import { StoreRequestsModule } from './store-requests/store-requests.module'
 import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
@@ -25,7 +24,6 @@ import { RolesGuard } from './common/custom-decorators/custom-role.guard'
     MapsModule,
     ReviewsModule,
     OpenaiModule,
-    StoreRequestsModule,
     ManagerRequestsModule,
     RepliesModule,
     AuthModule,

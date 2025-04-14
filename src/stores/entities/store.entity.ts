@@ -1,6 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Review } from "src/reviews/entites/review.entity"
-import { StoreRequest } from "../../store-requests/entities/store-request.entity"
 import { ManagerRequest } from "src/manager-requests/entities/manager-requests.entity"
 import { User } from "src/users/entities/user.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
@@ -51,9 +50,6 @@ export class Store {
 
     @OneToMany(() => Event, (event) => event.store)
     events: Event[]
-
-    @OneToOne(() => StoreRequest)
-    storeRequest: StoreRequest
 
     @OneToMany(() => ManagerRequest, (managerRequest) => managerRequest.store)
     managerRequest: ManagerRequest[]

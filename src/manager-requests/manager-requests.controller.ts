@@ -111,7 +111,7 @@ export class ManagerRequestsController {
         const foundRequest = await this.managerRequestsService.readManagerRequestById(request_id)
 
         if (foundRequest.user.user_id !== req.user.user_id) {
-            throw new ForbiddenException('You Can Only Delete Your Own Store Request.')
+            throw new ForbiddenException('You Can Only Delete Your Own Manager Request.')
         }
 
         await this.managerRequestsService.deleteManagerRequest(request_id)
