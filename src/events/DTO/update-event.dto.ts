@@ -1,3 +1,4 @@
+import { Type } from "class-transformer"
 import { IsBoolean, IsDate, IsNotEmpty, IsString } from "class-validator"
 
 export class UpdateEventDTO {
@@ -10,10 +11,12 @@ export class UpdateEventDTO {
     description: string
 
     @IsNotEmpty()
+    @Type(() => Date)
     @IsDate()
     start_date: Date
 
     @IsNotEmpty()
+    @Type(() => Date)
     @IsDate()
     end_date: Date
 
