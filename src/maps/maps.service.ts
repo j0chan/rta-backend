@@ -18,6 +18,12 @@ export class MapsService {
 
     // 클라이언트 ID 반환
     getClientId() {
+        /* 에러 점검 */
+        console.log('process.env.MAP_CLIENT_ID: ', this.MAP_CLIENT_ID)
+        console.log('process.env.MAP_CLIENT_SECRET: ', this.MAP_CLIENT_SECRET)
+        console.log('process.env.MAP_SERVICE_ID: ', this.MAP_SERVICE_ID)
+        console.log('process.env.MAP_SERVICE_SECRET: ', this.MAP_SERVICE_SECRET)
+
         return { clientId: this.MAP_CLIENT_ID }
     }
 

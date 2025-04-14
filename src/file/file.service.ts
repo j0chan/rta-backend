@@ -30,6 +30,12 @@ export class FileService {
         const region = process.env.AWS_REGION
         this.bucketName = String(process.env.AWS_S3_BUCKET)
 
+        /* 에러 점검*/
+        console.log('AWS_S3_ACCESS_KEY:', process.env.AWS_S3_ACCESS_KEY)
+        console.log('AWS_S3_SECRET_ACCESS_KEY:', process.env.AWS_S3_SECRET_ACCESS_KEY)
+        console.log('AWS_REGION:', process.env.AWS_REGION)
+        console.log('AWS_S3_BUCKET:', process.env.AWS_S3_BUCKET)
+
         if (!accessKeyId || !secretAccessKey || !region || !this.bucketName) {
             throw new Error('Missing AWS S3 environment variables')
         }
