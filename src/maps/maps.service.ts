@@ -119,26 +119,30 @@ export class MapsService {
                         WHEN longitude BETWEEN 100000000 AND 999999999 THEN longitude / 1000000
                         WHEN longitude BETWEEN 1000000000 AND 9999999999 THEN longitude / 10000000
                         ELSE NULL
-                        END AS lon
+                        END AS lon,
+                        category_id
                     FROM store
                     WHERE latitude IS NOT NULL AND longitude IS NOT NULL
                     )
                     SELECT 
-                    store_id,
-                    store_name,
-                    address,
-                    latitude,
-                    longitude,
-                    lat,
-                    lon,
+                    cs.store_id,
+                    cs.store_name,
+                    cs.address,
+                    cs.latitude,
+                    cs.longitude,
+                    cs.lat,
+                    cs.lon,
                     ROUND(
                         6371 * acos(
-                        cos(radians(?)) * cos(radians(lat)) *
-                        cos(radians(lon) - radians(?)) +
-                        sin(radians(?)) * sin(radians(lat))
+                        cos(radians(?)) * cos(radians(cs.lat)) *
+                        cos(radians(cs.lon) - radians(?)) +
+                        sin(radians(?)) * sin(radians(cs.lat))
                         ), 2
-                    ) AS distance_km
-                    FROM converted_store
+                    ) AS distance_km,
+                     cs.category_id,
+                    c.category_name
+                    FROM converted_store cs
+                    JOIN category c ON cs.category_id = c.category_id
                     HAVING distance_km < ?
                     ORDER BY distance_km ASC
                     LIMIT 10
@@ -153,6 +157,8 @@ export class MapsService {
             lat: parseFloat(store.lat),
             lng: parseFloat(store.lon),
             distance: Math.round(store.distance),
+            category_id: store.category_id,
+            category_name: store.category_name,
           }))
       
         } catch (err) {
