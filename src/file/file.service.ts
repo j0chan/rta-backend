@@ -50,13 +50,13 @@ export class FileService {
         })
     }
 
-    // 파일 업로드
+    // public 파일 업로드 (private파일 업로드 기능 추후 구현 필요)
     async uploadImage(
         files: Express.Multer.File[],
         targetEntity: Review | Store | User | Event,
         uploadType: UploadType
     ): Promise<File[]> {
-        this.logger.log(`uploadImage START`)
+        this.logger.log(`uploadFile START`)
 
         const uploadedFiles: File[] = []
 
@@ -70,7 +70,7 @@ export class FileService {
 
                 // S3에 저장될 최종 파일 이름
                 const folderPrefix = this.getFolderByUploadType(uploadType)
-                const s3FileName = `${folderPrefix}/${uuid}${ext}`
+                const s3FileName = `public/${folderPrefix}/${uuid}${ext}`
 
                 // S3에 업로드 할 객체
                 const uploadParams = {
@@ -84,7 +84,7 @@ export class FileService {
                 const region = process.env.AWS_REGION
 
                 // DB에 저장할 url / 파일명(한글깨짐) 생성
-                const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${s3FileName}`
+                const url = `${process.env.AWS_CLOUDFRONT_DOMAIN}/${s3FileName}`
                 const dbFileName = file.originalname
 
                 // DB에 저장
@@ -117,17 +117,17 @@ export class FileService {
                 uploadedFiles.push(savedFile)
             }
         } catch (error) {
-            this.logger.error('Error uploading images:', error)
-            throw new Error('Failed to upload images')
+            this.logger.error('Error uploading files:', error)
+            throw new Error('Failed to upload files')
         }
 
-        this.logger.log(`uploadImage END`)
+        this.logger.log(`uploadFile END`)
         return uploadedFiles
     }
 
     // 파일 삭제
     async deleteImage(file_name: string): Promise<string> {
-        this.logger.log(`deleteImage START`)
+        this.logger.log(`deleteFile START`)
 
         const deleteParams = {
             Bucket: this.bucketName,
@@ -139,7 +139,7 @@ export class FileService {
         // DB에서 삭제
         await this.fileRepository.delete({ file_name })
 
-        this.logger.log(`deleteImage END`)
+        this.logger.log(`deleteFile END`)
         return `File ${file_name} deleted successfully`
     }
 
