@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class UpdateStoreDetailDTO {
     @IsNotEmpty()
@@ -17,7 +17,7 @@ export class UpdateStoreDetailDTO {
     @IsString()
     contact_number: string
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     description: string
 }
