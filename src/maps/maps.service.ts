@@ -160,11 +160,13 @@ export class MapsService {
             store_id: store.store_id,
             store_name: store.store_name,
             address: store.address,
-            lat: parseFloat(store.lat),
-            lng: parseFloat(store.lon),
+            latitude: parseFloat(store.lat),
+            longitude: parseFloat(store.lon),
             distance: Math.round(store.distance),
-            category_id: store.category_id,
-            category_name: store.category_name,
+            category: {
+                category_id: store.category_id,
+                category_name: store.category_name
+            }
           }))
       
         } catch (err) {
