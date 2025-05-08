@@ -11,6 +11,7 @@ import { UserRole } from 'src/users/entities/user-role.enum'
 import { Roles } from 'src/common/custom-decorators/roles.decorator'
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
 import { Store } from './entities/store.entity'
+import { Public } from 'src/common/custom-decorators/public.decorator'
 
 @Controller('api/stores')
 // @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -46,6 +47,7 @@ export class StoresController {
     }
 
     // READ - 모든 가게 조회
+    @Public()
     @Get('/')
     async readAllStores(@Query('category_id') category_id: number, @Query('keyword') keyword: string): Promise<ApiResponseDTO<ReadStoreDTO[]>> {
         var stores: Store[] = []
