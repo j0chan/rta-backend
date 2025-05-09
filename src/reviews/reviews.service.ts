@@ -28,7 +28,8 @@ export class ReviewsService {
     async createReview(
         store_id: number,
         user_id: number,
-        createReviewDTO: CreateReviewDTO, files: Express.Multer.File[]
+        createReviewDTO: CreateReviewDTO,
+        files: Express.Multer.File[]
     ): Promise<Review> {
         this.logger.log(`createReview START`)
         const { content } = createReviewDTO

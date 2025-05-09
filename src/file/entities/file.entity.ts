@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { UploadType } from "./upload-type.enum"
 import { Review } from "src/reviews/entites/review.entity"
+import { User } from "src/users/entities/user.entity"
 
 @Entity()
 export class File {
@@ -28,4 +29,8 @@ export class File {
     @ManyToOne(() => Review, (review) => review.files)
     @JoinColumn({ name: "review_id" })
     review: Review
+
+    @OneToOne(()=>User, (user)=>user.file)
+    @JoinColumn({name: "user_id"})
+    user: User
 }

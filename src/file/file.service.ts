@@ -50,7 +50,7 @@ export class FileService {
         })
     }
 
-    // public 파일 업로드 (private파일 업로드 기능 추후 구현 필요)
+    // public 파일 업로드
     async uploadImage(
         files: Express.Multer.File[],
         targetEntity: Review | Store | User | Event,
@@ -102,9 +102,9 @@ export class FileService {
                     // case UploadType.STORE_PROFILE:
                     //     fileData.store = targetEntity as Store
                     //     break
-                    // case UploadType.USER_PROFILE:
-                    //     fileData.user = targetEntity as User
-                    //     break
+                    case UploadType.PROFILE_IMG:
+                        fileData.user = targetEntity as User
+                        break
                     // case UploadType.EVENT_IMAGE:
                     //     fileData.event = targetEntity as Event
                     //     break
@@ -147,8 +147,8 @@ export class FileService {
         switch (uploadType) {
             case UploadType.REVIEW_IMAGE:
                 return 'review'
-            case UploadType.USER_PROFILE:
-                return 'user_profile'
+            case UploadType.PROFILE_IMG:
+                return 'profile_img'
             case UploadType.STORE_PROFILE:
                 return 'store'
             case UploadType.EVENT_IMAGE:
@@ -156,5 +156,18 @@ export class FileService {
             default:
                 return 'etc'
         }
+    }
+
+    async createDefaultProfileImage(user: User): Promise<File> {
+        const defaultFile: Partial<File> = {
+            file_name: 'default-profile.jpg',
+            url: 'https://team-201.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg',
+            content_type: 'image/jpg',
+            upload_type: UploadType.PROFILE_IMG,
+            user: user
+        }
+
+        const fileEntity = this.fileRepository.create(defaultFile)
+        return await this.fileRepository.save(fileEntity)
     }
 }

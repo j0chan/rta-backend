@@ -42,6 +42,6 @@ export class User {
     @OneToMany(() => Favorite, (favorite) => favorite.user)
     favorites: Favorite[]
 
-    @OneToOne(() => File, { nullable: true })
-    profile_image: File
+    @OneToOne(() => File, (file) => file.user, { eager: true })
+    file: File
 }
