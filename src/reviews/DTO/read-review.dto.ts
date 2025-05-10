@@ -6,7 +6,7 @@ export class ReadReviewDTO {
     review_id: number
     user_name: string
     user: {
-        user_id: number
+        id: number
         nickname: string
         profile_image: {
             url: string
@@ -24,10 +24,10 @@ export class ReadReviewDTO {
         this.review_id = review.review_id
         this.user_name = review.user.nickname
         this.user = {
-            user_id: review.user.user_id,
+            id: review.user.user_id,
             nickname: review.user.nickname,
             profile_image: {
-                url: review.user.file?.url || '',
+                url: review.user.profile_image?.url || '',
             }
         }
         this.store_name = review.store.store_name

@@ -43,5 +43,5 @@ export class User {
     favorites: Favorite[]
 
     @OneToOne(() => File, (file) => file.user, { eager: true })
-    file: File
+    profile_image: File
 }

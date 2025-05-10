@@ -30,6 +30,7 @@ export class FileService {
         const region = process.env.AWS_REGION
         this.bucketName = String(process.env.AWS_S3_BUCKET)
 
+        https://
         /* 에러 점검*/
         console.log('AWS_S3_ACCESS_KEY:', process.env.AWS_S3_ACCESS_KEY)
         console.log('AWS_S3_SECRET_ACCESS_KEY:', process.env.AWS_S3_SECRET_ACCESS_KEY)
@@ -84,7 +85,7 @@ export class FileService {
                 const region = process.env.AWS_REGION
 
                 // DB에 저장할 url / 파일명(한글깨짐) 생성
-                const url = `${process.env.AWS_CLOUDFRONT_DOMAIN}/${s3FileName}`
+                const url = `${process.env.AWS_DOMAIN}/${s3FileName}`
                 const dbFileName = file.originalname
 
                 // DB에 저장
@@ -124,6 +125,43 @@ export class FileService {
         this.logger.log(`uploadFile END`)
         return uploadedFiles
     }
+
+    async updateUserProfileImage(
+        newFile: Express.Multer.File,
+        user: User
+    ): Promise<File> {
+        this.logger.log('updateUserProfileImage START');
+    
+        // 1. 기존 프로필 이미지 조회
+        const existingFile = await this.fileRepository.findOne({
+            where: {
+                user: { user_id: user.user_id },
+                upload_type: UploadType.PROFILE_IMG
+            },
+            relations: ['user']
+        });
+    
+        // 2. 기존 이미지가 있다면 삭제
+        if (existingFile) {
+            const isDefault = existingFile.file_name.includes('default-profile');
+    
+            if (!isDefault) {
+                // S3에서 삭제
+                const s3Key = existingFile.url.split('.com/')[1];
+                await this.deleteImage(s3Key);
+            }
+    
+            // DB에서도 삭제 (default든 아니든)
+            await this.fileRepository.delete({ file_id: existingFile.file_id });
+        }
+    
+        // 3. 새로운 이미지 업로드
+        const uploaded = await this.uploadImage([newFile], user, UploadType.PROFILE_IMG);
+        
+        this.logger.log('updateUserProfileImage END');
+        return uploaded[0];
+    }
+    
 
     // 파일 삭제
     async deleteImage(file_name: string): Promise<string> {

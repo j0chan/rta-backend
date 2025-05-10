@@ -18,6 +18,6 @@ export class ReadUserDTO {
         this.phone_number = user.phone_number
         this.role = user.role
         this.created_at = user.created_at
-        this.profile_image = user.file.url
+        this.profile_image = user.profile_image.url
     }
 }

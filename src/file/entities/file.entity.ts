@@ -30,7 +30,7 @@ export class File {
     @JoinColumn({ name: "review_id" })
     review: Review
 
-    @OneToOne(()=>User, (user)=>user.file)
+    @OneToOne(()=>User, (user)=>user.profile_image)
     @JoinColumn({name: "user_id"})
     user: User
 }

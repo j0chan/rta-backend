@@ -74,13 +74,19 @@ export class UsersService {
     }
 
     // UPDATE - 내 정보 수정
-    async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO) {
+    async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO, file?: Express.Multer.File) {
         const foundUser = await this.readUserById(user_id)
 
         const { password, nickname } = updateUserDTO
 
         foundUser.password = password
         foundUser.nickname = nickname
+
+        if (file) {
+            const uploadedFile = await this.fileService.updateUserProfileImage(file, foundUser)
+
+            foundUser.profile_image = uploadedFile
+        }
 
         await this.usersRepository.save(foundUser)
     }
