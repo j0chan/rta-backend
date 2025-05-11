@@ -52,10 +52,10 @@ export class AuthService {
                 user_id: existingUser.user_id,
                 email: existingUser.email,
                 nickname: existingUser.nickname,
-                role: existingUser.role
+                role: existingUser.role,
+                profile_image: existingUser.profile_image.url
             }
             const accessToken = await this.jwtService.sign(payload)
-
             return accessToken
         } catch {
             throw error

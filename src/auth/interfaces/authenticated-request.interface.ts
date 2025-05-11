@@ -5,5 +5,6 @@ export interface AuthenticatedRequest extends Request {
         user_id: number
         email: string
         role: UserRole
+        profile_image: string
     }
 }
