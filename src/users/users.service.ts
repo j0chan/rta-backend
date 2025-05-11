@@ -4,6 +4,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { Repository } from 'typeorm'
+import { FileService } from 'src/file/file.service'
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,7 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private fileService: FileService,
     ) { }
 
     // CREATE - 회원가입
@@ -27,6 +29,8 @@ export class UsersService {
         })
 
         const createdUser = await this.usersRepository.save(newUser)
+
+        await this.fileService.createDefaultProfileImage(createdUser)
 
         return createdUser
     }
@@ -70,13 +74,19 @@ export class UsersService {
     }
 
     // UPDATE - 내 정보 수정
-    async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO) {
+    async updateUserById(user_id: number, updateUserDTO: UpdateUserDTO, file?: Express.Multer.File) {
         const foundUser = await this.readUserById(user_id)
 
         const { password, nickname } = updateUserDTO
 
         foundUser.password = password
         foundUser.nickname = nickname
+
+        if (file) {
+            const uploadedFile = await this.fileService.updateUserProfileImage(file, foundUser)
+
+            foundUser.profile_image = uploadedFile
+        }
 
         await this.usersRepository.save(foundUser)
     }

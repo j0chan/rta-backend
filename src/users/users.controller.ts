@@ -1,6 +1,6 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { UsersService } from './users.service'
-import { Body, Controller, Delete, Get, HttpStatus, Put, Query, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { User } from './entities/user.entity'
 import { ReadUserDTO } from './DTO/read-user.dto'
 import { UpdateUserDTO } from './DTO/update-user.dto'
@@ -10,6 +10,7 @@ import { UserRole } from './entities/user-role.enum'
 import { AuthGuard } from '@nestjs/passport'
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface'
 import { Public } from 'src/common/custom-decorators/public.decorator'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 @Controller('api/users')
 export class UsersController {
@@ -54,14 +55,16 @@ export class UsersController {
     // UPDATE - by user_id
     @Put('/')
     // @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @UseInterceptors(FileInterceptor('profile_image'))
     @Roles(UserRole.USER, UserRole.MANAGER)
     async updateUserById(
         @Req() req: AuthenticatedRequest,
-        @Body() updateUserDto: UpdateUserDTO
+        @Body() updateUserDTO: UpdateUserDTO,
+        @UploadedFile() profile_image: Express.Multer.File
     ): Promise<ApiResponseDTO<void>> {
         const user_id = req.user.user_id
 
-        await this.usersService.updateUserById(user_id, updateUserDto)
+        await this.usersService.updateUserById(user_id, updateUserDTO, profile_image)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'User Updated Successfully')
     }
