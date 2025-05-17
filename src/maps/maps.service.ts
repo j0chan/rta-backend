@@ -233,4 +233,53 @@ export class MapsService {
     //         throw new Error('음식점 정보를 가져오는 데 실패했습니다.')
     //     }
     // }
+
+    // 추천 키워드 기반 외부 장소 검색 후 DB와 매칭
+    async findNearbyMatchedAndExternalStores(keyword: string, lat: number, lng: number): Promise<{
+        matchedStores: Store[],
+        externalPlaces: any[] // 또는 NaverPlaceDto 형식으로 타입 지정 가능
+    }> {
+        const allStores = await this.storeRepository.find();
+        const matched: Store[] = [];
+
+        const response = await axios.get('https://openapi.naver.com/v1/search/local.json', {
+            headers: {
+                'X-Naver-Client-Id': this.MAP_SERVICE_ID,
+                'X-Naver-Client-Secret': this.MAP_SERVICE_SECRET,
+            },
+            params: {
+                query: keyword,
+                display: 5,
+                sort: 'random'
+            }
+        });
+
+        const items = response.data.items;
+
+        for (const place of items) {
+            const title = place.title.replace(/<[^>]*>/g, '').trim();
+            const phone = place.telephone?.replace(/[^0-9]/g, '');
+
+            const match = allStores.find(store => {
+                const storePhone = store.contact_number?.replace(/[^0-9]/g, '');
+                return (
+                    (phone && storePhone && phone === storePhone) ||
+                    store.store_name === title ||
+                    (place.address && store.address.includes(place.address))
+                );
+            });
+
+            if (match && !matched.includes(match)) {
+                matched.push(match);
+            }
+        }
+
+        const result = {
+            matchedStores: matched,
+            externalPlaces: items
+        };
+        console.log('최종 반환값:', result);
+        return result;
+    }
+
 }
