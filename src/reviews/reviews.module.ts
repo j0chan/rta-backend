@@ -7,6 +7,7 @@ import { StoresModule } from 'src/stores/stores.module'
 import { UsersModule } from 'src/users/users.module'
 import { File } from 'src/file/entities/file.entity'
 import { FileModule } from 'src/file/file.module'
+import { MyReviewsController } from './my-reviews.controller'
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import { FileModule } from 'src/file/file.module'
         FileModule
     ],
     providers: [ReviewsService],
-    controllers: [ReviewsController],
+    controllers: [ReviewsController, MyReviewsController],
     exports: [ReviewsService]
 })
 export class ReviewsModule { }

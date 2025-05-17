@@ -71,23 +71,23 @@ export class ReviewsController {
         return new ApiResponseDTO(true, HttpStatus.OK, 'Successfully Retrieved Review!', foundReview)
     }
 
-    // READ - 나의 리뷰 조회
-    @Get('/my-reviews')
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(UserRole.USER)
-    async readMyReviews(
-        @Req() req: AuthenticatedRequest
-    ): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
-        this.logger.log(`readMyReviews START`)
+    // READ - 나의 리뷰 조회 [별도의 컨트롤러 생성]
+    // @Get('/my-reviews')
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @Roles(UserRole.USER)
+    // async readMyReviews(
+    //     @Req() req: AuthenticatedRequest
+    // ): Promise<ApiResponseDTO<ReadReviewDTO[]>> {
+    //     this.logger.log(`readMyReviews START`)
 
-        const user_id = req.user.user_id
+    //     const user_id = req.user.user_id
 
-        const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
-        const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
+    //     const foundReviews = await this.reviewsService.readReviewsByUser(user_id)
+    //     const readReviewDTOs = foundReviews.map((review) => new ReadReviewDTO(review))
 
-        this.logger.log(`readMyReviews END`)
-        return new ApiResponseDTO(true, HttpStatus.OK, 'My Reviews Retrieved Successfully', readReviewDTOs)
-    }
+    //     this.logger.log(`readMyReviews END`)
+    //     return new ApiResponseDTO(true, HttpStatus.OK, 'My Reviews Retrieved Successfully', readReviewDTOs)
+    // }
 
     // UPDATE[1] - 본인 리뷰 수정
     @Put('/:review_id')

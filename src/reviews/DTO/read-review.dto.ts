@@ -4,7 +4,7 @@ import { File } from "src/file/entities/file.entity" // File 엔티티 import
 
 export class ReadReviewDTO {
     review_id: number
-    user_name: string
+    // user_name: string
     user: {
         id: number
         nickname: string
@@ -22,7 +22,7 @@ export class ReadReviewDTO {
 
     constructor(review: Review) {
         this.review_id = review.review_id
-        this.user_name = review.user.nickname
+        // this.user_name = review.user.nickname
         this.user = {
             id: review.user.user_id,
             nickname: review.user.nickname,
