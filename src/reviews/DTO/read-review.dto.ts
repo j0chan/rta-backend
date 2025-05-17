@@ -12,7 +12,10 @@ export class ReadReviewDTO {
             url: string
         }
     }
-    store_name: string
+    store: {
+        store_id: number
+        store_name: string
+    }
     content: string
     helpful_count: number
     reply?: ReadReplyDTO
@@ -30,7 +33,10 @@ export class ReadReviewDTO {
                 url: review.user.profile_image?.url || '',
             }
         }
-        this.store_name = review.store.store_name
+        this.store = {
+            store_id: review.store.store_id,
+            store_name: review.store.store_name
+        }
         this.content = review.content
         this.helpful_count = review.helpful_count
         this.reply = review.reply ? new ReadReplyDTO(review.reply) : undefined
