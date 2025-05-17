@@ -4,7 +4,7 @@ import { File } from "src/file/entities/file.entity" // File 엔티티 import
 
 export class ReadReviewDTO {
     review_id: number
-    user_name: string
+    // user_name: string
     user: {
         id: number
         nickname: string
@@ -12,7 +12,10 @@ export class ReadReviewDTO {
             url: string
         }
     }
-    store_name: string
+    store: {
+        store_id: number
+        store_name: string
+    }
     content: string
     helpful_count: number
     reply?: ReadReplyDTO
@@ -22,7 +25,7 @@ export class ReadReviewDTO {
 
     constructor(review: Review) {
         this.review_id = review.review_id
-        this.user_name = review.user.nickname
+        // this.user_name = review.user.nickname
         this.user = {
             id: review.user.user_id,
             nickname: review.user.nickname,
@@ -30,7 +33,10 @@ export class ReadReviewDTO {
                 url: review.user.profile_image?.url || '',
             }
         }
-        this.store_name = review.store.store_name
+        this.store = {
+            store_id: review.store.store_id,
+            store_name: review.store.store_name
+        }
         this.content = review.content
         this.helpful_count = review.helpful_count
         this.reply = review.reply ? new ReadReplyDTO(review.reply) : undefined
