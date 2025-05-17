@@ -3,6 +3,7 @@ import { MapsService } from './maps.service'
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'
 import { AuthGuard } from '@nestjs/passport'
 import { Public } from 'src/common/custom-decorators/public.decorator'
+import { Store } from 'src/stores/entities/store.entity'
 
 @Controller('api/maps')
 // @UseGuards(AuthGuard('jwt'), RolesGuard) // JWT인증, roles guard 적용
@@ -61,4 +62,23 @@ export class MapsController {
 
     //     return await this.mapsService.getNearbyStores(parseFloat(lat), parseFloat(lng))
     // }
+
+    // 네이버 장소 검색 + DB 매칭
+    @Public()
+    @Get('naver-match')
+    async getMatchedStoresFromNaver(
+        @Query('keyword') keyword: string,
+        @Query('lat') lat: string,
+        @Query('lng') lng: string,
+    ) {
+        const latNum = parseFloat(lat);
+        const lngNum = parseFloat(lng);
+
+        if (!keyword || isNaN(latNum) || isNaN(lngNum)) {
+            throw new Error('keyword, lat, lng 모두 필요합니다.');
+        }
+
+        return await this.mapsService.findNearbyMatchedAndExternalStores(keyword, latNum, lngNum);
+    }
+
 }
