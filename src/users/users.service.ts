@@ -40,8 +40,8 @@ export class UsersService {
         this.logger.log("readUserById Start")
 
         const foundUsers: User[] = await this.usersRepository.find()
-        if (!foundUsers) {
-            throw new NotFoundException("No Users Found")
+        if (foundUsers.length === 0) {
+            throw new NotFoundException("Cannot Find Any User")
         }
 
         return foundUsers
