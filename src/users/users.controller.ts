@@ -1,9 +1,12 @@
-import { Body, Controller, Get, HttpStatus, Logger, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Logger, Put, Query, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiResponseDTO } from 'src/common/api-response-DTO/api-response.dto';
 import { ReadUserDTO } from './DTO/read-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserDTO } from './DTO/update-user.dto';
+import { Roles } from 'src/common/custom-decorators/roles.decorator';
+import { UserRole } from './entities/user-role.enum';
+import { Public } from 'src/common/custom-decorators/public.decorator';
 
 @Controller('api/users')
 export class UsersController {
@@ -13,7 +16,7 @@ export class UsersController {
 
     // READ[1] - 모든 유저 정보 조회
     @Get('/')
-    // @Roles(UserRole.admin)
+    @Roles(UserRole.ADMIN)
     async readAllUsers(): Promise<ApiResponseDTO<ReadUserDTO[]>> {
         this.logger.log("readAllUsers Start")
 
@@ -24,6 +27,7 @@ export class UsersController {
     }
 
     // READ[2] - 로그인된 유저 정보 조회
+    @Public()
     @Get('/my')
     async readUserById(
         // @Req() req: AuthenticatedRequest
@@ -39,7 +43,7 @@ export class UsersController {
     }
 
     // READ[3] - 이메일 중복 검사
-    // @Public()
+    @Public()
     @Get('/check-email')
     async readEmailExists(
         @Query('email') email: string
@@ -54,7 +58,7 @@ export class UsersController {
     // UPDATE - 로그인된 유저 정보 수정
     @Put('/')
     // @UseInterceptors(FileInterceptor('profile_image'))
-    // @Roles(UserRole.USER, UserRole.Manager)
+    @Roles(UserRole.USER, UserRole.MANAGER)
     async updateUserById(
         // @Req() req: AuthenticatedRequest,
         @Body() updateUserDTO: UpdateUserDTO,
@@ -70,7 +74,7 @@ export class UsersController {
     }
 
     // DELETE - 로그인된 유저 탈퇴
-    // @Roles(UserRole.USER, UserRole.MANAGER)
+    @Roles(UserRole.USER, UserRole.MANAGER)
     async deleteUserById(
         // @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<void>> {
