@@ -1,7 +1,7 @@
 ---
 name: RTA issue template
 about: RTA's issue template.
-title: ''
+title: "[tag] issue"
 labels: ''
 assignees: ''
 
