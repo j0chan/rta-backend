@@ -5,11 +5,12 @@ import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
 import { File } from 'src/file/entities/file.entity'
 import { FileModule } from 'src/file/file.module'
+import { UserPoint } from './entities/user-point.entity'
 
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, File]),
+        TypeOrmModule.forFeature([User, File, UserPoint]),
         FileModule
     ],
     providers: [UsersService],
