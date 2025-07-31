@@ -3,10 +3,10 @@ import { PointsService } from './points.service';
 import { Roles } from 'src/common/custom-decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user-role.enum';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
-import { EarnPointDTO } from './DTO/earn-point.dto';
+import { EarnPointDTO } from './DTO/update-earnpoint.dto';
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
 import { PointTransaction } from './entities/point-transaction.entity';
-import { UsePointDTO } from './DTO/use-point.dot';
+import { UsePointDTO } from './DTO/update-usepoint.dot';
 
 @Controller('api/points')
 export class PointsController {
