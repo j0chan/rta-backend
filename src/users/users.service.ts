@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { Repository } from 'typeorm'
 import { FileService } from 'src/file/file.service'
-import { UserPoint } from './entities/user-point.entity'
 
 @Injectable()
 export class UsersService {
@@ -14,9 +13,6 @@ export class UsersService {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
         private fileService: FileService,
-        
-        @InjectRepository(UserPoint)
-        private userPointRepository: Repository<UserPoint>,
     ) { }
 
     // CREATE - 회원가입
@@ -35,12 +31,6 @@ export class UsersService {
         const createdUser = await this.usersRepository.save(newUser)
 
         await this.fileService.createDefaultProfileImage(createdUser)
-
-        const userPoint = this.userPointRepository.create({
-            user: createdUser,
-            balance: 0
-        });
-        await this.userPointRepository.save(userPoint);
 
         return createdUser
     }

@@ -19,12 +19,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     // [5] JWT에서 사용자 정보 가져오기
     async validate(payload: JwtPayload) {
-        console.log('JWT payload:', payload); 
         const { user_id } = payload
 
         const user: User = await this.usersService.readUserById(user_id)
         if (!user) {
-            console.log('User not found for user_id:', user_id);
             throw new UnauthorizedException("Invalid Token: User Not Found")
         }
 

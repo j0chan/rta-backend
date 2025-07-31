@@ -5,7 +5,6 @@ import { ManagerRequest } from "src/manager-requests/entities/manager-requests.e
 import { Review } from "src/reviews/entites/review.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
 import { File } from "src/file/entities/file.entity"
-import { UserPoint } from "./user-point.entity"
 
 
 @Entity()
@@ -45,7 +44,4 @@ export class User {
 
     @OneToOne(() => File, (file) => file.user, { eager: true })
     profile_image: File
-
-    @OneToOne(() => UserPoint, point => point.user)
-    point: UserPoint;
 }
