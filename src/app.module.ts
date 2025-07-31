@@ -15,6 +15,7 @@ import { EventsModule } from './events/events.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/custom-decorators/jwt-auth.guard'
 import { RolesGuard } from './common/custom-decorators/custom-role.guard'
+import { PointsModule } from './points/points.module'
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RolesGuard } from './common/custom-decorators/custom-role.guard'
     FavoriteModule,
     FileModule,
     EventsModule,
+    PointsModule,
   ],
   providers: [
     {
@@ -40,6 +42,7 @@ import { RolesGuard } from './common/custom-decorators/custom-role.guard'
       provide: APP_GUARD,
       useClass: RolesGuard, // 그 다음 권한
     },
-  ]
+  ],
+  controllers: []
 })
 export class AppModule { }
