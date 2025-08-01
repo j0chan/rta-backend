@@ -6,6 +6,7 @@ import { Review } from "src/reviews/entites/review.entity"
 import { Favorite } from "src/favorites/entites/favorite.entity"
 import { File } from "src/file/entities/file.entity"
 import { UserPoint } from "./user-point.entity"
+import { GiftCardPocket } from "src/gift-cards/entities/gift-card-pocket.entity"
 
 
 @Entity()
@@ -48,4 +49,7 @@ export class User {
 
     @OneToOne(() => UserPoint, point => point.user)
     point: UserPoint;
+
+    @OneToMany(() => GiftCardPocket, pocket => pocket.user)
+    gift_card_pocket: GiftCardPocket[];
 }
