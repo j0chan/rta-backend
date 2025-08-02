@@ -6,11 +6,12 @@ import { UsersController } from './users.controller'
 import { File } from 'src/file/entities/file.entity'
 import { FileModule } from 'src/file/file.module'
 import { UserPoint } from './entities/user-point.entity'
+import { GiftCardPocket } from 'src/gift-cards/entities/gift-card-pocket.entity'
 
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, File, UserPoint]),
+        TypeOrmModule.forFeature([User, File, UserPoint, GiftCardPocket]),
         FileModule
     ],
     providers: [UsersService],

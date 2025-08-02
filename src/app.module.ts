@@ -16,6 +16,7 @@ import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/custom-decorators/jwt-auth.guard'
 import { RolesGuard } from './common/custom-decorators/custom-role.guard'
 import { PointsModule } from './points/points.module'
+import { GiftCardsModule } from './gift-cards/gift-cards.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PointsModule } from './points/points.module'
     FileModule,
     EventsModule,
     PointsModule,
+    GiftCardsModule,
   ],
   providers: [
     {
