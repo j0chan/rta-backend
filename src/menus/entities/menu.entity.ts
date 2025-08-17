@@ -31,5 +31,5 @@ export class Menu {
     store: Store
 
     @OneToOne(() => File, { nullable: true })
-    review_image: File
+    menu_image: File
 }
