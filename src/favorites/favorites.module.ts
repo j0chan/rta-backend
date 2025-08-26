@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { FavoritesService } from './favorites.service'
 import { UsersModule } from 'src/users/users.module'
 import { StoresModule } from 'src/stores/stores.module'
-import { Favorite } from './entites/favorite.entity'
+import { Favorite } from './entities/favorite.entity'
 import { FavoritesController } from './favorites.controller'
 
 @Module({

@@ -1,7 +1,7 @@
 import { UpdateReviewDTO } from './DTO/update-review.dto'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Review } from './entites/review.entity'
+import { Review } from './entities/review.entity'
 import { Repository } from 'typeorm'
 import { CreateReviewDTO } from './DTO/create-review.dto'
 import { StoresService } from 'src/stores/stores.service'

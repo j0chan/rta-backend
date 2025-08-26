@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.
 import { EarnPointDTO } from './DTO/update-earnpoint.dto';
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
 import { PointTransaction } from './entities/point-transaction.entity';
-import { UsePointDTO } from './DTO/update-usepoint.dot';
+import { UsePointDTO } from './DTO/update-usepoint.dto';
 
 @Controller('api/points')
 export class PointsController {

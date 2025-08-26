@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UsersService } from 'src/users/users.service'
 import { StoresService } from 'src/stores/stores.service'
-import { Favorite } from './entites/favorite.entity'
+import { Favorite } from './entities/favorite.entity'
 import { CreateFavoriteDTO } from './DTO/create-favorite.dto'
 
 @Injectable()
