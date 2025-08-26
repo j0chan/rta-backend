@@ -1,5 +1,5 @@
 import { ReadReplyDTO } from "src/replies/DTO/read-reply.dto"
-import { Review } from "../entites/review.entity"
+import { Review } from "../entities/review.entity"
 import { File } from "src/file/entities/file.entity" // File 엔티티 import
 
 export class ReadReviewDTO {

@@ -1,7 +1,7 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewsService } from './reviews.service'
 import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, Logger, Param, Patch, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
-import { Review } from './entites/review.entity'
+import { Review } from './entities/review.entity'
 import { UpdateReviewDTO } from './DTO/update-review.dto'
 import { ReadReviewDTO } from './DTO/read-review.dto'
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard'

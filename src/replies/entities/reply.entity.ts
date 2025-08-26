@@ -1,4 +1,4 @@
-import { Review } from "src/reviews/entites/review.entity"
+import { Review } from "src/reviews/entities/review.entity"
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 

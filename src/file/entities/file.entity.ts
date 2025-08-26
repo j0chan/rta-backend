@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { UploadType } from "./upload-type.enum"
-import { Review } from "src/reviews/entites/review.entity"
+import { Review } from "src/reviews/entities/review.entity"
 import { User } from "src/users/entities/user.entity"
 
 @Entity()

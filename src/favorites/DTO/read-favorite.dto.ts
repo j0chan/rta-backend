@@ -1,4 +1,4 @@
-import { Favorite } from "../entites/favorite.entity"
+import { Favorite } from "../entities/favorite.entity"
 
 export class ReadFavoriteDTO {
     store_id: number
