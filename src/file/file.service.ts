@@ -149,10 +149,9 @@ export class FileService {
                 // S3에서 삭제
                 const s3Key = existingFile.url.split('.com/')[1];
                 await this.deleteImage(s3Key);
+                // DB에서도 삭제 (default가 아닐 때만)
+                await this.fileRepository.delete({ file_id: existingFile.file_id });
             }
-    
-            // DB에서도 삭제 (default든 아니든)
-            await this.fileRepository.delete({ file_id: existingFile.file_id });
         }
     
         // 3. 새로운 이미지 업로드
@@ -199,7 +198,7 @@ export class FileService {
     async createDefaultProfileImage(user: User): Promise<File> {
         const defaultFile: Partial<File> = {
             file_name: 'default-profile.jpg',
-            url: 'https://team-201.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg',
+            url: 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg',
             content_type: 'image/jpg',
             upload_type: UploadType.PROFILE_IMG,
             user: user
