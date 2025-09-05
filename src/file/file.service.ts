@@ -131,30 +131,26 @@ export class FileService {
         user: User
     ): Promise<File> {
         this.logger.log('updateUserProfileImage START');
-    
-        // 1. 기존 프로필 이미지 조회
+
         const existingFile = await this.fileRepository.findOne({
             where: {
                 user: { user_id: user.user_id },
                 upload_type: UploadType.PROFILE_IMG
             },
-            relations: ['user']
         });
-    
-        // 2. 기존 이미지가 있다면 삭제
+
         if (existingFile) {
             const isDefault = existingFile.file_name.includes('default-profile');
-    
+
+            await this.fileRepository.delete(existingFile.file_id);
+
             if (!isDefault) {
-                // S3에서 삭제
                 const s3Key = existingFile.url.split('.com/')[1];
-                await this.deleteImage(s3Key);
-                // DB에서도 삭제 (default가 아닐 때만)
-                await this.fileRepository.delete({ file_id: existingFile.file_id });
+                const deleteParams = { Bucket: this.bucketName, Key: s3Key };
+                await this.s3Client.send(new DeleteObjectCommand(deleteParams));
             }
         }
-    
-        // 3. 새로운 이미지 업로드
+
         const uploaded = await this.uploadImage([newFile], user, UploadType.PROFILE_IMG);
         
         this.logger.log('updateUserProfileImage END');
