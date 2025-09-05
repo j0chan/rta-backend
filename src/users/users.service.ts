@@ -101,7 +101,12 @@ export class UsersService {
         await this.usersRepository.save(foundUser)
     }
 
-    // DELETE
+    // DELETE - 프로필 사진 기본값으로 변경
+    async revertToDefaultProfileImage(user_id: number) {
+        await this.fileService.revertToDefaultProfileImage(user_id)
+    }
+
+    // DELETE - 탈퇴
     async deleteUserById(user_id: number) {
         const foundUser = await this.readUserById(user_id)
 

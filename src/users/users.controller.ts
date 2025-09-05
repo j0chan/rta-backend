@@ -77,9 +77,22 @@ export class UsersController {
         @Req() req: AuthenticatedRequest
     ): Promise<ApiResponseDTO<void>> {
         const user_id = req.user.user_id
-        
+
         await this.usersService.deleteUserById(user_id)
 
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'User Deleted Successfully')
+    }
+
+    // DELETE - 프로필 삭제 (기본값으로)
+    @Delete('/profile-image')
+    @Roles(UserRole.USER, UserRole.MANAGER)
+    async deleteProfileImage(
+        @Req() req: AuthenticatedRequest
+    ): Promise<ApiResponseDTO<void>> {
+        const user_id = req.user.user_id
+        
+        await this.usersService.revertToDefaultProfileImage(user_id)
+
+        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Profile Image Deleted Successfully.')
     }
 }
