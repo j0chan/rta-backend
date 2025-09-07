@@ -130,37 +130,69 @@ export class FileService {
         newFile: Express.Multer.File,
         user: User
     ): Promise<File> {
-        this.logger.log('updateUserProfileImage START');
-    
-        // 1. 기존 프로필 이미지 조회
+        this.logger.log('updateUserProfileImage START')
+
         const existingFile = await this.fileRepository.findOne({
             where: {
                 user: { user_id: user.user_id },
                 upload_type: UploadType.PROFILE_IMG
             },
-            relations: ['user']
-        });
-    
-        // 2. 기존 이미지가 있다면 삭제
+        })
+
         if (existingFile) {
             const isDefault = existingFile.file_name.includes('default-profile');
-    
+
+            await this.fileRepository.delete(existingFile.file_id);
+
             if (!isDefault) {
-                // S3에서 삭제
                 const s3Key = existingFile.url.split('.com/')[1];
-                await this.deleteImage(s3Key);
-                // DB에서도 삭제 (default가 아닐 때만)
-                await this.fileRepository.delete({ file_id: existingFile.file_id });
+                const deleteParams = { Bucket: this.bucketName, Key: s3Key };
+                await this.s3Client.send(new DeleteObjectCommand(deleteParams));
             }
         }
-    
-        // 3. 새로운 이미지 업로드
+
         const uploaded = await this.uploadImage([newFile], user, UploadType.PROFILE_IMG);
-        
+
         this.logger.log('updateUserProfileImage END');
         return uploaded[0];
     }
-    
+
+    // 프로필사진 삭제 후 기본 프로필로 되돌리기
+    async revertToDefaultProfileImage(user_id: number): Promise<File> {
+        this.logger.log(`revertToDefaultProfileImage START for user: ${user_id}`);
+
+        // 1. 현재 프로필 이미지 조회
+        const existingFile = await this.fileRepository.findOne({
+            where: {
+                user: { user_id: user_id },
+                upload_type: UploadType.PROFILE_IMG
+            },
+        });
+
+        // 만약 파일 기록이 없다면(신규 유저 등), 새로 생성
+        if (!existingFile) {
+            return this.createDefaultProfileImage({ user_id } as User);
+        }
+
+        const isDefault = existingFile.file_name.includes('default-profile');
+
+        // 2. 기존 이미지가 '기본 이미지'가 아니라면 S3에서 물리적 삭제
+        if (!isDefault) {
+            const s3Key = existingFile.url.split('.com/')[1];
+            const deleteParams = { Bucket: this.bucketName, Key: s3Key };
+            await this.s3Client.send(new DeleteObjectCommand(deleteParams));
+        }
+
+        // 3. 기존 DB 레코드의 내용을 default 값으로 덮어쓰기
+        existingFile.file_name = 'default-profile.jpg';
+        existingFile.url = 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg';
+        existingFile.content_type = 'image/jpg';
+
+        const updatedFile = await this.fileRepository.save(existingFile);
+
+        this.logger.log(`revertToDefaultProfileImage END for user: ${user_id}`);
+        return updatedFile;
+    }
 
     // 파일 삭제
     async deleteImage(file_name: string): Promise<string> {
