@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
 import { GiftCardPocket } from './gift-card-pocket.entity';
 import { GiftCardType } from './gift-card-type.enum';
 
@@ -21,4 +21,7 @@ export class GiftCard {
 
   @OneToMany(() => GiftCardPocket, pocket => pocket.giftCard)
   pockets: GiftCardPocket[];
+
+  @CreateDateColumn()
+  create_at: Date;
 }

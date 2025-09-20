@@ -36,6 +36,15 @@ export class GiftCardsService {
     });
   }
 
+  // 상품권 상세 조회 로직
+   async getGiftCardById(id: number): Promise<GiftCard> {
+    const card = await this.giftCardRepository.findOne({
+      where: { gift_card_id : id },
+    });
+    if (!card) throw new NotFoundException('Gift card not found');
+    return card;
+  }
+
   // 내 상품권 조회 로직
   async getUserGiftCards(user_id: number): Promise<GiftCardPocket[]> {
     return this.giftCardPocketRepository.find({

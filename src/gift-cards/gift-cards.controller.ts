@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, HttpCode, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Post, Body, Req, HttpCode, HttpStatus, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { GiftCardsService } from './gift-cards.service';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
 import { Roles } from 'src/common/custom-decorators/roles.decorator';
@@ -23,6 +23,16 @@ export class GiftCardsController {
     const giftCards = await this.giftCardsService.getAllGiftCards();
 
     return new ApiResponseDTO(true, HttpStatus.OK, 'Gift card catalog retrieved', giftCards);
+  }
+
+  // 상품권 상세 조회
+  @Get('/catalog/:id')
+  @Roles(UserRole.USER)
+  async getGiftCardById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponseDTO<GiftCard>> {
+    const card = await this.giftCardsService.getGiftCardById(id);
+    return new ApiResponseDTO(true, HttpStatus.OK, 'Gift card retrieved', card);
   }
 
   // 내 상품권 조회 로직
