@@ -17,6 +17,7 @@ import { JwtAuthGuard } from './common/custom-decorators/jwt-auth.guard'
 import { RolesGuard } from './common/custom-decorators/custom-role.guard'
 import { PointsModule } from './points/points.module'
 import { GiftCardsModule } from './gift-cards/gift-cards.module';
+import { CashModule } from './cash/cash.module'
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GiftCardsModule } from './gift-cards/gift-cards.module';
     EventsModule,
     PointsModule,
     GiftCardsModule,
+    CashModule,
   ],
   providers: [
     {

@@ -1,4 +1,3 @@
-// src/cash/cash.controller.ts
 import { Controller, Get, Post, Body, UseGuards, Req, Logger, HttpStatus, } from '@nestjs/common';
 import { CashService } from './cash.service';
 import { CashTransaction } from './entities/cash-transaction.entity';
@@ -16,14 +15,14 @@ type BalancePayload = { total: number };
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.USER, UserRole.ADMIN)
-@Controller('cash')
+@Controller('api/cash')
 export class CashController {
     private readonly logger = new Logger(CashController.name);
 
     constructor(private readonly cashService: CashService) { }
 
     // 캐쉬 잔액 조회
-    @Get('balance')
+    @Get('/balance')
     async getMyCashBalance(
         @Req() req: AuthenticatedRequest,
     ): Promise<ApiResponseDTO<BalancePayload>> {
@@ -42,7 +41,7 @@ export class CashController {
     }
 
     // 캐쉬 사용 이력 조회
-    @Get('transactions')
+    @Get('/transactions')
     async getMyCashTransactions(
         @Req() req: AuthenticatedRequest,
     ): Promise<ApiResponseDTO<CashTransaction[]>> {
@@ -60,7 +59,7 @@ export class CashController {
     }
 
     // 캐쉬 충전
-    @Post('deposit')
+    @Post('/deposit')
     async postDeposit(
         @Req() req: AuthenticatedRequest,
         @Body() dto: DepositCashDto,
@@ -79,7 +78,7 @@ export class CashController {
     }
 
     // 캐쉬 인출
-    @Post('withdraw')
+    @Post('/withdraw')
     async postWithdraw(
         @Req() req: AuthenticatedRequest,
         @Body() dto: WithdrawCashDto,
@@ -98,7 +97,7 @@ export class CashController {
     }
 
     // 캐쉬 사용
-    @Post('pay')
+    @Post('/pay')
     async postPay(
         @Req() req: AuthenticatedRequest,
         @Body() dto: PayWithCashDto,

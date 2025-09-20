@@ -1,122 +1,78 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Logger, HttpStatus, } from '@nestjs/common';
-import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
-import { CashService } from 'src/cash/cash.service';
-import { DepositCashDto } from 'src/cash/DTO/deposit-cash.dto';
-import { PayWithCashDto } from 'src/cash/DTO/pay-with-cash.dto';
-import { WithdrawCashDto } from 'src/cash/DTO/withdraw-cash.dto';
-import { CashTransaction } from 'src/cash/entities/cash-transaction.entity';
-import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
-import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard';
-import { JwtAuthGuard } from 'src/common/custom-decorators/jwt-auth.guard';
+import { Controller, Get, Post, Req, Body, HttpStatus, Logger } from '@nestjs/common';
+import { PointsService } from './points.service';
 import { Roles } from 'src/common/custom-decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user-role.enum';
+import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
+import { EarnPointDTO } from './DTO/update-earnpoint.dto';
+import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto';
+import { PointTransaction } from './entities/point-transaction.entity';
+import { UsePointDTO } from './DTO/update-usepoint.dto';
 
-type BalancePayload = { total: number };
+@Controller('api/points')
+export class PointsController {
+    private readonly logger = new Logger(PointsController.name);
 
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.USER, UserRole.ADMIN)
-@Controller('cash')
-export class CashController {
-    private readonly logger = new Logger(CashController.name);
+    constructor(private readonly pointsService: PointsService) { }
 
-    constructor(private readonly cashService: CashService) { }
-
-    // 캐쉬 잔액 조회
-    @Get('balance')
-    async getMyCashBalance(
+    // CREATE - 포인트 적립
+    @Post('/earn')
+    @Roles(UserRole.USER)
+    async earnPoint(
         @Req() req: AuthenticatedRequest,
-    ): Promise<ApiResponseDTO<BalancePayload>> {
-        this.logger.log('getMyCashBalance START');
+        @Body() earnPointDTO: EarnPointDTO
+    ): Promise<ApiResponseDTO<{ earned: number }>> {
+        this.logger.log(`earnPoint START`);
 
         const userId = req.user.user_id;
-        const total = await this.cashService.getUserCashBalance(userId);
+        const earned = await this.pointsService.earn(userId, earnPointDTO.amount, earnPointDTO.reason);
 
-        this.logger.log('getMyCashBalance END');
-        return new ApiResponseDTO<BalancePayload>(
-            true,
-            HttpStatus.OK,
-            'Current Cash Balance Retrieved',
-            { total },
-        );
+        this.logger.log(`earnPoint END`);
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Point Earned Successfully', { earned });
     }
 
-    // 캐쉬 이력 조회
-    @Get('transactions')
-    async getMyCashTransactions(
+    // 포인트 사용
+    @Post('/use')
+    @Roles(UserRole.USER)
+    async usePoint(
         @Req() req: AuthenticatedRequest,
-    ): Promise<ApiResponseDTO<CashTransaction[]>> {
-        this.logger.log('getMyCashTransactions START');
-        const transactions = await this.cashService.getUserCashTransactions(
-            req.user.user_id,
-        );
-        this.logger.log('getMyCashTransactions END');
-        return new ApiResponseDTO<CashTransaction[]>(
-            true,
-            HttpStatus.OK,
-            'Transaction History Retrieved',
-            transactions,
-        );
+        @Body() usePointDTO: UsePointDTO
+    ): Promise<ApiResponseDTO<{ used: number }>> {
+        this.logger.log(`usePoint START`);
+
+        const user_id = req.user.user_id;
+        const used = await this.pointsService.use(user_id, usePointDTO.amount, usePointDTO.reason);
+
+        this.logger.log(`usePoint END`);
+        return new ApiResponseDTO(true, HttpStatus.CREATED, 'Point Used Successfully', { used });
     }
 
-    // 캐쉬 충전
-    @Post('deposit')
-    async postDeposit(
-        @Req() req: AuthenticatedRequest,
-        @Body() dto: DepositCashDto,
-    ): Promise<ApiResponseDTO<{ balance: number; transaction: CashTransaction }>> {
-        this.logger.log(
-            `deposit START user=${req.user.user_id}, amount=${dto.amount}`,
-        );
-        const data = await this.cashService.deposit(req.user.user_id, dto);
-        this.logger.log('deposit END');
-        return new ApiResponseDTO(
-            true,
-            HttpStatus.OK,
-            '충전 완료',
-            data,
-        );
+    // READ - 내 포인트 보유량 조회
+    @Get('/balance')
+    @Roles(UserRole.USER)
+    async getMyPointBalance(
+        @Req() req: AuthenticatedRequest
+    ): Promise<ApiResponseDTO<{ total: number }>> {
+        this.logger.log(`getMyPointBalance START`);
+
+        const userId = req.user.user_id;
+        const total = await this.pointsService.getUserPointTotal(userId);
+
+        this.logger.log(`getMyPointBalance END`);
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Current Point Balance Retrieved', { total });
     }
 
-    // 캐쉬 인출
-    @Post('withdraw')
-    async postWithdraw(
-        @Req() req: AuthenticatedRequest,
-        @Body() dto: WithdrawCashDto,
-    ): Promise<ApiResponseDTO<{ balance: number; transaction: CashTransaction }>> {
-        this.logger.log(
-            `withdraw START user=${req.user.user_id}, amount=${dto.amount}`,
-        );
-        const data = await this.cashService.withdraw(req.user.user_id, dto);
-        this.logger.log('withdraw END');
-        return new ApiResponseDTO(
-            true,
-            HttpStatus.OK,
-            '인출 완료',
-            data,
-        );
-    }
+    // READ - 내 포인트 이력 조회
+    @Get('/transactions')
+    @Roles(UserRole.USER)
+    async getMyPointTransactions(
+        @Req() req: AuthenticatedRequest
+    ): Promise<ApiResponseDTO<PointTransaction[]>> {
+        this.logger.log(`getMyPointTransactions START`);
 
-    // 캐쉬 사용
-    @Post('pay')
-    async postPay(
-        @Req() req: AuthenticatedRequest,
-        @Body() dto: PayWithCashDto,
-    ): Promise<
-        ApiResponseDTO<{
-            cash: { balance: number; transaction: CashTransaction };
-            point: { balance: number; earned: number; transaction: any };
-        }>
-    > {
-        this.logger.log(
-            `pay START user=${req.user.user_id}, store=${dto.store_id}, amount=${dto.amount}`,
-        );
-        const data = await this.cashService.pay(req.user.user_id, dto);
-        this.logger.log('pay END');
-        return new ApiResponseDTO(
-            true,
-            HttpStatus.OK,
-            '결제 완료',
-            data,
-        );
+        const userId = req.user.user_id;
+        const transactions = await this.pointsService.getUserPointTransactions(userId);
+
+        this.logger.log(`getMyPointTransactions END`);
+        return new ApiResponseDTO(true, HttpStatus.OK, 'Transaction History Retrieved', transactions);
     }
 }
