@@ -7,6 +7,7 @@ import { Favorite } from "src/favorites/entities/favorite.entity"
 import { File } from "src/file/entities/file.entity"
 import { UserPoint } from "./user-point.entity"
 import { GiftCardPocket } from "src/gift-cards/entities/gift-card-pocket.entity"
+import { UserCash } from "./user-cash.entity"
 
 
 @Entity()
@@ -52,4 +53,7 @@ export class User {
 
     @OneToMany(() => GiftCardPocket, pocket => pocket.user)
     gift_card_pocket: GiftCardPocket[];
+
+    @OneToOne(() => UserCash, cash => cash.user)
+    cash: UserCash;
 }
