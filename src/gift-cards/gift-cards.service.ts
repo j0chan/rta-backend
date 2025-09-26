@@ -9,6 +9,7 @@ import { CreateGiftCardDTO } from './dto/create-gift-card.dto';
 import { GiftCard } from './entities/gift-card.entity';
 import { UserPoint } from 'src/users/entities/user-point.entity';
 import { User } from 'src/users/entities/user.entity';
+import { PointTransaction, PointTransactionType } from 'src/points/entities/point-transaction.entity';
 
 @Injectable()
 export class GiftCardsService {
@@ -25,6 +26,9 @@ export class GiftCardsService {
     @InjectRepository(UserPoint)
     private userPointRepository: Repository<UserPoint>,
 
+    @InjectRepository(PointTransaction)
+    private pointTransactionRepository: Repository<PointTransaction>,
+
     @InjectRepository(User)
     private userRepository: Repository<User>
   ) { }
@@ -37,9 +41,9 @@ export class GiftCardsService {
   }
 
   // 상품권 상세 조회 로직
-   async getGiftCardById(id: number): Promise<GiftCard> {
+  async getGiftCardById(id: number): Promise<GiftCard> {
     const card = await this.giftCardRepository.findOne({
-      where: { gift_card_id : id },
+      where: { gift_card_id: id },
     });
     if (!card) throw new NotFoundException('Gift card not found');
     return card;
@@ -156,7 +160,16 @@ export class GiftCardsService {
 
     // 포인트 차감
     userPoint.balance -= giftCard.amount;
+
+    // 포인트 사용 이력 생성
+    const transaction = this.pointTransactionRepository.create({
+      userPoint,
+      type: PointTransactionType.USE,
+      amount: giftCard.amount,
+      reason: giftCard.name,
+    });
     await this.userPointRepository.save(userPoint);
+    await this.pointTransactionRepository.save(transaction);
 
     // GiftCardPocket 생성
     const pocket = this.giftCardPocketRepository.create({
