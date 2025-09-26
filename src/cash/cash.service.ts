@@ -113,7 +113,6 @@ export class CashService {
 
             return {
                 balance: wallet.balance,
-                transaction: tx,
             };
         });
     }

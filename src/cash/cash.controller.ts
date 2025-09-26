@@ -63,7 +63,7 @@ export class CashController {
     async postDeposit(
         @Req() req: AuthenticatedRequest,
         @Body() dto: DepositCashDto,
-    ): Promise<ApiResponseDTO<{ balance: number; transaction: CashTransaction }>> {
+    ): Promise<ApiResponseDTO<{ balance: number; }>> {
         this.logger.log(
             `deposit START user=${req.user.user_id}, amount=${dto.amount}`,
         );
