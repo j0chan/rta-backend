@@ -11,7 +11,7 @@ export class GiftCardPocket {
   @ManyToOne(() => User, user => user.gift_card_pocket, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => GiftCard, giftCard => giftCard.pockets, { onDelete: 'CASCADE' })
+  @OneToMany(() => GiftCard, giftCard => giftCard.pockets, { onDelete: 'CASCADE' })
   giftCard: GiftCard;
 
   @Column({ type: 'int', default: 0 })

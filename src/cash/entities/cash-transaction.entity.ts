@@ -33,7 +33,7 @@ export class CashTransaction {
     store?: Store | null;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    memo?: string | null;
+    reason?: string | null;
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;

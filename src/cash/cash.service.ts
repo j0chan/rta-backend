@@ -107,13 +107,12 @@ export class CashService {
                 type: CashTransactionType.DEPOSIT,
                 amount: dto.amount,
                 balance_after: wallet.balance,
-                memo: dto.memo ?? null,
+                reason: dto.memo ?? null,
             });
             await manager.getRepository(CashTransaction).save(tx);
 
             return {
                 balance: wallet.balance,
-                transaction: tx,
             };
         });
     }
@@ -139,13 +138,12 @@ export class CashService {
                 type: CashTransactionType.WITHDRAW,
                 amount: dto.amount,
                 balance_after: wallet.balance,
-                memo: dto.memo ?? null,
+                reason: dto.memo ?? null,
             });
             await manager.getRepository(CashTransaction).save(tx);
 
             return {
                 balance: wallet.balance,
-                transaction: tx,
             };
         });
     }
@@ -172,13 +170,18 @@ export class CashService {
             wallet.balance -= dto.amount;
             await manager.getRepository(UserCash).save(wallet);
 
+            const storeLabel =
+                (store as any)?.name ??
+                (store as any)?.store_name ??
+                `store#${dto.store_id}`;
+
             const cashTx = manager.getRepository(CashTransaction).create({
                 userCash: wallet,
                 type: CashTransactionType.PAYMENT,
                 amount: dto.amount,
                 balance_after: wallet.balance,
                 store,
-                memo: dto.memo ?? null,
+                reason: `${storeLabel}`,
             });
             await manager.getRepository(CashTransaction).save(cashTx);
 
@@ -204,16 +207,11 @@ export class CashService {
             userPoint.balance += earnPoint;
             await manager.getRepository(UserPoint).save(userPoint);
 
-            const storeLabel =
-                (store as any)?.name ??
-                (store as any)?.store_name ??
-                `store#${dto.store_id}`;
-
             const pointTx = manager.getRepository(PointTransaction).create({
                 userPoint,
                 type: PointTransactionType.EARN,
                 amount: earnPoint,
-                reason: `CASH_PAYMENT_EARN:${storeLabel}:${dto.amount}`,
+                reason: `${storeLabel}`,
                 balance_after: userPoint.balance,
             } as any);
             await manager.getRepository(PointTransaction).save(pointTx);
@@ -221,12 +219,9 @@ export class CashService {
             return {
                 cash: {
                     balance: wallet.balance,
-                    transaction: cashTx,
                 },
                 point: {
-                    balance: userPoint.balance,
                     earned: earnPoint,
-                    transaction: pointTx,
                 },
             };
         });

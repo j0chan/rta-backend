@@ -63,7 +63,7 @@ export class CashController {
     async postDeposit(
         @Req() req: AuthenticatedRequest,
         @Body() dto: DepositCashDto,
-    ): Promise<ApiResponseDTO<{ balance: number; transaction: CashTransaction }>> {
+    ): Promise<ApiResponseDTO<{ balance: number; }>> {
         this.logger.log(
             `deposit START user=${req.user.user_id}, amount=${dto.amount}`,
         );
@@ -82,7 +82,7 @@ export class CashController {
     async postWithdraw(
         @Req() req: AuthenticatedRequest,
         @Body() dto: WithdrawCashDto,
-    ): Promise<ApiResponseDTO<{ balance: number; transaction: CashTransaction }>> {
+    ): Promise<ApiResponseDTO<{ balance: number }>> {
         this.logger.log(
             `withdraw START user=${req.user.user_id}, amount=${dto.amount}`,
         );
@@ -103,8 +103,8 @@ export class CashController {
         @Body() dto: PayWithCashDto,
     ): Promise<
         ApiResponseDTO<{
-            cash: { balance: number; transaction: CashTransaction };
-            point: { balance: number; earned: number; transaction: any };
+            cash: { balance: number };
+            point: { earned: number };
         }>
     > {
         this.logger.log(
