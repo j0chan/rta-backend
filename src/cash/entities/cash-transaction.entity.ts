@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn } from 'typeorm';
 import { Store } from 'src/stores/entities/store.entity';
-import { User } from 'src/users/entities/user.entity';
 import { UserCash } from 'src/users/entities/user-cash.entity';
 
 export enum CashTransactionType {
@@ -22,7 +21,6 @@ export class CashTransaction {
     @Column({ type: 'enum', enum: CashTransactionType })
     type: CashTransactionType;
 
-    // 항상 양수. 증/감은 type으로 판단
     @Column({ type: 'int' })
     amount: number;
 
