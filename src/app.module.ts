@@ -18,6 +18,8 @@ import { RolesGuard } from './common/custom-decorators/custom-role.guard'
 import { PointsModule } from './points/points.module'
 import { GiftCardsModule } from './gift-cards/gift-cards.module';
 import { CashModule } from './cash/cash.module'
+import { NoticesModule } from './notices/notices.module'
+import { PromotionsModule } from './promotions/promotions.module'
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { CashModule } from './cash/cash.module'
     PointsModule,
     GiftCardsModule,
     CashModule,
+    NoticesModule,
+    PromotionsModule,
   ],
   providers: [
     {
