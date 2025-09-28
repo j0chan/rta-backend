@@ -11,15 +11,10 @@ export class PointTransaction {
     @PrimaryGeneratedColumn()
     point_transaction_id: number;
 
-    @ManyToOne(() => UserPoint, userPoint => userPoint.transactions, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => UserPoint, userPoint => userPoint.transactions, { onDelete: 'CASCADE', })
     userPoint: UserPoint;
 
-    @Column({
-        type: 'enum',
-        enum: PointTransactionType,
-    })
+    @Column({ type: 'enum', enum: PointTransactionType, })
     type: PointTransactionType;
 
     @Column({ type: 'int' })

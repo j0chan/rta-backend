@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('notice')
 export class Notice {
@@ -18,7 +17,7 @@ export class Notice {
 
   @CreateDateColumn()
   created_at: Date;
-
+ㅋ
   @UpdateDateColumn()
   updated_at: Date;
 }
