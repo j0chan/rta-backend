@@ -1,13 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn, JoinColumn } from 'typeorm';
 import { GiftCardPocket } from './gift-card-pocket.entity';
 
-@Entity()
+@Entity({ name: 'gift_card_usage_history' })
 export class GiftCardUsageHistory {
   @PrimaryGeneratedColumn()
   usage_id: number;
 
-  @ManyToOne(() => GiftCardPocket, pocket => pocket.usageHistories, { onDelete: 'CASCADE' })
+  @ManyToOne(() => GiftCardPocket, pocket => pocket.usageHistories, { onDelete: 'CASCADE', nullable: false })
+  @JoinColumn({ name: 'pocket_id' })
   pocket: GiftCardPocket;
+
+  @Column({ type: 'int', name: 'pocket_id' })
+  pocket_id: number;
 
   @Column({ type: 'int', nullable: true })
   amount_used?: number;
