@@ -1,12 +1,11 @@
-import { IsIn, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { PromotionPlacement } from '../entities/promotion.entity';
 
 export class CreatePromotionDTO {
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(500)
-    image_url: string;
+  @IsEnum(PromotionPlacement)
+  placement: PromotionPlacement;
 
-    @IsString()
-    @IsIn(['MAIN', 'GIFT_CARD'])
-    placement: 'MAIN' | 'GIFT_CARD';
+  @IsOptional()
+  @IsString()
+  image_url?: string;
 }

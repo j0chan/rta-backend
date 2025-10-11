@@ -1,0 +1,7 @@
+export enum GiftCategoryCode {
+    CHICKEN_BURGER = 'CHICKEN_BURGER',
+    COFFEE_DRINK = 'COFFEE_DRINK',
+    BAKERY_DESSERT = 'BAKERY_DESSERT',
+    APPAREL = 'APPAREL',
+    ETC = 'ETC',
+}

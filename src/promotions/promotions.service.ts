@@ -1,35 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Promotion } from './entities/promotion.entity';
+import { Promotion, PromotionPlacement } from './entities/promotion.entity';
 import { CreatePromotionDTO } from './dto/create-promotion.dto';
+import { UploadType } from 'src/file/entities/upload-type.enum';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
-export class PromotionsService {
+export class PromotionService {
     constructor(
         @InjectRepository(Promotion)
-        private readonly repo: Repository<Promotion>,
+        private readonly promoRepo: Repository<Promotion>,
+        private readonly fileService: FileService,
     ) { }
 
-    async create(dto: CreatePromotionDTO): Promise<Promotion> {
-        const p = this.repo.create(dto);
-        return this.repo.save(p);
-    }
-
-    async listAll(): Promise<Promotion[]> {
-        return this.repo.find({ order: { created_at: 'DESC' } });
-    }
-
-    async listActiveByPlacement(placement: 'MAIN' | 'GIFT_CARD'): Promise<Promotion[]> {
-        // “비활성화 없음, 삭제만” 이므로 단순히 최신순 정렬
-        return this.repo.find({
+    async listByPlacement(placement: PromotionPlacement): Promise<Promotion[]> {
+        return this.promoRepo.find({
             where: { placement },
             order: { created_at: 'DESC' },
         });
     }
 
-    async delete(promotion_id: number): Promise<void> {
-        const res = await this.repo.delete(promotion_id);
-        if (!res.affected) throw new NotFoundException('Promotion not found');
+    async create(dto: CreatePromotionDTO, image?: Express.Multer.File): Promise<Promotion> {
+        let imageUrl: string | undefined;
+
+        if (image) {
+            const uploaded = await this.fileService.uploadImage([image], {} as any, UploadType.PROMOTION_IMAGE);
+            imageUrl = uploaded[0]?.url;
+        } else if (dto.image_url) {
+            imageUrl = dto.image_url.trim();
+        }
+
+        const entity = this.promoRepo.create({
+            placement: dto.placement,
+            image_url: imageUrl ?? undefined,
+        });
+        return this.promoRepo.save(entity);
+    }
+
+    async getOne(id: number): Promise<Promotion> {
+        const found = await this.promoRepo.findOne({ where: { promotion_id: id } });
+        if (!found) throw new NotFoundException('Promotion not found');
+        return found;
+    }
+
+    async remove(id: number): Promise<void> {
+        const found = await this.promoRepo.findOne({ where: { promotion_id: id } });
+        if (!found) throw new NotFoundException('Promotion not found');
+
+        // 1) S3 오브젝트 삭제 (URL만 저장한 구조 -> deleteByUrl 사용)
+        await this.fileService.deleteByUrl(found.image_url);
+
+        // 2) DB 레코드 삭제
+        await this.promoRepo.delete({ promotion_id: id });
     }
 }

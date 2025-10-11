@@ -19,7 +19,7 @@ import { PointsModule } from './points/points.module'
 import { GiftCardsModule } from './gift-cards/gift-cards.module';
 import { CashModule } from './cash/cash.module'
 import { NoticesModule } from './notices/notices.module'
-import { PromotionsModule } from './promotions/promotions.module'
+import { PromotionModule } from './promotions/promotions.module'
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { PromotionsModule } from './promotions/promotions.module'
     GiftCardsModule,
     CashModule,
     NoticesModule,
-    PromotionsModule,
+    PromotionModule,
   ],
   providers: [
     {

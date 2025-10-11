@@ -1,13 +1,24 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MulterModule } from '@nestjs/platform-express';
 import { Promotion } from './entities/promotion.entity';
-import { PromotionsService } from './promotions.service';
-import { PromotionsController } from './promotions.controller';
+import { PromotionController } from './promotions.controller';
+import { PromotionService } from './promotions.service';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Promotion])],
-    providers: [PromotionsService],
-    controllers: [PromotionsController],
-    exports: [PromotionsService],
+    imports: [
+        TypeOrmModule.forFeature([Promotion,]),
+        FileModule,
+        MulterModule.register({
+            limits: { fileSize: 5 * 1024 * 1024 },
+        }),
+    ],
+    controllers: [
+        PromotionController,
+    ],
+    providers: [
+        PromotionService,
+    ],
 })
-export class PromotionsModule { }
+export class PromotionModule { }

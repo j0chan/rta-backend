@@ -1,143 +1,152 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { Injectable, Logger } from '@nestjs/common'
-import * as dotenv from 'dotenv'
-import * as path from 'path'
-import { File } from './entities/file.entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { UploadType } from './entities/upload-type.enum'
-import { Review } from 'src/reviews/entities/review.entity'
-import { v4 as uuidv4 } from 'uuid'
-import { Store } from 'src/stores/entities/store.entity'
-import { User } from 'src/users/entities/user.entity'
-import { Event } from 'src/events/entities/event.entity'
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { Injectable, Logger } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { readFileSync, existsSync, unlinkSync } from 'fs';
+import { File } from './entities/file.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UploadType } from './entities/upload-type.enum';
+import { Review } from 'src/reviews/entities/review.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { Store } from 'src/stores/entities/store.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Event } from 'src/events/entities/event.entity';
+import { GiftCard } from 'src/gift-cards/entities/gift-card.entity';
+import { Promotion } from 'src/promotions/entities/promotion.entity';
 
-dotenv.config()
+dotenv.config();
 
 @Injectable()
 export class FileService {
-    private readonly logger = new Logger(FileService.name)
+    private readonly logger = new Logger(FileService.name);
 
-    s3Client: S3Client
-    private bucketName: string
+    private s3Client: S3Client;
+    private bucketName: string;
+    private domain?: string; // 예: https://team-201.s3.ap-northeast-2.amazonaws.com
 
     constructor(
         @InjectRepository(File)
         private fileRepository: Repository<File>,
     ) {
-        const accessKeyId = process.env.AWS_S3_ACCESS_KEY
-        const secretAccessKey = process.env.AWS_S3_SECRET_ACCESS_KEY
-        const region = process.env.AWS_REGION
-        this.bucketName = String(process.env.AWS_S3_BUCKET)
-
-        https://
-        /* 에러 점검*/
-        console.log('AWS_S3_ACCESS_KEY:', process.env.AWS_S3_ACCESS_KEY)
-        console.log('AWS_S3_SECRET_ACCESS_KEY:', process.env.AWS_S3_SECRET_ACCESS_KEY)
-        console.log('AWS_REGION:', process.env.AWS_REGION)
-        console.log('AWS_S3_BUCKET:', process.env.AWS_S3_BUCKET)
+        const accessKeyId = process.env.AWS_S3_ACCESS_KEY;
+        const secretAccessKey = process.env.AWS_S3_SECRET_ACCESS_KEY;
+        const region = process.env.AWS_REGION;
+        this.bucketName = String(process.env.AWS_S3_BUCKET);
+        this.domain = process.env.AWS_DOMAIN;
 
         if (!accessKeyId || !secretAccessKey || !region || !this.bucketName) {
-            throw new Error('Missing AWS S3 environment variables')
+            throw new Error('Missing AWS S3 environment variables');
         }
 
-        // AWS S3 클라이언트 초기화. 환경 설정 정보를 사용하여 AWS 리전, Access Key, Secret Key를 설정.
         this.s3Client = new S3Client({
-            region: region, // AWS Region
-            credentials: {
-                accessKeyId: accessKeyId, // Access Key
-                secretAccessKey: secretAccessKey, // Secret Key
-            },
-        })
+            region,
+            credentials: { accessKeyId, secretAccessKey },
+        });
     }
 
-    // public 파일 업로드
+    /**
+     * public 파일 업로드
+     * - Multer memoryStorage(file.buffer)와 diskStorage(file.path) 모두 지원
+     * - 업로드 성공 후 diskStorage라면 임시 파일 삭제
+     */
     async uploadImage(
         files: Express.Multer.File[],
-        targetEntity: Review | Store | User | Event,
+        targetEntity: Review | Store | User | Event | GiftCard | Promotion,
         uploadType: UploadType
     ): Promise<File[]> {
-        this.logger.log(`uploadFile START`)
-
-        const uploadedFiles: File[] = []
+        this.logger.log(`uploadImage START (${uploadType})`);
+        const uploadedFiles: File[] = [];
 
         try {
             for (const file of files) {
-                // uuid를 통해 파일명 중복 방지
-                const uuid = uuidv4()
+                const uuid = uuidv4();
+                const ext = path.extname(file.originalname) || '';
+                const folderPrefix = this.getFolderByUploadType(uploadType);
+                const s3Key = `public/${folderPrefix}/${uuid}${ext}`;
 
-                // 파일 확장자 추출
-                const ext = path.extname(file.originalname)
+                // 메모리/디스크 모두 대응
+                const body =
+                    typeof file.buffer !== 'undefined'
+                        ? file.buffer
+                        : (file.path ? readFileSync(file.path) : undefined);
 
-                // S3에 저장될 최종 파일 이름
-                const folderPrefix = this.getFolderByUploadType(uploadType)
-                const s3FileName = `public/${folderPrefix}/${uuid}${ext}`
-
-                // S3에 업로드 할 객체
-                const uploadParams = {
-                    Bucket: this.bucketName,
-                    Key: s3FileName,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
+                if (!body) {
+                    this.logger.error(`uploadImage: file body is empty (uploadType=${uploadType})`);
+                    throw new Error('Empty file body');
                 }
-                await this.s3Client.send(new PutObjectCommand(uploadParams))
 
-                const region = process.env.AWS_REGION
+                await this.s3Client.send(new PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: s3Key,
+                    Body: body,
+                    ContentType: file.mimetype,
+                }));
 
-                // DB에 저장할 url / 파일명(한글깨짐) 생성
-                const url = `${process.env.AWS_DOMAIN}/${s3FileName}`
-                const dbFileName = file.originalname
+                // diskStorage 임시파일 정리
+                if (file.path && existsSync(file.path)) {
+                    try { unlinkSync(file.path); } catch { /* ignore */ }
+                }
 
-                // DB에 저장
+                const url = `${this.domain ? this.domain : ''}/${s3Key}`.replace(/([^:]\/)\/+/g, '$1');
+                const dbFileName = file.originalname;
+
                 const fileData: Partial<File> = {
                     file_name: dbFileName,
-                    url: url,
+                    url,
                     content_type: file.mimetype,
                     upload_type: uploadType,
-                }
+                };
+
+                // 필요 시 엔티티 연관 추가 (현재는 URL만 쓰므로 주석 유지 가능)
                 switch (uploadType) {
                     case UploadType.REVIEW_IMAGE:
-                        fileData.review = targetEntity as Review
-                        break
-                    // 추후 구현 완료 시 주석 해제
-                    // case UploadType.STORE_PROFILE:
-                    //     fileData.store = targetEntity as Store
-                    //     break
+                        fileData.review = targetEntity as Review;
+                        break;
                     case UploadType.PROFILE_IMG:
-                        fileData.user = targetEntity as User
-                        break
+                        fileData.user = targetEntity as User;
+                        break;
+                    // case UploadType.STORE_PROFILE:
+                    //     fileData.store = targetEntity as Store;
+                    //     break;
                     // case UploadType.EVENT_IMAGE:
-                    //     fileData.event = targetEntity as Event
-                    //     break
+                    //     fileData.event = targetEntity as Event;
+                    //     break;
+                    case UploadType.GIFT_CARD_IMAGE:
+                        // fileData.giftCard = targetEntity as GiftCard;
+                        break;
+                    case UploadType.PROMOTION_IMAGE:
+                        // fileData.promotion = targetEntity as Promotion;
+                        break;
                     default:
-                        this.logger.warn(`Unknown upload type: ${uploadType}`)
+                        this.logger.warn(`Unknown upload type: ${uploadType}`);
                 }
-                const fileEntity = this.fileRepository.create(fileData)
 
-                const savedFile = await this.fileRepository.save(fileEntity)
-                uploadedFiles.push(savedFile)
+                const fileEntity = this.fileRepository.create(fileData);
+                const savedFile = await this.fileRepository.save(fileEntity);
+                uploadedFiles.push(savedFile);
             }
         } catch (error) {
-            this.logger.error('Error uploading files:', error)
-            throw new Error('Failed to upload files')
+            this.logger.error('Error uploading files:', error as Error);
+            throw new Error('Failed to upload files');
         }
 
-        this.logger.log(`uploadFile END`)
-        return uploadedFiles
+        this.logger.log(`uploadImage END (${uploadType})`);
+        return uploadedFiles;
     }
 
     async updateUserProfileImage(
         newFile: Express.Multer.File,
         user: User
     ): Promise<File> {
-        this.logger.log('updateUserProfileImage START')
+        this.logger.log('updateUserProfileImage START');
 
         const existingFile = await this.fileRepository.findOne({
             where: {
                 user: { user_id: user.user_id },
                 upload_type: UploadType.PROFILE_IMG
             },
-        })
+        });
 
         if (existingFile) {
             const isDefault = existingFile.file_name.includes('default-profile');
@@ -145,9 +154,10 @@ export class FileService {
             await this.fileRepository.delete(existingFile.file_id);
 
             if (!isDefault) {
-                const s3Key = existingFile.url.split('.com/')[1];
-                const deleteParams = { Bucket: this.bucketName, Key: s3Key };
-                await this.s3Client.send(new DeleteObjectCommand(deleteParams));
+                const key = this.getKeyFromUrl(existingFile.url);
+                if (key) {
+                    await this.s3Client.send(new DeleteObjectCommand({ Bucket: this.bucketName, Key: key }));
+                }
             }
         }
 
@@ -161,29 +171,25 @@ export class FileService {
     async revertToDefaultProfileImage(user_id: number): Promise<File> {
         this.logger.log(`revertToDefaultProfileImage START for user: ${user_id}`);
 
-        // 1. 현재 프로필 이미지 조회
         const existingFile = await this.fileRepository.findOne({
             where: {
-                user: { user_id: user_id },
+                user: { user_id },
                 upload_type: UploadType.PROFILE_IMG
             },
         });
 
-        // 만약 파일 기록이 없다면(신규 유저 등), 새로 생성
         if (!existingFile) {
             return this.createDefaultProfileImage({ user_id } as User);
         }
 
         const isDefault = existingFile.file_name.includes('default-profile');
-
-        // 2. 기존 이미지가 '기본 이미지'가 아니라면 S3에서 물리적 삭제
         if (!isDefault) {
-            const s3Key = existingFile.url.split('.com/')[1];
-            const deleteParams = { Bucket: this.bucketName, Key: s3Key };
-            await this.s3Client.send(new DeleteObjectCommand(deleteParams));
+            const key = this.getKeyFromUrl(existingFile.url);
+            if (key) {
+                await this.s3Client.send(new DeleteObjectCommand({ Bucket: this.bucketName, Key: key }));
+            }
         }
 
-        // 3. 기존 DB 레코드의 내용을 default 값으로 덮어쓰기
         existingFile.file_name = 'default-profile.jpg';
         existingFile.url = 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg';
         existingFile.content_type = 'image/jpg';
@@ -194,36 +200,91 @@ export class FileService {
         return updatedFile;
     }
 
-    // 파일 삭제
+    /**
+     * 파일명(Key)로 삭제 (기존 로직 유지)
+     * 주의: 여기서 file_name은 S3 Key가 아닌 "원본 파일명"일 수 있음
+     * 이 메서드는 필요 시에만 사용하고, 가급적 deleteByUrl을 추천
+     */
     async deleteImage(file_name: string): Promise<string> {
-        this.logger.log(`deleteFile START`)
+        this.logger.log(`deleteImage START (by key or name: ${file_name})`);
 
-        const deleteParams = {
+        await this.s3Client.send(new DeleteObjectCommand({
             Bucket: this.bucketName,
             Key: file_name,
-        }
-
-        await this.s3Client.send(new DeleteObjectCommand(deleteParams))
+        }));
 
         // DB에서 삭제
-        await this.fileRepository.delete({ file_name })
+        await this.fileRepository.delete({ file_name });
 
-        this.logger.log(`deleteFile END`)
-        return `File ${file_name} deleted successfully`
+        this.logger.log(`deleteImage END`);
+        return `File ${file_name} deleted successfully`;
+    }
+
+    /**
+     * 퍼블릭 URL로 삭제 (프로모션/상품권처럼 URL만 있는 경우에 유용)
+     */
+    async deleteByUrl(url?: string | null): Promise<void> {
+        if (!url) return;
+
+        const key = this.getKeyFromUrl(url);
+        if (!key) {
+            this.logger.warn(`deleteByUrl: failed to extract key from url=${url}`);
+            return;
+        }
+
+        try {
+            await this.s3Client.send(new DeleteObjectCommand({
+                Bucket: this.bucketName,
+                Key: key,
+            }));
+            this.logger.log(`S3 deleted: ${key}`);
+        } catch (e) {
+            this.logger.warn(`deleteByUrl failed url=${url} err=${(e as Error).message}`);
+            // 실패해도 전체 트랜잭션을 막을 필요는 없음
+        }
+    }
+
+    /** URL에서 S3 Key 추출 (AWS_DOMAIN이 있으면 우선 사용) */
+    private getKeyFromUrl(url?: string | null): string | null {
+        if (!url) return null;
+
+        // 1) .env의 AWS_DOMAIN 기준
+        if (this.domain && url.startsWith(this.domain)) {
+            const prefix = this.domain.endsWith('/') ? this.domain : `${this.domain}/`;
+            return url.substring(prefix.length);
+        }
+
+        // 2) 일반 S3 퍼블릭 URL 패턴 추정
+        const idx = url.indexOf('.amazonaws.com/');
+        if (idx !== -1) {
+            return url.substring(idx + '.amazonaws.com/'.length + url.substring(0, idx).length);
+        }
+
+        // 3) 마지막 폴백: ".com/" 기준
+        const afterCom = url.split('.com/')[1];
+        if (afterCom) return afterCom;
+
+        // 4) 정말 안 되면 마지막 3개 세그먼트 조합
+        const segs = url.split('/');
+        return segs.length > 3 ? segs.slice(3).join('/') : null;
     }
 
     private getFolderByUploadType(uploadType: UploadType): string {
         switch (uploadType) {
             case UploadType.REVIEW_IMAGE:
-                return 'review'
+                return 'review';
             case UploadType.PROFILE_IMG:
-                return 'profile_img'
+                return 'profile_img';
             case UploadType.STORE_PROFILE:
-                return 'store'
+                return 'store';
             case UploadType.EVENT_IMAGE:
-                return 'event'
+                return 'event';
+            case UploadType.GIFT_CARD_IMAGE:
+                return 'gift_card';
+            case UploadType.PROMOTION_IMAGE:
+                return 'promotion';
             default:
-                return 'etc'
+                return 'etc';
         }
     }
 
@@ -233,10 +294,10 @@ export class FileService {
             url: 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg',
             content_type: 'image/jpg',
             upload_type: UploadType.PROFILE_IMG,
-            user: user
-        }
+            user,
+        };
 
-        const fileEntity = this.fileRepository.create(defaultFile)
-        return await this.fileRepository.save(fileEntity)
+        const fileEntity = this.fileRepository.create(defaultFile);
+        return await this.fileRepository.save(fileEntity);
     }
 }
