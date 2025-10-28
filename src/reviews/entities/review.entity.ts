@@ -3,6 +3,7 @@ import { File } from "src/file/entities/file.entity"
 import { Store } from "src/stores/entities/store.entity"
 import { User } from "src/users/entities/user.entity"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { ReviewHelpful } from "./review-helpful.entity"
 
 @Entity()
 export class Review {
@@ -34,6 +35,9 @@ export class Review {
 
     @OneToMany(() => File, (file) => file.review)
     files: File[]
+
+    @OneToMany(() => ReviewHelpful, (helpful) => helpful.review)
+    helpfuls: ReviewHelpful[]
 
     get isModified(): boolean {
         return this.created_at.getTime() !== this.updated_at.getTime()

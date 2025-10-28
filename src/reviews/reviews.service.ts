@@ -9,6 +9,7 @@ import { Reply } from 'src/replies/entities/reply.entity'
 import { UsersService } from 'src/users/users.service'
 import { FileService } from 'src/file/file.service'
 import { UploadType } from 'src/file/entities/upload-type.enum'
+import { ReviewHelpful } from './entities/review-helpful.entity'
 
 @Injectable()
 export class ReviewsService {
@@ -22,6 +23,9 @@ export class ReviewsService {
         private storesService: StoresService,
         private usersService: UsersService,
         private fileService: FileService,
+
+        @InjectRepository(ReviewHelpful)
+        private reviewHelpfulRepository: Repository<ReviewHelpful>,
     ) { }
 
     // CREATE [1]
@@ -145,4 +149,31 @@ export class ReviewsService {
         await this.reviewRepository.remove(foundReview)
         this.logger.log(`deleteReviewById END`)
     }
+
+    async toggleHelpful(reviewId: number, userId: number): Promise<void> {
+        const review = await this.readReviewByReviewId(reviewId)
+        const user = await this.usersService.readUserById(userId)
+
+        const existing = await this.reviewHelpfulRepository.findOne({
+            where: {
+            review: { review_id: reviewId },
+            user: { user_id: userId },
+            },
+        })
+
+        if (existing) {
+            // 이미 눌렀으면 취소
+            await this.reviewHelpfulRepository.remove(existing)
+            review.helpful_count -= 1
+        } else {
+            // 처음 누름
+            const newHelpful = this.reviewHelpfulRepository.create({ review, user })
+            await this.reviewHelpfulRepository.save(newHelpful)
+            review.helpful_count += 1
+        }
+
+        await this.reviewRepository.save(review)
+    }
+
+
 }

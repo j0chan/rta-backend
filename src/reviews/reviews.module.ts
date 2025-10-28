@@ -8,10 +8,11 @@ import { UsersModule } from 'src/users/users.module'
 import { File } from 'src/file/entities/file.entity'
 import { FileModule } from 'src/file/file.module'
 import { MyReviewsController } from './my-reviews.controller'
+import { ReviewHelpful } from './entities/review-helpful.entity'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Review, File]),
+        TypeOrmModule.forFeature([Review, File, ReviewHelpful]),
         StoresModule,
         UsersModule,
         FileModule

@@ -1,6 +1,6 @@
 import { ApiResponseDTO } from 'src/common/api-reponse-dto/api-response.dto'
 import { ReviewsService } from './reviews.service'
-import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, Logger, Param, Patch, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, ForbiddenException, Get, HttpStatus, Logger, Param, ParseIntPipe, Patch, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
 import { Review } from './entities/review.entity'
 import { UpdateReviewDTO } from './DTO/update-review.dto'
 import { ReadReviewDTO } from './DTO/read-review.dto'
@@ -141,4 +141,14 @@ export class ReviewsController {
         this.logger.log(`deleteReviewByReviewId END`)
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Deleted Successfully')
     }
+
+    @Post(':reviewId/helpful')
+    async toggleHelpful(
+        @Param('reviewId', ParseIntPipe) reviewId: number,
+        @Req() req
+    ) {
+        const userId = req.user.user_id
+        return await this.reviewsService.toggleHelpful(reviewId, userId)
+    }
+
 }
