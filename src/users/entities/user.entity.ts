@@ -8,6 +8,7 @@ import { File } from "src/file/entities/file.entity"
 import { UserPoint } from "./user-point.entity"
 import { GiftCardPocket } from "src/gift-cards/entities/gift-card-pocket.entity"
 import { UserCash } from "./user-cash.entity"
+import { ReviewHelpful } from "src/reviews/entities/review-helpful.entity"
 
 
 @Entity()
@@ -56,4 +57,8 @@ export class User {
 
     @OneToOne(() => UserCash, cash => cash.user)
     cash: UserCash;
+
+    @OneToMany(() => ReviewHelpful, (helpful) => helpful.user)
+    reviewHelpfuls: ReviewHelpful[]
+
 }
