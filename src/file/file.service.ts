@@ -190,8 +190,8 @@ export class FileService {
             }
         }
 
-        existingFile.file_name = 'default-profile.jpg';
-        existingFile.url = 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.jpg';
+        existingFile.file_name = 'default-profile.png';
+        existingFile.url = 'https://team-rta.s3.ap-northeast-2.amazonaws.com/public/profile_img/default-profile.png';
         existingFile.content_type = 'image/jpg';
 
         const updatedFile = await this.fileRepository.save(existingFile);
