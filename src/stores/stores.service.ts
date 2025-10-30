@@ -1,7 +1,7 @@
 import { UsersService } from 'src/users/users.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ILike, Repository } from 'typeorm'
+import { ILike, In, Repository } from 'typeorm'
 import { CreateStoreDTO } from './DTO/create-store.dto'
 import { UpdateStoreDetailDTO } from './DTO/update-store-detail.dto'
 import { Store } from './entities/store.entity'
@@ -23,7 +23,7 @@ export class StoresService {
         const foundUser = await this.usersService.readUserById(user_id)
 
         const categoryEntity = await this.categoriesService.readCategoryById(category_id)
-        
+
         if (!categoryEntity) {
             throw new NotFoundException(`Category ${category_id} not found`)
         }
@@ -135,5 +135,17 @@ export class StoresService {
         const foundStore = await this.readStoreById(store_id)
 
         await this.storesRepository.remove(foundStore)
+    }
+
+    async findStoresByIds(store_ids: number[]): Promise<Store[]> {
+        if (store_ids.length === 0) {
+            return [];
+        }
+
+        return this.storesRepository.find({
+            where: {
+                store_id: In(store_ids),
+            },
+        });
     }
 }

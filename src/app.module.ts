@@ -5,7 +5,7 @@ import { StoresModule } from './stores/stores.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { typeOrmConfig } from './config/typeorm.config'
 import { MapsModule } from './maps/maps.module'
-import { OpenaiModule } from './openai/openai.module'
+// import { OpenaiModule } from './openai/openai.module'
 import { ManagerRequestsModule } from './manager-requests/manager-requests.module'
 import { RepliesModule } from './replies/replies.module'
 import { AuthModule } from './auth/auth.module'
@@ -20,6 +20,7 @@ import { GiftCardsModule } from './gift-cards/gift-cards.module';
 import { CashModule } from './cash/cash.module'
 import { NoticesModule } from './notices/notices.module'
 import { PromotionModule } from './promotions/promotions.module'
+import { RecommendationsModule } from './recommendations/recommendations.module'
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { PromotionModule } from './promotions/promotions.module'
     StoresModule,
     MapsModule,
     ReviewsModule,
-    OpenaiModule,
+    // OpenaiModule,
     ManagerRequestsModule,
     RepliesModule,
     AuthModule,
@@ -40,6 +41,7 @@ import { PromotionModule } from './promotions/promotions.module'
     CashModule,
     NoticesModule,
     PromotionModule,
+    RecommendationsModule,
   ],
   providers: [
     {

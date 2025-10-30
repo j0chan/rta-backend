@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcryptjs'
 import { UpdateUserDTO } from './DTO/update-user.dto'
 import { CreateUserDTO } from './DTO/create-user.dto'
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
@@ -23,9 +24,11 @@ export class UsersService {
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
         const { email, password, nickname, phone_number, role } = createUserDTO
 
+        const hashedPassword = await bcrypt.hash(password, 10)
+
         const newUser: User = this.usersRepository.create({
             email: email,
-            password: password,
+            password: hashedPassword,
             nickname: nickname,
             phone_number: phone_number,
             role: role,
@@ -109,6 +112,13 @@ export class UsersService {
     // DELETE - 탈퇴
     async deleteUserById(user_id: number) {
         const foundUser = await this.readUserById(user_id)
+
+        // Delete associated profile image if it exists and is not the default
+        if (foundUser.profile_image) {
+            const isDefault = foundUser.profile_image.file_name.includes('default-profile');
+            await this.fileService.deleteByUrl(foundUser.profile_image.url);
+            await this.fileService.deleteImage(foundUser.profile_image.file_name);
+        }
 
         await this.usersRepository.remove(foundUser)
     }

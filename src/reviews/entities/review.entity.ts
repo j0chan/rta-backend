@@ -18,7 +18,7 @@ export class Review {
     @JoinColumn({ name: "user_id" })
     user: User
 
-    @Column()
+    @Column({ length: 1000 })
     content: string
 
     @CreateDateColumn({ type: "timestamp" })

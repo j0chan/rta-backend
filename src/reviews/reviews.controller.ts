@@ -112,15 +112,15 @@ export class ReviewsController {
         return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Review Updated Successfully!')
     }
 
-    // UPDATE[2] - 리뷰 도움됐어요 반응
-    @Patch('/:review_id/helpful')
-    @Roles(UserRole.USER)
-    async markHelpful(
-        @Param("review_id") review_id: number
-    ): Promise<ApiResponseDTO<void>> {
-        await this.reviewsService.markHelpful(review_id)
-        return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
-    }
+    // // UPDATE[2] - 리뷰 도움됐어요 반응
+    // @Patch('/:review_id/helpful')
+    // @Roles(UserRole.USER)
+    // async markHelpful(
+    //     @Param("review_id") review_id: number
+    // ): Promise<ApiResponseDTO<void>> {
+    //     await this.reviewsService.markHelpful(review_id)
+    //     return new ApiResponseDTO(true, HttpStatus.NO_CONTENT, 'Reaction Applied Successfully!')
+    // }
 
     // DELETE - 본인 리뷰 삭제
     @Delete('/:review_id')
