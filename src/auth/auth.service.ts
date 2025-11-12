@@ -57,8 +57,8 @@ export class AuthService {
             }
             const accessToken = await this.jwtService.sign(payload)
             return accessToken
-        } catch {
-            throw error
+        } catch (e) {
+            throw e
         }
     }
 
