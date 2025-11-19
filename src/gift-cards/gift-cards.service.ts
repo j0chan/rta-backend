@@ -31,7 +31,7 @@ export class GiftCardsService {
     private pointTransactionRepository: Repository<PointTransaction>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private readonly fileService: FileService, // ✅ S3 업로드 사용
+    private readonly fileService: FileService,
   ) { }
 
   async getAllGiftCards(opts?: {
@@ -43,11 +43,7 @@ export class GiftCardsService {
       .where('g.is_active = :active', { active: true });
 
     if (opts?.category) {
-      // ENUM 매칭: 정상 경로라면 대문자 값만 저장되므로 아래 한 줄이면 충분
       qb.andWhere('g.category = :cat', { cat: opts.category });
-
-      // 과거에 소문자/지저분한 값이 섞여 들어간 전적이 있다면:
-      // qb.andWhere('UPPER(g.category) = :cat', { cat: opts.category });
     }
 
     switch (opts?.sort) {
@@ -125,16 +121,11 @@ export class GiftCardsService {
     }
   }
 
-  // ✅ S3 업로드 사용: 파일이 있으면 먼저 업로드하여 URL 확보 → GiftCard에 저장
   async createGiftCard(dto: CreateGiftCardDTO, image?: Express.Multer.File): Promise<GiftCard> {
     let imageUrl: string | undefined;
 
     if (image) {
       const files = await this.fileService.uploadImage([image], {} as any /* dummy */, UploadType.GIFT_CARD_IMAGE);
-      // ↑ uploadImage는 targetEntity를 받아 File 레코드에 연관을 심을 수 있지만,
-      //   GiftCard 관계를 아직 만들지 않았다면 dummy로 넘겨도 무방(연관 없이 파일 기록만 저장).
-      //   만약 File 엔티티에 giftCard 관계가 있다면, 선저장 후 updateGiftCardImage를 권장.
-
       imageUrl = files[0]?.url;
     } else if (dto.image_url) {
       imageUrl = dto.image_url.trim();
@@ -150,13 +141,6 @@ export class GiftCardsService {
     });
 
     const saved = await this.giftCardRepository.save(giftCard);
-
-    // (선택) File ↔ GiftCard 연계가 필요하면 여기서 updateGiftCardImage로 교체:
-    // if (image) {
-    //   const uploaded = await this.fileService.updateGiftCardImage(image, saved);
-    //   saved.image_url = uploaded.url;
-    //   await this.giftCardRepository.save(saved);
-    // }
 
     return saved;
   }
@@ -191,5 +175,147 @@ export class GiftCardsService {
       is_used: false,
     });
     return this.giftCardPocketRepository.save(pocket);
+  }
+
+  async giftGiftCard(
+    payer_user_id: number,
+    gift_card_id: number,
+  ): Promise<{ gift_code: string; pocket: GiftCardPocket }> {
+
+    // 1) 선물 보내는 사람 조회 (현재 로그인한 사용자)
+    const sender = await this.userRepository.findOne({
+      where: { user_id: payer_user_id },
+      relations: ['point'],
+    });
+    if (!sender) {
+      throw new NotFoundException('User not found');
+    }
+
+    // 2) 상품권 조회 (활성 여부 포함)
+    const giftCard = await this.giftCardRepository.findOne({
+      where: { gift_card_id, is_active: true },
+    });
+    if (!giftCard) {
+      throw new NotFoundException('Gift card not found or inactive');
+    }
+
+    // 3) 선물 보내는 사람의 포인트 조회 및 잔액 체크
+    const senderPoint = await this.userPointRepository.findOne({
+      where: { user: { user_id: payer_user_id } },
+    });
+    if (!senderPoint || senderPoint.balance < giftCard.amount) {
+      throw new BadRequestException('Not enough points to gift this gift card');
+    }
+
+    // 4) 포인트 차감
+    senderPoint.balance -= giftCard.amount;
+
+    // 5) 포인트 거래 내역 생성 (선물 구매)
+    const transaction = this.pointTransactionRepository.create({
+      userPoint: senderPoint,
+      type: PointTransactionType.USE,
+      amount: giftCard.amount,
+      reason: `${giftCard.name} (gift code)`,
+    });
+
+    // 6) 포인트 저장
+    await this.userPointRepository.save(senderPoint);
+    await this.pointTransactionRepository.save(transaction);
+
+    // 7) 고유 코드 생성 (중복 방지)
+    const giftCode = await this.generateUniqueGiftCode();
+
+    // 8) PENDING 상태의 pocket 생성
+    const pocket = this.giftCardPocketRepository.create({
+      payer: sender,                // 선물 보내는 사람 (현재 로그인한 사용자)
+      giftCard,
+      gift_code: giftCode,
+      code_status: 'PENDING',
+      remaining_amount: giftCard.type === GiftCardType.AMOUNT ? giftCard.amount : 0,
+      is_used: false,
+      code_created_at: new Date(),
+      code_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    });
+
+    const savedPocket = await this.giftCardPocketRepository.save(pocket);
+
+    // 9) 생성된 코드와 pocket 정보 반환
+    return {
+      gift_code: giftCode,
+      pocket: savedPocket,
+    };
+  }
+
+  async registerGiftCode(
+    user_id: number,
+    gift_code: string,
+  ): Promise<GiftCardPocket> {
+
+    // 1) 코드로 pocket 조회
+    const pocket = await this.giftCardPocketRepository.findOne({
+      where: { gift_code },
+      relations: ['giftCard', 'payer'],
+    });
+
+    // 코드가 존재하지 않음
+    if (!pocket) {
+      throw new NotFoundException('Invalid gift code');
+    }
+
+    // 2) 코드 상태 확인 - 이미 등록된 코드
+    if (pocket.code_status === 'REGISTERED') {
+      throw new BadRequestException('This code has already been registered');
+    }
+
+    // 3) 코드 상태 확인 - PENDING이 아닌 경우 (예외 상황)
+    if (pocket.code_status !== 'PENDING') {
+      throw new BadRequestException('Invalid code status');
+    }
+
+    // 4) 만료 확인
+    if (pocket.code_expires_at && new Date() > pocket.code_expires_at) {
+      throw new BadRequestException('This code has expired');
+    }
+
+    // 6) 사용자 조회
+    const user = await this.userRepository.findOne({
+      where: { user_id },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // 7) pocket에 사용자 정보 업데이트
+    pocket.user = user;
+    pocket.code_status = 'REGISTERED';
+    pocket.code_registered_at = new Date();
+
+    return this.giftCardPocketRepository.save(pocket);
+  }
+
+  private async generateUniqueGiftCode(): Promise<string> {
+    let code: string;
+    let exists: boolean;
+
+    // 중복이 없을 때까지 반복
+    do {
+      code = this.generateGiftCode();
+      const existing = await this.giftCardPocketRepository.findOne({
+        where: { gift_code: code },
+      });
+      exists = !!existing;
+    } while (exists);
+
+    return code;
+  }
+
+  // ===== 헬퍼 함수: 코드 생성 로직 =====
+  private generateGiftCode(): string {
+    // GIFT-XXXXXXXXXXXX 형식 (총 16자)
+    const prefix = 'GIFT';
+    const timestamp = Date.now().toString(36).toUpperCase();  // 36진수로 변환
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    return `${prefix}-${timestamp}${random}`;
   }
 }
