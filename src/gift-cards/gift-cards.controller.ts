@@ -21,6 +21,7 @@ import { GiftCardUsageHistory } from './entities/gift-card-usage-history.entity'
 import { JwtAuthGuard } from 'src/common/custom-decorators/jwt-auth.guard';
 import { RolesGuard } from 'src/common/custom-decorators/custom-role.guard';
 import { GiftCategoryCode } from './entities/gift-category-code.enum';
+import { GiftCardGiftPurchaseDto, RegisterGiftCodeDto } from './dto/gift-card-gift-purchase.dto';
 
 type CatalogSort = 'LATEST' | 'PRICE_ASC' | 'PRICE_DESC' | 'POPULAR';
 
@@ -55,7 +56,7 @@ export class GiftCardsController {
   }
 
   @Get('/my')
-  @UseGuards(JwtAuthGuard, RolesGuard)          // ✅ 인증 → 권한 가드 적용
+  @UseGuards(JwtAuthGuard, RolesGuard)          // 인증 → 권한 가드 적용
   @Roles(UserRole.USER)
   async getMyGiftCards(@Req() req: AuthenticatedRequest): Promise<ApiResponseDTO<GiftCardPocket[]>> {
     // ✅ 방어: 로그인 안 됨
@@ -113,5 +114,44 @@ export class GiftCardsController {
     const userId = req.user.user_id;
     const histories = await this.giftCardsService.getUsageHistory(userId);
     return new ApiResponseDTO(true, HttpStatus.OK, 'Gift card usage history retrieved', histories);
+  }
+
+  @Roles(UserRole.USER)
+  @Post('/gift')
+  async giftGiftCard(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: GiftCardGiftPurchaseDto,
+  ): Promise<ApiResponseDTO<{ gift_code: string; pocket: GiftCardPocket }>> {
+    const result = await this.giftCardsService.giftGiftCard(
+      req.user.user_id,
+      dto.gift_card_id,
+    );
+
+    return new ApiResponseDTO(
+      true,
+      HttpStatus.CREATED,
+      'Gift code generated successfully. Share this code with recipient.',
+      result,
+    );
+  }
+
+  // ===== 3. 코드 등록하기 =====
+  @Roles(UserRole.USER)
+  @Post('/register')
+  async registerGiftCode(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: RegisterGiftCodeDto,
+  ): Promise<ApiResponseDTO<GiftCardPocket>> {
+    const pocket = await this.giftCardsService.registerGiftCode(
+      req.user.user_id,
+      dto.gift_code
+    );
+    
+    return new ApiResponseDTO(
+      true,
+      HttpStatus.OK,
+      'Gift code registered successfully',
+      pocket,
+    );
   }
 }
